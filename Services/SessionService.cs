@@ -15,6 +15,7 @@ namespace SmartCubeMobile.Services
         public DateTime? Expires { get; set; }
         public DateTime? LastLogin { get; set; }
         public string SmartScanLicence { get; set; }
+        public bool MustChangePassword { get; set; }
     }
 
     public static class SessionService
@@ -23,12 +24,20 @@ namespace SmartCubeMobile.Services
             Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
             "SmartCube", "device.json");
 
-        private static readonly HttpClient _http = new(new HttpClientHandler
+        private static readonly HttpClient _http = CreateClient();
+
+        private static HttpClient CreateClient()
         {
-            UseCookies = true,
-            CookieContainer = new CookieContainer(),
-        })
-        { Timeout = TimeSpan.FromSeconds(30) };
+            var client = new HttpClient(new HttpClientHandler
+            {
+                UseCookies = true,
+                CookieContainer = new CookieContainer(),
+            })
+            { Timeout = TimeSpan.FromSeconds(30) };
+            try { client.DefaultRequestHeaders.Add("X-SmartCube-Version", AppInfo.Current.VersionString); }
+            catch { }
+            return client;
+        }
 
         public static SessionUser Current { get; private set; }
         public static bool IsSignedIn => Current != null;
@@ -111,6 +120,13 @@ namespace SmartCubeMobile.Services
             return (true, null);
         }
 
+        public static async Task<(bool Ok, string Error)> ChangePassword(string currentPassword, string newPassword)
+        {
+            var (ok, error, _) = await Post("/api/account/change-password", new { currentPassword, newPassword });
+            if (ok && Current != null) Current.MustChangePassword = false;
+            return (ok, error);
+        }
+
         public static async Task Logout()
         {
             var token = DeviceToken;
@@ -131,6 +147,7 @@ namespace SmartCubeMobile.Services
                 Expires = json["expires"]?.Type == JTokenType.Date ? json["expires"].Value<DateTime>() : null,
                 LastLogin = json["lastLogin"]?.Type == JTokenType.Date ? json["lastLogin"].Value<DateTime>() : null,
                 SmartScanLicence = json["smartScanLicence"]?.Type == JTokenType.Null ? null : json["smartScanLicence"]?.ToString(),
+                MustChangePassword = json["mustChangePassword"]?.Value<bool>() ?? false,
             };
 
             var profile = UserProfileDataService.GetProfile();

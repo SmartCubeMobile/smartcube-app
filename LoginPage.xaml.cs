@@ -114,8 +114,10 @@ public partial class LoginPage : ContentPage
     private async Task EnterDashboard()
     {
         await Card.FadeTo(0, 250, Easing.CubicIn);
-        var dashboard = new SmartCubeDashboard();
-        Navigation.InsertPageBefore(dashboard, this);
+        Page next = SessionService.Current?.MustChangePassword == true
+            ? new ChangePasswordPage(forced: true)
+            : new SmartCubeDashboard();
+        Navigation.InsertPageBefore(next, this);
         await Navigation.PopAsync(false);
     }
 }

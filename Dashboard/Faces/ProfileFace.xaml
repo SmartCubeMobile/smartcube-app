@@ -702,9 +702,15 @@
             <!-- Session Info -->
             <Border x:Name="SessionCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="8">
-                    <Grid ColumnDefinitions="*,Auto">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
                         <Label Text="Session" Style="{StaticResource Heading2}" />
-                        <Button Grid.Column="1" x:Name="SignOutBtn" Text="Sign Out"
+                        <Button Grid.Column="1" x:Name="ChangePasswordBtn" Text="Change Password"
+                                BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                FontSize="11" FontAttributes="Bold"
+                                CornerRadius="8" Padding="10,2"
+                                HeightRequest="26"
+                                Clicked="OnChangePasswordClicked" />
+                        <Button Grid.Column="2" x:Name="SignOutBtn" Text="Sign Out"
                                 BackgroundColor="#3B1A1A" TextColor="#EF4444"
                                 FontSize="11" FontAttributes="Bold"
                                 CornerRadius="8" Padding="10,2"

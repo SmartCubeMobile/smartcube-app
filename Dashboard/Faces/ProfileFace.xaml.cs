@@ -60,6 +60,12 @@ namespace SmartCubeMobile.Dashboard.Faces
 
         private async void OnSmartScanKeyClicked(object sender, EventArgs e) => await PromptSmartScanKey();
 
+        private async void OnChangePasswordClicked(object sender, EventArgs e)
+        {
+            var nav = Application.Current?.Windows.FirstOrDefault()?.Page?.Navigation;
+            if (nav != null) await nav.PushAsync(new ChangePasswordPage(forced: false));
+        }
+
         private async void OnSignOutClicked(object sender, EventArgs e)
         {
             var window = Application.Current?.Windows.FirstOrDefault();
