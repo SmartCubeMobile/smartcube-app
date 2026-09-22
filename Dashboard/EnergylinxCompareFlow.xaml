@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.EnergylinxCompareFlow"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="0">
+
+        <!-- Header -->
+        <Border BackgroundColor="{StaticResource NavBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="0,0,0,1"
+                Padding="24,14">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Text="← Back" BackgroundColor="Transparent"
+                        TextColor="{StaticResource TextSecondary}"
+                        FontSize="13" Padding="8,4"
+                        Clicked="OnBackClicked" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
+                    <Label x:Name="PageTitle" Text="Compare Tariffs"
+                           FontSize="20" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           HorizontalOptions="Center" />
+                    <Label x:Name="PageSubtitle" Text="Powered by Energylinx"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+                <Button x:Name="ScrapeBtn" Grid.Column="2" Text="Scrape Results"
+                        BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                        FontSize="12" FontAttributes="Bold"
+                        CornerRadius="8" Padding="12,4"
+                        HeightRequest="32" IsVisible="False"
+                        Clicked="OnScrapeClicked" />
+            </Grid>
+        </Border>
+
+        <!-- WebView for Energylinx -->
+        <Grid Grid.Row="1">
+            <WebView x:Name="CompareWebView"
+                     Navigating="OnWebViewNavigating"
+                     Navigated="OnWebViewNavigated" />
+            <ActivityIndicator x:Name="LoadingSpinner"
+                               IsRunning="False"
+                               Color="{StaticResource Primary}"
+                               HeightRequest="40" WidthRequest="40"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center" />
+        </Grid>
+
+        <!-- Results Panel (slides up over WebView when tariffs found) -->
+        <Border x:Name="ResultsPanel" Grid.Row="1" Grid.RowSpan="2"
+                BackgroundColor="{StaticResource CardBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="0,1,0,0"
+                IsVisible="False"
+                Padding="0">
+            <Grid RowDefinitions="Auto,*">
+                <Border BackgroundColor="{StaticResource NavBg}" Padding="16,12">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label x:Name="ResultsTitle" Text="Available Tariffs"
+                               TextColor="{StaticResource TextPrimary}"
+                               FontSize="16" FontAttributes="Bold"
+                               VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="Back to Search"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource Primary}"
+                                FontSize="12" Padding="8,4"
+                                Clicked="OnBackToSearch" />
+                    </Grid>
+                </Border>
+                <ScrollView Grid.Row="1" Padding="20">
+                    <VerticalStackLayout x:Name="TariffResults" Spacing="10" />
+                </ScrollView>
+            </Grid>
+        </Border>
+
+        <!-- URL bar -->
+        <Border Grid.Row="2" BackgroundColor="{StaticResource CardBgLight}"
+                Padding="12,6" Margin="0">
+            <Label x:Name="UrlLabel" Text="" TextColor="{StaticResource TextMuted}"
+                   FontSize="10" LineBreakMode="MiddleTruncation" />
+        </Border>
+
+    </Grid>
+
+</ContentPage>

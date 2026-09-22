@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.TariffDescription"
+             Title="Tariff Description"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid Padding="20">
+        <Border Style="{StaticResource CardFrame}"
+                BackgroundColor="{StaticResource CardBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 12">
+            <ScrollView Padding="16">
+                <VerticalStackLayout Spacing="14">
+                    <Label Text="Tariff Description"
+                           Style="{StaticResource Heading2}"
+                           TextColor="{StaticResource TextPrimary}" />
+
+                    <BoxView HeightRequest="1"
+                             Color="{StaticResource BorderColor}" />
+
+                    <Label Text="Tariff Name"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Label Text="-"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="15" />
+
+                    <Label Text="Description"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Label Text="-"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="15"
+                           LineBreakMode="WordWrap" />
+
+                    <Label Text="Rate"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Label Text="-"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="15" />
+
+                    <Label Text="Standing Charge"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Label Text="-"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="15" />
+
+                    <Label Text="Contract Length"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Label Text="-"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="15" />
+
+                    <Button Text="Close"
+                            Style="{StaticResource SecondaryButton}"
+                            HorizontalOptions="End"
+                            Margin="0,8,0,0" />
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+    </Grid>
+
+</ContentPage>

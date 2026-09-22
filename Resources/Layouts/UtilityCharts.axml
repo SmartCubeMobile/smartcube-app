@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    
+    <!-- Start of Utility Charts -->
+    <com.google.android.material.tabs.TabLayout
+            app:tabMode="fixed"
+            app:tabIndicatorAnimationMode="linear"
+            app:tabIndicatorColor="#EF0C4C"
+            app:tabIndicatorFullWidth="true"
+            app:tabIndicatorHeight="2dp"
+            app:tabSelectedTextColor="#EF0C4C"            
+            app:tabGravity="fill"
+            android:id="@+id/utilitychartstabLayout"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:tabTextAppearance="@style/TabTextAppearance"/>    
+     
+        <androidx.viewpager2.widget.ViewPager2
+            android:id="@+id/utilitychartsviewPager"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+    
+</LinearLayout>

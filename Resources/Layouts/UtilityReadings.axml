@@ -1,0 +1,120 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@android:color/white">
+    
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+   
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:text="Account No"
+            android:id="@+id/headingAccountNo"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:text="Statement Id"
+            android:id="@+id/headingStatementId"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:text="Period End"
+            android:id="@+id/headingReadingsPeriodEnd"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:text="Meter No"
+            android:id="@+id/headingMeterSerialNo"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:text="Read Type"
+            android:id="@+id/headingReadType"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:text="This Read"
+            android:id="@+id/headingThisRead"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:text="Last Read"
+            android:id="@+id/headingLastRead"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:text="Units Used"
+            android:id="@+id/headingUnitsUsed"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:text="UoM"
+            android:id="@+id/headingUnitOfMeasure"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+    </LinearLayout>
+    
+    <FrameLayout
+        android:background="@android:color/holo_blue_light"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.recyclerview.widget.RecyclerView 
+            android:background="@android:color/white"        
+            android:id="@+id/utilityReadings"      
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+    
+</LinearLayout>

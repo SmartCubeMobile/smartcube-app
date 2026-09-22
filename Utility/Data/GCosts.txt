@@ -1,0 +1,1 @@
+USERNAME nvarchar(18)	CUBEFACE_CODE nchar(1)	RESOURCE_CODE nchar(1)	UNIQUE_NUMBER smallint(2)	SUPPLIER_CODE smallint(2)	BRAND_CODE smallint(2)	TARIFF_CODE int(4)	TCR numeric(146)	RESOURCE_TYPE nvarchar(2)	PAYMENT_PLAN nvarchar(1)	TOTAL_COST int(4)

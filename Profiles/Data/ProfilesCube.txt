@@ -1,0 +1,15 @@
+Header Line (ignored)
+ANNA	2021-06-01 00:00:00	F	Mrs AT Marsh	1982-12-29	07731329706	atmc_21@hotmail.com
+ANNA	2021-06-01 00:00:00	U	Mrs AT Marsh	1982-12-29	07731329706	atmc_21@hotmail.com
+BOB	2021-04-29 00:00:00	U	Mr Robert Chapman	1947-04-29	07971698944	bobchapmanuk@yahoo.co.uk
+IRENE	2021-12-03 00:00:00	U	Mrs Irene Slater	1941-06-30	01614911931	hammondreg@hotmail.com
+LUCY	2021-05-12 00:00:00	U	Mrs L Cox	1921-08-26	?	ray_chapman48@hotmail.com
+MARIA	2021-10-16 00:00:00	U	Mrs MA Chapman	1953-09-10	07731377016	maria_chapman53@hotmail.com
+MARK	2021-05-12 00:00:00	U	Mr M Waterfall	1960-01-01	012264623560	abc@def.com
+MARK_PILBEAM	2021-05-12 00:00:00	U	M Pilbeam	1960-01-01		abc@def.com
+MARKUS	2021-05-12 00:00:00	U	Mr Nils Barg	1960-01-01	07747811698	markus.barg@gmail.com
+MARTIN	2021-05-12 00:00:00	U	Mr Martin Frost	1960-01-01	?	frosty@o2email.co.uk
+MICHELLE	2021-08-14 00:00:00	U	Mrs Michelle Slater	1960-01-01	?	abc@def.com
+PAT	2021-05-12 00:00:00	U	Mrs P O'Donnell	1960-01-01	?	mrsdiamondcat@yahoo.co.uk
+RAY	2021-09-19 00:00:00	F	Mr RD Chapman	1948-09-19	ACO 2746	ray_chapman48@hotmail.com
+RAY	2021-09-19 00:00:00	U	Mr RD Chapman	1948-09-19	ACO 2746	ray_chapman48@hotmail.com

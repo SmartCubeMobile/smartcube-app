@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.Faces.BankingFace"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid RowDefinitions="Auto,*" Padding="16">
+
+        <!-- Summary Cards Row -->
+        <ScrollView Grid.Row="0" Orientation="Horizontal" Margin="0,0,0,12">
+            <HorizontalStackLayout Spacing="12" x:Name="AccountCards" />
+        </ScrollView>
+
+        <!-- Transactions List -->
+        <Border x:Name="TransactionsCard" Grid.Row="1" Style="{StaticResource CardFrame}" Padding="16">
+            <Grid RowDefinitions="Auto,*">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8" Margin="0,0,0,12">
+                    <Label Text="Recent Transactions"
+                           Style="{StaticResource Heading2}" />
+                    <Button Grid.Column="1" x:Name="RefreshBtn" Text="⟳"
+                            BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                            FontSize="16" CornerRadius="8"
+                            WidthRequest="36" HeightRequest="36"
+                            Padding="0" VerticalOptions="Center"
+                            Clicked="OnRefreshClicked" />
+                    <Label Grid.Column="2" x:Name="TransactionCount"
+                           Text="19 transactions"
+                           Style="{StaticResource SubHeading}"
+                           VerticalOptions="Center" />
+                </Grid>
+
+                <CollectionView Grid.Row="1" x:Name="TransactionsList"
+                                SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="{StaticResource CardBgLight}"
+                                    StrokeShape="RoundRectangle 8"
+                                    Stroke="Transparent"
+                                    Padding="12,10"
+                                    Margin="0,0,0,6">
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="12">
+                                    <VerticalStackLayout Grid.Column="0" Spacing="2">
+                                        <Label Text="{Binding Description}"
+                                               TextColor="{StaticResource TextPrimary}"
+                                               FontSize="14" />
+                                        <HorizontalStackLayout Spacing="8">
+                                            <Label Text="{Binding Date, StringFormat='{0:dd MMM}'}"
+                                                   TextColor="{StaticResource TextMuted}"
+                                                   FontSize="11" />
+                                            <Label Text="{Binding Category}"
+                                                   TextColor="{StaticResource Accent}"
+                                                   FontSize="11" />
+                                            <Label Text="{Binding AccountName}"
+                                                   TextColor="{StaticResource TextMuted}"
+                                                   FontSize="11" />
+                                        </HorizontalStackLayout>
+                                    </VerticalStackLayout>
+                                    <Label Grid.Column="1"
+                                           Text="{Binding AmountFormatted}"
+                                           TextColor="{Binding AmountColour}"
+                                           FontSize="14"
+                                           FontAttributes="Bold"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Type}"
+                                           TextColor="{StaticResource TextMuted}"
+                                           FontSize="11"
+                                           VerticalOptions="Center"
+                                           WidthRequest="36"
+                                           HorizontalTextAlignment="End" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+            </Grid>
+        </Border>
+
+    </Grid>
+</ContentView>

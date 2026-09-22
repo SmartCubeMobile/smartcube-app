@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.UtilityChartsPopup"
+             Title="Utility Charts"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid Padding="20">
+        <Border Style="{StaticResource CardFrame}"
+                BackgroundColor="{StaticResource CardBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 12">
+            <VerticalStackLayout Padding="16" Spacing="12">
+                <Label Text="Utility Charts"
+                       Style="{StaticResource Heading2}"
+                       TextColor="{StaticResource TextPrimary}" />
+
+                <BoxView HeightRequest="1"
+                         Color="{StaticResource BorderColor}" />
+
+                <!-- Placeholder chart area -->
+                <Border BackgroundColor="{StaticResource CardBgLight}"
+                        Stroke="{StaticResource BorderColor}"
+                        StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8"
+                        HeightRequest="300"
+                        Padding="16">
+                    <VerticalStackLayout VerticalOptions="Center"
+                                         HorizontalOptions="Center"
+                                         Spacing="8">
+                        <Label Text="&#xf080;"
+                               FontSize="48"
+                               TextColor="{StaticResource TextMuted}"
+                               HorizontalTextAlignment="Center" />
+                        <Label Text="Chart will be displayed here"
+                               TextColor="{StaticResource TextSecondary}"
+                               HorizontalTextAlignment="Center"
+                               FontSize="14" />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+
+</ContentPage>

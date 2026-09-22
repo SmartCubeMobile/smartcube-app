@@ -1,0 +1,56 @@
+USE [SMARTFINANCE]
+GO
+
+/****** Object:  StoredProcedure [dbo].[INSTITUTION_TYPES]    Script Date: 2021-04-17 10:14:23 AM ******/
+SET ANSI_NULLS ON
+GO
+
+SET QUOTED_IDENTIFIER ON
+GO
+
+
+-- =============================================
+-- Author:		Ray Chapman
+-- Create date: 17-Jun-2020
+-- Description:	Retrieve INSTITUTION TYPES
+-- Modified:    17-Apr-2021 Inclide INSTITUTION_CATEGORIES
+--
+-- NOTE:  No BRAND_CODE in the INSTITUTION selection so we don't get Scottish Hydro, SWALEC, Southern ELectric and Atlantic
+--        How does this work for Banks??  NATWEST is a subsidiary of RBS??
+-- =============================================
+ALTER PROCEDURE [dbo].[INSTITUTION_TYPES] @cubeface_code nchar(1)
+AS
+BEGIN
+	-- SET NOCOUNT ON added to prevent extra result sets from
+	-- interfering with SELECT statements.
+	SET NOCOUNT ON
+
+    -- Insert statements for procedure here
+	--SELECT <@Param1, sysname, @p1>, <@Param2, sysname, @p2>
+	SELECT I.*
+    FROM [SMARTMUM].SmartData.CUBEFACES AS C
+	JOIN SmartFinance.CATEGORY_CODES AS CC
+	ON CC.CUBEFACE_CODE = C.CUBEFACE_CODE
+	JOIN SmartFinance.INSTITUTION_CATEGORIES AS IC
+	ON (CC.CUBEFACE_CODE = IC.CUBEFACE_CODE AND 
+		CC.CATEGORY_CODE = IC.CATEGORY_CODE)
+	JOIN SmartFinance.INSTITUTION_TYPES AS IT
+	ON (IC.CUBEFACE_CODE = IT.CUBEFACE_CODE AND 
+		IC.CATEGORY_CODE = IT.CATEGORY_CODE AND 
+		IC.INSTITUTION_CODE = IT.INSTITUTION_CODE)
+	JOIN SmartFinance.INSTITUTIONS AS I
+    ON (I.CUBEFACE_CODE = CC.CUBEFACE_CODE AND 
+		I.CATEGORY_CODE = CC.CATEGORY_CODE AND
+		I.CATEGORY_TYPE = IT.CATEGORY_TYPE AND
+		I.INSTITUTION_CODE = IT.INSTITUTION_CODE)
+    WHERE C.CUBEFACE_CODE = @cubeface_code
+	AND C.Status_Flag = ''
+	AND CC.Status_Flag = ''
+	AND I.Status_Flag = ''
+	AND IT.Status_Flag = ''
+
+END
+
+
+
+GO

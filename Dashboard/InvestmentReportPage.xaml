@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.InvestmentReportPage"
+             BackgroundColor="{StaticResource PageBg}"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*" Padding="0">
+
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="{StaticResource NavBg}"
+                Stroke="{StaticResource BorderColor}" StrokeThickness="0,0,0,1"
+                Padding="20,14">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button x:Name="BackButton" Text="←" BackgroundColor="Transparent"
+                        TextColor="{StaticResource TextSecondary}" FontSize="20"
+                        Padding="0" WidthRequest="40" HeightRequest="40"
+                        Clicked="OnBackClicked" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="Portfolio Report" FontSize="22" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}" />
+                    <Label x:Name="ReportDate" FontSize="12"
+                           TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+                <Label Grid.Column="2" Text="📊" FontSize="22" VerticalOptions="Center" />
+            </Grid>
+        </Border>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1" Padding="24,16">
+            <VerticalStackLayout Spacing="16" MaximumWidthRequest="900" HorizontalOptions="Center">
+
+                <!-- Portfolio Summary -->
+                <Border x:Name="SummaryCard" Style="{StaticResource CardFrame}" Padding="20">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Portfolio Summary" Style="{StaticResource Heading2}" />
+                        <Grid x:Name="SummaryGrid" ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" RowSpacing="16" ColumnSpacing="16" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Performance KPIs -->
+                <Border x:Name="PerformanceCard" Style="{StaticResource CardFrame}" Padding="20">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Performance" Style="{StaticResource Heading2}" />
+                        <Grid x:Name="PerformanceGrid" ColumnDefinitions="*,*,*,*" ColumnSpacing="12" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Holdings Breakdown -->
+                <Border x:Name="HoldingsCard" Style="{StaticResource CardFrame}" Padding="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Holdings Breakdown" Style="{StaticResource Heading2}" />
+                        <!-- Column headers -->
+                        <Border BackgroundColor="{StaticResource NavBg}" StrokeShape="RoundRectangle 6"
+                                Stroke="Transparent" Padding="12,8">
+                            <Grid ColumnDefinitions="60,*,80,90,90,80" ColumnSpacing="8">
+                                <Label Text="Symbol" TextColor="{StaticResource TextMuted}" FontSize="10" FontAttributes="Bold" />
+                                <Label Grid.Column="1" Text="Name" TextColor="{StaticResource TextMuted}" FontSize="10" FontAttributes="Bold" />
+                                <Label Grid.Column="2" Text="Shares" TextColor="{StaticResource TextMuted}" FontSize="10" FontAttributes="Bold" HorizontalTextAlignment="End" />
+                                <Label Grid.Column="3" Text="Value" TextColor="{StaticResource TextMuted}" FontSize="10" FontAttributes="Bold" HorizontalTextAlignment="End" />
+                                <Label Grid.Column="4" Text="P&amp;L" TextColor="{StaticResource TextMuted}" FontSize="10" FontAttributes="Bold" HorizontalTextAlignment="End" />
+                                <Label Grid.Column="5" Text="Weight" TextColor="{StaticResource TextMuted}" FontSize="10" FontAttributes="Bold" HorizontalTextAlignment="End" />
+                            </Grid>
+                        </Border>
+                        <VerticalStackLayout x:Name="HoldingsTable" Spacing="4" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Sector Allocation -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                    <Border x:Name="SectorCard" Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Sector Allocation" Style="{StaticResource Heading2}" />
+                            <VerticalStackLayout x:Name="SectorTable" Spacing="6" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="1" x:Name="TypeCard" Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Asset Type Breakdown" Style="{StaticResource Heading2}" />
+                            <VerticalStackLayout x:Name="TypeTable" Spacing="6" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Top & Bottom Performers -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                    <Border x:Name="TopCard" Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Top Performers" Style="{StaticResource Heading2}" />
+                            <VerticalStackLayout x:Name="TopList" Spacing="6" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Grid.Column="1" x:Name="BottomCard" Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Bottom Performers" Style="{StaticResource Heading2}" />
+                            <VerticalStackLayout x:Name="BottomList" Spacing="6" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- Dividend Income -->
+                <Border x:Name="DividendCard" Style="{StaticResource CardFrame}" Padding="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Dividend Income (Est. Annual)" Style="{StaticResource Heading2}" />
+                        <Grid x:Name="DividendSummary" ColumnDefinitions="*,*,*" ColumnSpacing="16" Margin="0,0,0,8" />
+                        <VerticalStackLayout x:Name="DividendTable" Spacing="4" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Platform Summary -->
+                <Border x:Name="PlatformCard" Style="{StaticResource CardFrame}" Padding="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Platform Summary" Style="{StaticResource Heading2}" />
+                        <VerticalStackLayout x:Name="PlatformTable" Spacing="6" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Risk Metrics -->
+                <Border x:Name="RiskCard" Style="{StaticResource CardFrame}" Padding="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Risk &amp; Diversification" Style="{StaticResource Heading2}" />
+                        <Grid x:Name="RiskGrid" ColumnDefinitions="*,*,*" ColumnSpacing="16" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

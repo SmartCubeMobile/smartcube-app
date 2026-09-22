@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!-- SignIn strings -->
+	<x:String Key="UsernameBox">Usuario</x:String>
+	<x:String Key="PasswordBox">Contraseña</x:String>
+	<x:String Key="LoginStatusMessage">Debe iniciar sesión para ejecutar SmartSwitch</x:String>
+	<x:String Key="Signin">Iniciar sesión</x:String>
+	<x:String Key="ResetUTC">Restablecer UTC</x:String>
+	<x:String Key="Fatalerror">Error grave</x:String>
+	<x:String Key="CreateHandlerFailure">No se pudo crear el controlador Uri</x:String>
+	<x:String Key="EnsureConnectedToInternet">Asegúrate de que el dispositivo esté conectado a Internet antes de iniciar sesión</x:String>
+	<x:String Key="ProblemUTC">Problema al recuperar UTC ... pulse Reset</x:String>
+	<x:String Key="PleaseSignin">Inicie sesión para continuar por favor</x:String>
+	<x:String Key="CannotSignin">No se puede iniciar sesión en este momento</x:String>
+	<x:String Key="EnterUsernameAndPassword">Introduzca su nombre de usuario y contraseña antes de iniciar sesión</x:String>
+	<x:String Key="InvalidSignin">Inicio de sesión no válido</x:String>
+	<x:String Key="CannotLoadFromMothership">No se puede cargar desde la Mothership</x:String>
+	<x:String Key="UnableToAuthenticate">No se puede autenticar: no ha iniciado sesión</x:String>
+	<x:String Key="CancellationTokenNone">Token de cancelación Ninguno</x:String>
+	<x:String Key="CreateAccount">Crear una cuenta</x:String>
+
+	<!-- MessageBox strings -->
+	<x:String Key="ReallyLeave">¿De verdad quieres dejar SmartSwitch?</x:String>
+	<x:String Key="ConfirmationRequired">Confirmación necesaria</x:String>
+	<x:String Key="Yes">Si</x:String>
+	<x:String Key="No">No</x:String>
+</ResourceDictionary>

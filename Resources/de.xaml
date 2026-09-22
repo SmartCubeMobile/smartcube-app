@@ -1,0 +1,22 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+    <!-- SignIn strings -->
+    <x:String x:Key="UsernameBox">Benutzername</x:String>
+    <x:String x:Key="PasswordBox">Passwort</x:String>
+    <x:String x:Key="LoginStatusMessage">Zum Ausführen von SmartSwitch müssen Sie angemeldet sein</x:String>
+    <x:String x:Key="Signin">Anmeldung</x:String>
+    <x:String x:Key="ResetGMT">GMT zurücksetzen</x:String>
+    <x:String x:Key="Fatalerror">Schwerwiegender Fehler</x:String>
+    <x:String x:Key="CreateHandlerFailure">Uri-Handler konnte nicht erstellt werden</x:String>
+    <x:String x:Key="EnsureConnectedToInternet">Stellen Sie vor der Anmeldung sicher, dass Ihr Gerät mit dem Internet verbunden ist</x:String>
+    <x:String x:Key="ProblemGMT">Problem beim Abrufen von GMT ... bitte Reset drücken</x:String>
+    <x:String x:Key="PleaseSignin">Melden Sie sich an bitte, um fortzufahren</x:String>
+    <x:String x:Key="CannotSignin">Anmeldung zurzeit nicht möglich</x:String>
+    <x:String x:Key="EnterUsernameAndPassword">Bitte geben Sie Ihren Benutzernamen und Ihr Passwort vor der Anmeldung ein</x:String>
+    <x:String x:Key="InvalidSignin">Anmeldung ungültig</x:String>
+<x:String x:Key="CannotLoadFromMothership">Laden von Mothership nicht möglich</x:String>
+<x:String x:Key="UnableToAuthenticate">Authentifizierung nicht möglich - Sie sind nicht angemeldet</x:String>
+    <x:String x:Key="CancellationTokenNone">Stornotoken Keine</x:String>
+    <x:String x:Key="CreateAccount">Konto erstellen</x:String>
+    <x:String x:Key="AccountNo">Konto</x:String>
+</ResourceDictionary>

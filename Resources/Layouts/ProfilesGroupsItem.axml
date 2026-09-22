@@ -1,0 +1,82 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/groupsGroupItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@android:color/white">
+
+    <TextView
+        android:id="@+id/groupsGroupname"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black"
+        android:background="@android:color/white"
+        android:layout_height = "28dp"
+        android:layout_width = "150dp"
+        android:gravity = "start"
+        android:singleLine="true"/>
+    <CheckBox
+        android:id="@+id/groupsActiveflag"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black"
+        android:background="@android:color/white"
+        android:layout_height = "28dp"
+        android:layout_width = "80dp"
+        android:gravity = "center"
+        android:textSize = "16sp"/>
+    <CheckBox
+        android:id="@+id/groupsSendF"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black"
+        android:background="@android:color/white"
+        android:layout_height = "28dp"
+        android:layout_width = "80dp"
+        android:gravity = "center"
+        android:textSize = "16sp"/>
+    <CheckBox
+        android:id="@+id/groupsSendU"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black"
+        android:background="@android:color/white"
+        android:layout_height = "28dp"
+        android:layout_width = "80dp"
+        android:gravity = "center"
+        android:textSize = "16sp"/>
+    <CheckBox
+        android:id="@+id/groupsReceiveAll"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black"
+        android:layout_height = "28dp"
+        android:layout_width = "80dp"
+        android:gravity = "center"
+        android:textSize = "16sp"/>
+    <EditText
+        android:id="@+id/groupsDisplayname"
+        android:layout_width = "100dp"
+        android:layout_height = "28sp"
+        android:inputType="text"
+        android:hint="@string/Name"
+        android:autofillHints="name"
+        android:padding="0sp"
+        android:layout_gravity="start"
+        android:gravity="top"
+        android:singleLine="true"
+        android:imeOptions="actionDone"
+        android:textColor="@android:color/black"
+        />
+    <!-- Empty View is trying to take the maximum amount of space, leaving room for the button-->
+    <View
+        android:layout_width="100dp"
+        android:layout_height="0dp"
+        android:layout_weight="0" />
+    <RadioButton
+        android:id="@+id/groupsDelete"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black"
+        android:background="@android:color/white"
+        android:layout_height = "28dp"
+        android:layout_width = "wrap_content"
+        android:gravity = "start"
+        android:layout_marginEnd="20dp"/>
+
+</LinearLayout>

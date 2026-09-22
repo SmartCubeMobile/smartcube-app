@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.InstitutionDetails"
+             BackgroundColor="{StaticResource PageBg}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*" Padding="16">
+
+        <!-- Header -->
+        <Grid ColumnDefinitions="*,Auto" Grid.Row="0" Padding="0,8,0,16">
+            <Label Text="Institution Details"
+                   Style="{StaticResource Heading2}"
+                   TextColor="{StaticResource TextPrimary}"
+                   VerticalOptions="Center" />
+            <Button Grid.Column="1"
+                    Text="Close"
+                    Style="{StaticResource SecondaryButton}"
+                    Clicked="OnCloseClicked" />
+        </Grid>
+
+        <!-- Card -->
+        <Border Grid.Row="1"
+                Style="{StaticResource CardFrame}"
+                BackgroundColor="{StaticResource CardBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeShape="RoundRectangle 12"
+                Padding="20">
+            <VerticalStackLayout Spacing="16">
+
+                <!-- Institution Name -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Name"
+                           TextColor="{StaticResource TextMuted}"
+                           FontSize="12" />
+                    <Label Text="{Binding InstitutionName}"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="16"
+                           FontAttributes="Bold" />
+                </VerticalStackLayout>
+
+                <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                <!-- Type -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Type"
+                           TextColor="{StaticResource TextMuted}"
+                           FontSize="12" />
+                    <Label Text="{Binding InstitutionType}"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="14" />
+                </VerticalStackLayout>
+
+                <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                <!-- Country -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Country"
+                           TextColor="{StaticResource TextMuted}"
+                           FontSize="12" />
+                    <Label Text="{Binding Country}"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="14" />
+                </VerticalStackLayout>
+
+                <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                <!-- Website -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Website"
+                           TextColor="{StaticResource TextMuted}"
+                           FontSize="12" />
+                    <Label Text="{Binding Website}"
+                           TextColor="{StaticResource Accent}"
+                           FontSize="14" />
+                </VerticalStackLayout>
+
+                <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                <!-- Status -->
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Status"
+                           TextColor="{StaticResource TextMuted}"
+                           FontSize="12" />
+                    <Label Text="{Binding Status}"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="14" />
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </Border>
+
+    </Grid>
+</ContentPage>

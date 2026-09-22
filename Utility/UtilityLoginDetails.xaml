@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.UtilityLoginDetails"
+             Title="Login Details"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid Padding="20"
+          VerticalOptions="Center">
+        <Border Style="{StaticResource CardFrame}"
+                BackgroundColor="{StaticResource CardBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 12"
+                MaximumWidthRequest="400"
+                HorizontalOptions="Center">
+            <VerticalStackLayout Padding="24" Spacing="16">
+                <Label Text="Login Details"
+                       Style="{StaticResource Heading2}"
+                       TextColor="{StaticResource TextPrimary}"
+                       HorizontalTextAlignment="Center" />
+
+                <BoxView HeightRequest="1"
+                         Color="{StaticResource BorderColor}" />
+
+                <Label x:Name="LoginStatusMessage"
+                       TextColor="{StaticResource Accent}"
+                       FontSize="13"
+                       HorizontalTextAlignment="Center" />
+
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="User ID"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Entry x:Name="UserId"
+                           Placeholder="Enter your user ID"
+                           TextColor="{StaticResource TextPrimary}"
+                           PlaceholderColor="{StaticResource TextMuted}"
+                           BackgroundColor="{StaticResource CardBgLight}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Password"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Entry x:Name="Password"
+                           Placeholder="Enter your password"
+                           IsPassword="True"
+                           TextColor="{StaticResource TextPrimary}"
+                           PlaceholderColor="{StaticResource TextMuted}"
+                           BackgroundColor="{StaticResource CardBgLight}" />
+                </VerticalStackLayout>
+
+                <Button Text="Login"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="White"
+                        HorizontalOptions="Fill"
+                        Margin="0,8,0,0" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+
+</ContentPage>

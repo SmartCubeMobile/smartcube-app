@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.ProfilesView">
+
+    <Grid RowDefinitions="Auto,*"
+          BackgroundColor="{StaticResource PageBg}" Padding="0">
+
+        <!-- TOP TOOLBAR -->
+        <Border Grid.Row="0" Style="{StaticResource CardFrame}" Margin="12,12,12,0" Padding="16">
+            <HorizontalStackLayout Spacing="12" VerticalOptions="Center">
+                <Button x:Name="SaveButton" Text="Save"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="{StaticResource TextPrimary}"
+                        CornerRadius="8" Padding="20,10"
+                        FontAttributes="Bold" />
+                <Button x:Name="AddButton" Text="Add Group"
+                        Style="{StaticResource SecondaryButton}" />
+            </HorizontalStackLayout>
+        </Border>
+
+        <!-- TWO-COLUMN LAYOUT -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*"
+              ColumnSpacing="12" Margin="12">
+
+            <!-- Cubefaces Column -->
+            <Border Grid.Column="0" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Cubefaces" Style="{StaticResource Heading1}" />
+                    <CollectionView x:Name="CubefacesGrid"
+                                    SelectionMode="None" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Groups Column -->
+            <Border Grid.Column="1" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Groups" Style="{StaticResource Heading1}" />
+                    <CollectionView x:Name="GroupsGrid"
+                                    SelectionMode="None" />
+                </VerticalStackLayout>
+            </Border>
+
+        </Grid>
+
+    </Grid>
+
+</ContentView>

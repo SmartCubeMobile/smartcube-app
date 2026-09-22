@@ -1,0 +1,26 @@
+# Build output
+bin/
+obj/
+*.binlog
+
+# IDE
+.vs/
+*.user
+*.suo
+*.swp
+.idea/
+
+# Personal / sensitive data — never commit
+Users/Data/
+*.xlsx
+Statement*.csv
+maui_crash.txt
+
+# Local databases and caches
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+
+# Published artefacts live in D:\SmartCubeMobile\Versions, not here
+publish/

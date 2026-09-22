@@ -1,0 +1,248 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.FinanceView">
+
+    <Grid ColumnDefinitions="220,*" RowDefinitions="Auto,*" BackgroundColor="{StaticResource PageBg}">
+
+        <!-- ════════════════════════════════════════════════════════════ -->
+        <!-- LEFT SIDEBAR -->
+        <!-- ════════════════════════════════════════════════════════════ -->
+        <Border Grid.Row="0" Grid.RowSpan="2" Grid.Column="0"
+                Style="{StaticResource CardFrame}"
+                Margin="8" Padding="12">
+            <ScrollView>
+                <VerticalStackLayout Spacing="16">
+
+                    <!-- Category Section -->
+                    <Label Text="Categories" Style="{StaticResource Heading2}" />
+                    <VerticalStackLayout Spacing="6" RadioButtonGroup.GroupName="CategoryGroup">
+                        <RadioButton x:Name="RBBanks" Content="Banks"
+                                     TextColor="{StaticResource TextPrimary}" />
+                        <RadioButton x:Name="RBSavings" Content="Savings"
+                                     TextColor="{StaticResource TextPrimary}" />
+                        <RadioButton x:Name="RBInvestments" Content="Investments"
+                                     TextColor="{StaticResource TextPrimary}" />
+                        <RadioButton x:Name="RBCryptos" Content="Crypto"
+                                     TextColor="{StaticResource TextPrimary}" />
+                    </VerticalStackLayout>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                    <!-- Navigation Section -->
+                    <Label Text="Navigation" Style="{StaticResource Heading2}" />
+                    <VerticalStackLayout Spacing="10">
+                        <Label x:Name="TransactionsButton" Text="Transactions"
+                               TextColor="{StaticResource Accent}"
+                               FontSize="15" FontAttributes="Bold">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer />
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label x:Name="WebViewButton" Text="Web View"
+                               TextColor="{StaticResource Accent}"
+                               FontSize="15" FontAttributes="Bold">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer />
+                            </Label.GestureRecognizers>
+                        </Label>
+                        <Label x:Name="CryptosButton" Text="Cryptos"
+                               TextColor="{StaticResource Accent}"
+                               FontSize="15" FontAttributes="Bold">
+                            <Label.GestureRecognizers>
+                                <TapGestureRecognizer />
+                            </Label.GestureRecognizers>
+                        </Label>
+                    </VerticalStackLayout>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                    <!-- Institution Picker -->
+                    <Label Text="Institution" Style="{StaticResource SubHeading}" />
+                    <Border StrokeShape="RoundRectangle 6" Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBgLight}" Padding="4">
+                        <Picker x:Name="FinanceInstitutions" Title="Select Institution"
+                                TextColor="{StaticResource TextPrimary}"
+                                TitleColor="{StaticResource TextMuted}" />
+                    </Border>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                    <!-- Currency Rates Section -->
+                    <Label Text="Exchange Rates" Style="{StaticResource Heading2}" />
+
+                    <Grid ColumnDefinitions="60,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="8" RowSpacing="6">
+                        <Label Grid.Row="0" Grid.Column="0" Text="GBP" Style="{StaticResource SubHeading}" />
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="GBP" Text="--"
+                               Style="{StaticResource CurrencyLabel}" />
+
+                        <Label Grid.Row="1" Grid.Column="0" Text="EUR" Style="{StaticResource SubHeading}" />
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="EUR" Text="--"
+                               Style="{StaticResource CurrencyLabel}" />
+
+                        <Label Grid.Row="2" Grid.Column="0" Text="USD" Style="{StaticResource SubHeading}" />
+                        <Label Grid.Row="2" Grid.Column="1" x:Name="USD" Text="--"
+                               Style="{StaticResource CurrencyLabel}" />
+
+                        <Label Grid.Row="3" Grid.Column="0" Text="JPY" Style="{StaticResource SubHeading}" />
+                        <Label Grid.Row="3" Grid.Column="1" x:Name="JPY" Text="--"
+                               Style="{StaticResource CurrencyLabel}" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                    <!-- Currency Selection -->
+                    <Label Text="Convert To" Style="{StaticResource SubHeading}" />
+                    <VerticalStackLayout Spacing="4" RadioButtonGroup.GroupName="CurrencyGroup">
+                        <RadioButton x:Name="RBNON" Content="None"
+                                     TextColor="{StaticResource TextPrimary}" />
+                        <RadioButton x:Name="RBGBP" Content="GBP"
+                                     TextColor="{StaticResource TextPrimary}" />
+                        <RadioButton x:Name="RBEUR" Content="EUR"
+                                     TextColor="{StaticResource TextPrimary}" />
+                        <RadioButton x:Name="RBUSD" Content="USD"
+                                     TextColor="{StaticResource TextPrimary}" />
+                        <RadioButton x:Name="RBJPY" Content="JPY"
+                                     TextColor="{StaticResource TextPrimary}" />
+                    </VerticalStackLayout>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                    <!-- Culture Picker -->
+                    <Label Text="Culture" Style="{StaticResource SubHeading}" />
+                    <Border StrokeShape="RoundRectangle 6" Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBgLight}" Padding="4">
+                        <Picker x:Name="CulturePicker" Title="Select Culture"
+                                TextColor="{StaticResource TextPrimary}"
+                                TitleColor="{StaticResource TextMuted}" />
+                    </Border>
+
+                    <!-- Auto Switch -->
+                    <Button x:Name="ButtonAutoSwitchFinance" Text="Auto Switch"
+                            Style="{StaticResource SecondaryButton}" />
+
+                </VerticalStackLayout>
+            </ScrollView>
+        </Border>
+
+        <!-- ════════════════════════════════════════════════════════════ -->
+        <!-- TOP TOOLBAR -->
+        <!-- ════════════════════════════════════════════════════════════ -->
+        <Border Grid.Row="0" Grid.Column="1"
+                Style="{StaticResource CardFrame}"
+                Margin="0,8,8,4" Padding="12">
+            <VerticalStackLayout Spacing="10">
+
+                <!-- Provider / Account Row -->
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10">
+                    <Border Grid.Column="0" StrokeShape="RoundRectangle 6"
+                            Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBgLight}" Padding="4">
+                        <Picker x:Name="FinanceProviders" Title="Provider"
+                                TextColor="{StaticResource TextPrimary}"
+                                TitleColor="{StaticResource TextMuted}" />
+                    </Border>
+                    <Border Grid.Column="1" StrokeShape="RoundRectangle 6"
+                            Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBgLight}" Padding="4">
+                        <Picker x:Name="FinanceAccounts" Title="Account"
+                                TextColor="{StaticResource TextPrimary}"
+                                TitleColor="{StaticResource TextMuted}" />
+                    </Border>
+                </Grid>
+
+                <!-- Date Filters Row -->
+                <Grid ColumnDefinitions="Auto,*,Auto,*,Auto" ColumnSpacing="8"
+                      VerticalOptions="Center">
+                    <Label Grid.Column="0" Text="From" Style="{StaticResource SubHeading}"
+                           VerticalOptions="Center" />
+                    <Border Grid.Column="1" StrokeShape="RoundRectangle 6"
+                            Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBgLight}" Padding="4">
+                        <DatePicker x:Name="StartingDate"
+                                    TextColor="{StaticResource TextPrimary}" />
+                    </Border>
+                    <Label Grid.Column="2" Text="To" Style="{StaticResource SubHeading}"
+                           VerticalOptions="Center" />
+                    <Border Grid.Column="3" StrokeShape="RoundRectangle 6"
+                            Stroke="{StaticResource BorderColor}"
+                            BackgroundColor="{StaticResource CardBgLight}" Padding="4">
+                        <DatePicker x:Name="EndingDate"
+                                    TextColor="{StaticResource TextPrimary}" />
+                    </Border>
+                    <Button Grid.Column="4" x:Name="ResetDatesButton" Text="Reset"
+                            Style="{StaticResource SecondaryButton}"
+                            VerticalOptions="Center" />
+                </Grid>
+
+                <!-- Action Buttons Row -->
+                <HorizontalStackLayout Spacing="8">
+                    <Button x:Name="SubmitButton" Text="Submit"
+                            Style="{StaticResource NavButton}"
+                            BackgroundColor="{StaticResource Primary}" />
+                    <Button x:Name="CancelButton" Text="Cancel"
+                            Style="{StaticResource SecondaryButton}" />
+                    <Button x:Name="DebitsCreditsButton" Text="Debits / Credits"
+                            Style="{StaticResource SecondaryButton}" />
+                    <Button x:Name="GraphsButton" Text="Graphs"
+                            Style="{StaticResource SecondaryButton}" />
+                </HorizontalStackLayout>
+
+                <!-- Results Info Row -->
+                <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                      ColumnSpacing="12" RowSpacing="2">
+                    <Label Grid.Column="0" Text="Start:" TextColor="{StaticResource TextMuted}"
+                           FontSize="12" VerticalOptions="Center" />
+                    <Label Grid.Column="1" x:Name="ResultsStartDate" Text="--"
+                           TextColor="{StaticResource TextSecondary}" FontSize="12"
+                           VerticalOptions="Center" />
+                    <Label Grid.Column="2" Text="End:" TextColor="{StaticResource TextMuted}"
+                           FontSize="12" VerticalOptions="Center" />
+                    <Label Grid.Column="3" x:Name="ResultsEndDate" Text="--"
+                           TextColor="{StaticResource TextSecondary}" FontSize="12"
+                           VerticalOptions="Center" />
+                    <Label Grid.Column="4" Text="Postcode:" TextColor="{StaticResource TextMuted}"
+                           FontSize="12" VerticalOptions="Center" />
+                    <Label Grid.Column="5" x:Name="PostCodeLabel" Text="--"
+                           TextColor="{StaticResource TextSecondary}" FontSize="12"
+                           VerticalOptions="Center" />
+                    <Label Grid.Column="6" x:Name="Culture" Text="--"
+                           TextColor="{StaticResource TextSecondary}" FontSize="12"
+                           VerticalOptions="Center" />
+                    <Label Grid.Column="7" x:Name="ExchangeRates" Text="--"
+                           TextColor="{StaticResource TextSecondary}" FontSize="12"
+                           VerticalOptions="Center" />
+                </Grid>
+
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- ════════════════════════════════════════════════════════════ -->
+        <!-- MAIN CONTENT - TRANSACTIONS LIST -->
+        <!-- ════════════════════════════════════════════════════════════ -->
+        <Border Grid.Row="1" Grid.Column="1"
+                Style="{StaticResource CardFrame}"
+                Margin="0,4,8,8" Padding="0">
+            <Grid RowDefinitions="Auto,*">
+                <Label Grid.Row="0" Text="Transactions" Style="{StaticResource Heading1}"
+                       Margin="16,12,16,8" />
+                <CollectionView Grid.Row="1" x:Name="FinanceTransactionsListView"
+                                SelectionMode="Single">
+                    <CollectionView.EmptyView>
+                        <VerticalStackLayout HorizontalOptions="Center" VerticalOptions="Center"
+                                             Padding="40">
+                            <Label Text="No transactions to display"
+                                   TextColor="{StaticResource TextMuted}"
+                                   FontSize="16" HorizontalOptions="Center" />
+                            <Label Text="Select a provider and account, then press Submit"
+                                   TextColor="{StaticResource TextMuted}"
+                                   FontSize="13" HorizontalOptions="Center" Margin="0,6,0,0" />
+                        </VerticalStackLayout>
+                    </CollectionView.EmptyView>
+                </CollectionView>
+            </Grid>
+        </Border>
+
+    </Grid>
+
+</ContentView>

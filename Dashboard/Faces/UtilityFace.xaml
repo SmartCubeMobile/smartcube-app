@@ -1,0 +1,361 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.Faces.UtilityFace"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid ColumnDefinitions="300,*" Padding="16" ColumnSpacing="12">
+
+        <!-- Left Column -->
+        <ScrollView Grid.Column="0">
+            <VerticalStackLayout Spacing="12">
+
+                <!-- Suppliers & Tariffs -->
+                <Border x:Name="SupplierCard" Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                            <Label Text="Suppliers &amp; Tariffs" Style="{StaticResource Heading2}" />
+                            <Button Grid.Column="1" Text="Compare"
+                                    BackgroundColor="#164E3A" TextColor="#22C55E"
+                                    FontSize="12" FontAttributes="Bold"
+                                    CornerRadius="8" Padding="10,4"
+                                    HeightRequest="30"
+                                    Clicked="OnCompareTariffsClicked" />
+                            <Button Grid.Column="2" Text="+ Add"
+                                    BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                    FontSize="12" FontAttributes="Bold"
+                                    CornerRadius="8" Padding="10,4"
+                                    HeightRequest="30"
+                                    Clicked="OnAddSupplierClicked" />
+                        </Grid>
+                        <VerticalStackLayout x:Name="SupplierList" Spacing="8" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Meter Readings -->
+                <Border x:Name="ReadingsCard" Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Latest Readings" Style="{StaticResource Heading2}" />
+                        <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto"
+                              RowSpacing="8" ColumnSpacing="12">
+                            <Label Grid.Row="0" Text="Meter" TextColor="{StaticResource TextMuted}" FontSize="11" />
+                            <Label Grid.Row="0" Grid.Column="1" Text="Reading" TextColor="{StaticResource TextMuted}"
+                                   FontSize="11" HorizontalTextAlignment="End" />
+                            <Label Grid.Row="0" Grid.Column="2" Text="Used" TextColor="{StaticResource TextMuted}"
+                                   FontSize="11" HorizontalTextAlignment="End" WidthRequest="70" />
+
+                            <Label Grid.Row="1" Text="⚡ Electricity" TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                            <Label Grid.Row="1" Grid.Column="1" x:Name="ElecReading" Text=""
+                                   TextColor="{StaticResource TextPrimary}" FontAttributes="Bold" FontSize="13"
+                                   HorizontalTextAlignment="End" />
+                            <Label Grid.Row="1" Grid.Column="2" x:Name="ElecUnits" Text=""
+                                   TextColor="{StaticResource Warning}" FontSize="12"
+                                   HorizontalTextAlignment="End" WidthRequest="70" />
+
+                            <Label Grid.Row="2" Text="🔥 Gas" TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                            <Label Grid.Row="2" Grid.Column="1" x:Name="GasReading" Text=""
+                                   TextColor="{StaticResource TextPrimary}" FontAttributes="Bold" FontSize="13"
+                                   HorizontalTextAlignment="End" />
+                            <Label Grid.Row="2" Grid.Column="2" x:Name="GasUnits" Text=""
+                                   TextColor="{StaticResource Warning}" FontSize="12"
+                                   HorizontalTextAlignment="End" WidthRequest="70" />
+
+                            <Label Grid.Row="3" Text="💧 Water" TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                            <Label Grid.Row="3" Grid.Column="1" x:Name="WaterReading" Text="—"
+                                   TextColor="{StaticResource TextMuted}" FontSize="13"
+                                   HorizontalTextAlignment="End" />
+                            <Label Grid.Row="3" Grid.Column="2" x:Name="WaterUnits" Text="No data"
+                                   TextColor="{StaticResource TextMuted}" FontSize="12"
+                                   HorizontalTextAlignment="End" WidthRequest="70" />
+                        </Grid>
+                        <Label x:Name="ReadingSourceLabel" Text=""
+                               TextColor="{StaticResource TextMuted}" FontSize="10" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Bills Status -->
+                <Border x:Name="BillsStatusCard" Style="{StaticResource CardFrame}" Padding="14"
+                        IsVisible="False" BackgroundColor="#1A1A2E">
+                    <HorizontalStackLayout Spacing="10">
+                        <Label x:Name="BillsStatusIcon" Text="⚠️" FontSize="16" VerticalOptions="Center" />
+                        <Label x:Name="BillsStatusLabel" Text=""
+                               TextColor="#F59E0B" FontSize="12"
+                               LineBreakMode="WordWrap"
+                               VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+
+                <!-- Latest Bills -->
+                <Border x:Name="CostsCard" Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="10">
+                        <Label x:Name="CostsHeading" Text="Latest Bills" Style="{StaticResource Heading2}" />
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,1,Auto" RowSpacing="8">
+                            <Label Grid.Row="0" Text="Electricity" TextColor="{StaticResource TextSecondary}" />
+                            <Label Grid.Row="0" Grid.Column="1" x:Name="ElecCost" Text=""
+                                   TextColor="{StaticResource Warning}" FontAttributes="Bold" />
+                            <Label Grid.Row="1" Text="Gas" TextColor="{StaticResource TextSecondary}" />
+                            <Label Grid.Row="1" Grid.Column="1" x:Name="GasCost" Text=""
+                                   TextColor="{StaticResource Warning}" FontAttributes="Bold" />
+                            <Label Grid.Row="2" Text="Water" TextColor="{StaticResource TextSecondary}" />
+                            <Label Grid.Row="2" Grid.Column="1" x:Name="WaterCost" Text=""
+                                   TextColor="{StaticResource Warning}" FontAttributes="Bold" />
+                            <Label Grid.Row="3" Text="Total usage" TextColor="{StaticResource TextMuted}" FontSize="11" />
+                            <Label Grid.Row="3" Grid.Column="1" x:Name="UnitsUsed" Text=""
+                                   TextColor="{StaticResource TextMuted}" FontSize="11" />
+                            <BoxView Grid.Row="4" Grid.ColumnSpan="2" Color="{StaticResource BorderColor}" />
+                            <Label Grid.Row="5" Text="Total" TextColor="{StaticResource TextPrimary}"
+                                   FontAttributes="Bold" />
+                            <Label Grid.Row="5" Grid.Column="1" x:Name="TotalCost" Text=""
+                                   TextColor="{StaticResource Danger}" FontSize="16" FontAttributes="Bold" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Bill Audit -->
+                <Border x:Name="AuditCard" Style="{StaticResource CardFrame}" Padding="16"
+                        IsVisible="False">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
+                            <Label Text="🛡️" FontSize="18" VerticalOptions="Center" />
+                            <VerticalStackLayout Grid.Column="1" Spacing="0">
+                                <Label Text="Bill Audit" Style="{StaticResource Heading2}" />
+                                <Label x:Name="AuditSubtitle" Text=""
+                                       TextColor="{StaticResource TextMuted}" FontSize="10" />
+                            </VerticalStackLayout>
+                            <HorizontalStackLayout Grid.Column="2" Spacing="6">
+                                <Button x:Name="DownloadReportBtn" Text="Report"
+                                        BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                        FontSize="11" FontAttributes="Bold"
+                                        CornerRadius="8" Padding="10,4"
+                                        HeightRequest="28" IsVisible="False"
+                                        Clicked="OnDownloadReportClicked" />
+                                <Button x:Name="RunAuditBtn" Text="Run Audit"
+                                        BackgroundColor="#3B1A1A" TextColor="#EF4444"
+                                        FontSize="11" FontAttributes="Bold"
+                                        CornerRadius="8" Padding="10,4"
+                                        HeightRequest="28"
+                                        Clicked="OnRunAuditClicked" />
+                            </HorizontalStackLayout>
+                        </Grid>
+
+                        <!-- Audit Summary -->
+                        <Border x:Name="AuditSummaryBanner"
+                                BackgroundColor="#0D2818"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="12,8" IsVisible="False">
+                            <Grid ColumnDefinitions="Auto,*" ColumnSpacing="8">
+                                <Label x:Name="AuditSummaryIcon" Text="✅" FontSize="16"
+                                       VerticalOptions="Center" />
+                                <Label Grid.Column="1" x:Name="AuditSummaryText" Text=""
+                                       TextColor="#22C55E" FontSize="12"
+                                       VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+
+                        <!-- Audit Findings List -->
+                        <VerticalStackLayout x:Name="AuditFindingsList" Spacing="6" />
+
+                        <!-- Total Potential Savings -->
+                        <Border x:Name="AuditSavingsBanner"
+                                BackgroundColor="#3B1A1A"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                Padding="12,8" IsVisible="False">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <Label Text="Total potential savings"
+                                       TextColor="#F87171" FontSize="12"
+                                       FontAttributes="Bold" VerticalOptions="Center" />
+                                <Label Grid.Column="1" x:Name="AuditTotalSavings" Text=""
+                                       TextColor="#EF4444" FontSize="18"
+                                       FontAttributes="Bold" VerticalOptions="Center" />
+                            </Grid>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Right Column: Drop Zone + Bills -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,Auto,*" RowSpacing="12">
+
+            <!-- Drop Zone -->
+            <Border x:Name="DropZone" Grid.Row="0"
+                    BackgroundColor="#0D1322"
+                    Stroke="#2A3F6B"
+                    StrokeThickness="2"
+                    StrokeDashArray="8,5"
+                    StrokeShape="RoundRectangle 12"
+                    Padding="24,20"
+                    MinimumHeightRequest="100">
+                <Border.GestureRecognizers>
+                    <DropGestureRecognizer AllowDrop="True"
+                                          DragOver="OnDragOver"
+                                          DragLeave="OnDragLeave"
+                                          Drop="OnDrop" />
+                </Border.GestureRecognizers>
+                <VerticalStackLayout Spacing="6" HorizontalOptions="Center"
+                                     VerticalOptions="Center">
+                    <Label x:Name="DropIcon" Text="📄" FontSize="28"
+                           HorizontalOptions="Center" />
+                    <Label x:Name="DropTitle" Text="Drop bill PDFs here"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="15" FontAttributes="Bold"
+                           HorizontalOptions="Center" />
+                    <Label x:Name="DropSubtitle"
+                           Text="Drag one or more PDF bills — we'll extract supplier, amount, usage &amp; dates automatically"
+                           TextColor="{StaticResource TextMuted}"
+                           FontSize="11" HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" MaxLines="2" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Parsed Bills Results -->
+            <Border x:Name="ParsedResultsCard" Grid.Row="1"
+                    Style="{StaticResource CardFrame}" Padding="16"
+                    IsVisible="False">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <Label x:Name="ParsedResultsTitle" Text="Parsed Bills"
+                               Style="{StaticResource Heading2}" />
+                        <Button Grid.Column="1" x:Name="AddAllBillsBtn" Text="Add All to History"
+                                BackgroundColor="#164E3A" TextColor="#22C55E"
+                                FontSize="12" FontAttributes="Bold"
+                                CornerRadius="8" Padding="12,4"
+                                HeightRequest="30"
+                                Clicked="OnAddAllParsedBills" />
+                        <Button Grid.Column="2" Text="Clear"
+                                BackgroundColor="Transparent" TextColor="#EF4444"
+                                FontSize="12" Padding="8,4"
+                                HeightRequest="30"
+                                Clicked="OnClearParsedBills" />
+                    </Grid>
+                    <ScrollView HeightRequest="220">
+                        <VerticalStackLayout x:Name="ParsedBillsList" Spacing="6" />
+                    </ScrollView>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Bills History -->
+            <Border x:Name="BillsCard" Grid.Row="2" Style="{StaticResource CardFrame}" Padding="16">
+                <Grid RowDefinitions="Auto,Auto,*">
+                    <Label Grid.Row="0" Text="Bill History" Style="{StaticResource Heading2}" Margin="0,0,0,8" />
+                    <Border Grid.Row="1" BackgroundColor="{StaticResource CardBgLight}"
+                            StrokeShape="RoundRectangle 6" Stroke="Transparent"
+                            Padding="12,8" Margin="0,0,0,6">
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="16">
+                            <Label Grid.Column="0" Text="Period"
+                                   TextColor="{StaticResource TextMuted}" FontSize="11"
+                                   FontAttributes="Bold" WidthRequest="80" />
+                            <Label Grid.Column="1" Text=""
+                                   WidthRequest="20" />
+                            <Label Grid.Column="2" Text="Supplier — Type"
+                                   TextColor="{StaticResource TextMuted}" FontSize="11"
+                                   FontAttributes="Bold" />
+                            <Label Grid.Column="3" Text="Property"
+                                   TextColor="{StaticResource TextMuted}" FontSize="11"
+                                   FontAttributes="Bold" WidthRequest="80"
+                                   HorizontalTextAlignment="End" />
+                            <Label Grid.Column="4" Text="Meter"
+                                   TextColor="{StaticResource TextMuted}" FontSize="11"
+                                   FontAttributes="Bold" WidthRequest="100"
+                                   HorizontalTextAlignment="End" />
+                            <Label Grid.Column="5" Text="Usage"
+                                   TextColor="{StaticResource TextMuted}" FontSize="11"
+                                   FontAttributes="Bold" WidthRequest="110"
+                                   HorizontalTextAlignment="End" />
+                            <Label Grid.Column="6" Text="Amount"
+                                   TextColor="{StaticResource TextMuted}" FontSize="11"
+                                   FontAttributes="Bold" WidthRequest="75"
+                                   HorizontalTextAlignment="End" />
+                            <Label Grid.Column="7" Text="Change"
+                                   TextColor="{StaticResource TextMuted}" FontSize="11"
+                                   FontAttributes="Bold" WidthRequest="70"
+                                   HorizontalTextAlignment="End" />
+                        </Grid>
+                    </Border>
+                    <CollectionView Grid.Row="2" x:Name="BillsList" SelectionMode="Single"
+                                    SelectionChanged="OnBillSelected">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        StrokeShape="RoundRectangle 8"
+                                        Stroke="Transparent"
+                                        Padding="12,10"
+                                        Margin="0,0,0,6">
+                                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="16">
+                                        <Label Grid.Column="0"
+                                               Text="{Binding Period}"
+                                               TextColor="{StaticResource TextSecondary}"
+                                               FontSize="13"
+                                               WidthRequest="80"
+                                               VerticalOptions="Center" />
+                                        <Border Grid.Column="1"
+                                                WidthRequest="20" HeightRequest="20"
+                                                BackgroundColor="{Binding SupplierBrandColor}"
+                                                StrokeShape="RoundRectangle 4"
+                                                Stroke="Transparent"
+                                                VerticalOptions="Center">
+                                            <Label Text="{Binding SupplierAbbrev}"
+                                                   TextColor="White"
+                                                   FontSize="{Binding AbbrevFontSize}"
+                                                   FontAttributes="Bold"
+                                                   HorizontalOptions="Center"
+                                                   VerticalOptions="Center"
+                                                   HorizontalTextAlignment="Center"
+                                                   VerticalTextAlignment="Center" />
+                                        </Border>
+                                        <Label Grid.Column="2"
+                                               Text="{Binding FuelType}"
+                                               TextColor="{Binding FuelColour}"
+                                               FontSize="13"
+                                               VerticalOptions="Center" />
+                                        <Label Grid.Column="3"
+                                               Text="{Binding Postcode}"
+                                               TextColor="{StaticResource TextMuted}"
+                                               FontSize="11"
+                                               WidthRequest="80"
+                                               HorizontalTextAlignment="End"
+                                               VerticalOptions="Center" />
+                                        <Label Grid.Column="4"
+                                               Text="{Binding MeterReadingFormatted}"
+                                               TextColor="{StaticResource TextMuted}"
+                                               FontSize="11"
+                                               WidthRequest="100"
+                                               HorizontalTextAlignment="End"
+                                               VerticalOptions="Center" />
+                                        <Label Grid.Column="5"
+                                               Text="{Binding UnitsFormatted}"
+                                               TextColor="{StaticResource TextMuted}"
+                                               FontSize="12"
+                                               WidthRequest="110"
+                                               HorizontalTextAlignment="End"
+                                               VerticalOptions="Center" />
+                                        <Label Grid.Column="6"
+                                               Text="{Binding AmountFormatted}"
+                                               TextColor="{StaticResource Warning}"
+                                               FontSize="14"
+                                               FontAttributes="Bold"
+                                               VerticalOptions="Center"
+                                               WidthRequest="75"
+                                               HorizontalTextAlignment="End" />
+                                        <Label Grid.Column="7"
+                                               Text="{Binding ChangeFormatted}"
+                                               TextColor="{Binding ChangeColour}"
+                                               FontSize="11"
+                                               VerticalOptions="Center"
+                                               WidthRequest="70"
+                                               HorizontalTextAlignment="End" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                </Grid>
+            </Border>
+
+        </Grid>
+
+    </Grid>
+</ContentView>

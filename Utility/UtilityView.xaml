@@ -1,0 +1,201 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.UtilityView">
+
+    <Grid RowDefinitions="Auto,*" ColumnDefinitions="280,*"
+          BackgroundColor="{StaticResource PageBg}" Padding="0">
+
+        <!-- TOP TOOLBAR (spans both columns) -->
+        <Border Grid.Row="0" Grid.ColumnSpan="2"
+                Style="{StaticResource CardFrame}" Margin="12,12,12,0" Padding="16">
+            <Grid ColumnDefinitions="Auto,Auto,Auto,Auto,*,Auto,Auto,Auto" RowDefinitions="Auto"
+                  ColumnSpacing="12" VerticalOptions="Center">
+
+                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                    <Label Text="Start Date" Style="{StaticResource SubHeading}" />
+                    <DatePicker x:Name="StartingDate"
+                                TextColor="{StaticResource TextPrimary}"
+                                BackgroundColor="{StaticResource CardBgLight}" />
+                </VerticalStackLayout>
+
+                <Button x:Name="ResetDates" Grid.Column="1"
+                        Text="Reset" Style="{StaticResource SecondaryButton}"
+                        VerticalOptions="End" />
+
+                <VerticalStackLayout Grid.Column="2" Spacing="4">
+                    <Label Text="End Date" Style="{StaticResource SubHeading}" />
+                    <DatePicker x:Name="EndingDate"
+                                TextColor="{StaticResource TextPrimary}"
+                                BackgroundColor="{StaticResource CardBgLight}" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Column="3" Spacing="4">
+                    <Label Text="Address" Style="{StaticResource SubHeading}" />
+                    <Picker x:Name="Addresses"
+                            TextColor="{StaticResource TextPrimary}"
+                            BackgroundColor="{StaticResource CardBgLight}"
+                            MinimumWidthRequest="180" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Grid.Column="5" Spacing="4">
+                    <Label Text="Culture" Style="{StaticResource SubHeading}" />
+                    <Picker x:Name="CulturePicker"
+                            TextColor="{StaticResource TextPrimary}"
+                            BackgroundColor="{StaticResource CardBgLight}"
+                            MinimumWidthRequest="120" />
+                </VerticalStackLayout>
+
+                <Button x:Name="SubmitButton" Grid.Column="6"
+                        Text="Submit"
+                        BackgroundColor="{StaticResource Primary}"
+                        TextColor="{StaticResource TextPrimary}"
+                        CornerRadius="8" Padding="20,10"
+                        FontAttributes="Bold"
+                        VerticalOptions="End" />
+
+                <Button x:Name="CancelButton" Grid.Column="7"
+                        Text="Cancel" Style="{StaticResource SecondaryButton}"
+                        VerticalOptions="End" />
+            </Grid>
+        </Border>
+
+        <!-- LEFT SIDEBAR -->
+        <ScrollView Grid.Row="1" Grid.Column="0" Margin="12,12,0,12">
+            <VerticalStackLayout Spacing="12">
+
+                <!-- Fuel Type -->
+                <Border Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Fuel Type" Style="{StaticResource Heading2}" />
+                        <RadioButton x:Name="URElectricity" Content="Electricity"
+                                     TextColor="{StaticResource TextPrimary}" />
+                        <RadioButton x:Name="URGas" Content="Gas"
+                                     TextColor="{StaticResource TextPrimary}" />
+                        <RadioButton x:Name="URDualFuel" Content="Dual Fuel"
+                                     TextColor="{StaticResource TextPrimary}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Navigation -->
+                <Border Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Navigation" Style="{StaticResource Heading2}" />
+                        <Button x:Name="CostsButton" Text="Costs"
+                                Style="{StaticResource ActiveNavButton}" />
+                        <Button x:Name="BillsButton" Text="Bills"
+                                Style="{StaticResource NavButton}" />
+                        <Button x:Name="ReadingsButton" Text="Readings"
+                                Style="{StaticResource NavButton}" />
+                        <Button x:Name="BreakdownButton" Text="Breakdown"
+                                Style="{StaticResource NavButton}" />
+                        <Button x:Name="ChartsButton" Text="Charts"
+                                Style="{StaticResource NavButton}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Charts Sub-Navigation -->
+                <Border Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Chart Views" Style="{StaticResource Heading2}" />
+                        <Button x:Name="ChartsCostsButton" Text="Costs Chart"
+                                Style="{StaticResource NavButton}" />
+                        <Button x:Name="ChartsReadingsButton" Text="Readings Chart"
+                                Style="{StaticResource NavButton}" />
+                        <Button x:Name="ChartsUsageButton" Text="Usage Chart"
+                                Style="{StaticResource NavButton}" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Currency -->
+                <Border Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Currency" Style="{StaticResource Heading2}" />
+
+                        <RadioButton x:Name="RBNON" Content="None"
+                                     TextColor="{StaticResource TextPrimary}" />
+                        <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto"
+                              RowSpacing="6" ColumnSpacing="8">
+                            <RadioButton x:Name="RBGBP" Content="GBP" Grid.Row="0" Grid.Column="0"
+                                         TextColor="{StaticResource TextPrimary}" />
+                            <Label x:Name="GBP" Grid.Row="0" Grid.Column="1"
+                                   Style="{StaticResource CurrencyLabel}" />
+
+                            <RadioButton x:Name="RBEUR" Content="EUR" Grid.Row="1" Grid.Column="0"
+                                         TextColor="{StaticResource TextPrimary}" />
+                            <Label x:Name="EUR" Grid.Row="1" Grid.Column="1"
+                                   Style="{StaticResource CurrencyLabel}" />
+
+                            <RadioButton x:Name="RBUSD" Content="USD" Grid.Row="2" Grid.Column="0"
+                                         TextColor="{StaticResource TextPrimary}" />
+                            <Label x:Name="USD" Grid.Row="2" Grid.Column="1"
+                                   Style="{StaticResource CurrencyLabel}" />
+
+                            <RadioButton x:Name="RBJPY" Content="JPY" Grid.Row="3" Grid.Column="0"
+                                         TextColor="{StaticResource TextPrimary}" />
+                            <Label x:Name="JPY" Grid.Row="3" Grid.Column="1"
+                                   Style="{StaticResource CurrencyLabel}" />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Suppliers -->
+                <Border Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Suppliers" Style="{StaticResource Heading2}" />
+                        <CollectionView x:Name="SuppliersFrame"
+                                        SelectionMode="Single"
+                                        HeightRequest="200" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- MAIN CONTENT AREA -->
+        <ScrollView Grid.Row="1" Grid.Column="1" Margin="12">
+            <VerticalStackLayout Spacing="12">
+
+                <!-- Costs Grid (visible by default) -->
+                <Border Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Utility Costs" Style="{StaticResource Heading1}" />
+                        <CollectionView x:Name="UtilityCostsGrid"
+                                        SelectionMode="None"
+                                        IsVisible="True" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Bills Grid (hidden initially) -->
+                <Border Style="{StaticResource CardFrame}" Padding="16" IsVisible="False">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Utility Bills" Style="{StaticResource Heading1}" />
+                        <CollectionView x:Name="UtilityBillsGrid"
+                                        SelectionMode="None" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Readings Grid (hidden initially) -->
+                <Border Style="{StaticResource CardFrame}" Padding="16" IsVisible="False">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Utility Readings" Style="{StaticResource Heading1}" />
+                        <CollectionView x:Name="UtilityReadingsGrid"
+                                        SelectionMode="None" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Breakdown Grid (hidden initially) -->
+                <Border Style="{StaticResource CardFrame}" Padding="16" IsVisible="False">
+                    <VerticalStackLayout Spacing="8">
+                        <Label Text="Utility Breakdown" Style="{StaticResource Heading1}" />
+                        <CollectionView x:Name="UtilityBreakdownGrid"
+                                        SelectionMode="None" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+
+</ContentView>

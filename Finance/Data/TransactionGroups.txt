@@ -1,0 +1,25 @@
+False
+1	ATM Withdrawal
+2
+3	Direct debit/ Direct Debit
+4	Arranged Overdraft Interest
+4	Non-Sterling transaction fee
+5	Visa purchase
+5	Contactless Payment
+5	Visa cash withdrawal
+6	Standing order
+7	Payment to
+8	Transfer to
+
+True
+1	Cash credit
+2	Cheque credits
+2	Cheque deposit
+3	Bank credit
+4	Transfer from
+5	Visa Credit
+6
+7
+8	Returned direct debit
+8	Interest added
+8	Unpaid standing order

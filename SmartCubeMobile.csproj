@@ -1,0 +1,182 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>net9.0-windows10.0.19041.0</TargetFrameworks>
+    <!-- Uncomment below to also target Android/iOS -->
+    <!-- <TargetFrameworks>$(TargetFrameworks);net9.0-android;net9.0-ios</TargetFrameworks> -->
+    <OutputType>Exe</OutputType>
+    <RootNamespace>SmartCubeMobile</RootNamespace>
+    <AssemblyName>SmartCubeMobile</AssemblyName>
+    <UseMaui>true</UseMaui>
+    <SingleProject>true</SingleProject>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>disable</Nullable>
+    <ApplicationTitle>SmartCube Mobile</ApplicationTitle>
+    <ApplicationId>com.smartcube.mobile</ApplicationId>
+    <ApplicationDisplayVersion>1.0.1</ApplicationDisplayVersion>
+    <ApplicationVersion>2</ApplicationVersion>
+    <WindowsPackageType>None</WindowsPackageType>
+    <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
+    <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
+    <TargetPlatformMinVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</TargetPlatformMinVersion>
+    <DefineConstants>$(DefineConstants);SMARTMAUI;CRYPTOS;MOCK_DATA</DefineConstants>
+  </PropertyGroup>
+
+  <!-- Exclude legacy/incompatible files (SDK auto-includes all .cs) -->
+  <ItemGroup>
+    <Compile Remove="XCode\**" />
+    <Compile Remove="Finance\Old\**" />
+    <Compile Remove="Finance\Selenium\**" />
+    <Compile Remove="Finance\Playwright\**" />
+    <Compile Remove="Finance\OpenBanking\**" />
+    <Compile Remove="Server\**" />
+    <!-- Exclude desktop-only bank scrapers (WebView2/WPF/WinForms only) -->
+    <Compile Remove="Finance\HalifaxClientWPF.cs" />
+    <Compile Remove="Finance\HalifaxWPF.cs" />
+    <Compile Remove="Finance\NationwideClientWPF.cs" />
+    <Compile Remove="Finance\NationwideWPF.cs" />
+    <Compile Remove="Finance\NationwideClientANDROID.cs" />
+    <Compile Remove="Finance\NationwideANDROID.cs" />
+    <!-- Exclude files marked as deletable or temp output -->
+    <Compile Remove="Main\MultiMeter.xamlCan Pprobablky Delete.cs" />
+    <Compile Remove="Main\MainMeter.xamlOld - PreStatic.cs" />
+    <Compile Remove="Finance\SmartFinanceV2025TempOut.cs" />
+    <Compile Remove="Finance\FinanceCurrenciesFragmentTempOut.cs" />
+    <Compile Remove="Finance\SmartChartsV2024Old.cs" />
+    <Compile Remove="Finance\CryptoBollocksV2025Old.cs" />
+    <Compile Remove="SignIn\SignInActivityOld-CanDelete.cs" />
+    <Compile Remove="SignIn\SignInActivity.cs" />
+    <Compile Remove="Main\MeterActivity.cs" />
+    <!-- Exclude files that are Android Activity based (not MAUI) -->
+    <Compile Remove="Finance\FinanceChartsFragment.cs" />
+    <Compile Remove="Finance\FinanceCurrenciesFragment.cs" />
+    <Compile Remove="Finance\FinanceConnectionsFragment.cs" />
+    <Compile Remove="Finance\FinanceTransactionsFragment.cs" />
+    <Compile Remove="Finance\FinanceWebViewFragment.cs" />
+    <Compile Remove="Utility\UtilityBillsFragment.cs" />
+    <Compile Remove="Utility\UtilityBreakdownFragment.cs" />
+    <Compile Remove="Utility\UtilityChartsFragment.cs" />
+    <Compile Remove="Utility\UtilityChartsCostsByTimeFragment.cs" />
+    <Compile Remove="Utility\UtilityChartsPastUsageByTimeFragment.cs" />
+    <Compile Remove="Utility\UtilityChartsReadingsByTimeFragment.cs" />
+    <Compile Remove="Utility\UtilityCostsFragment.cs" />
+    <Compile Remove="Utility\UtilityReadingsFragment.cs" />
+    <Compile Remove="Utility\FinanceTransactionsFragmentTempOut.cs" />
+    <Compile Remove="Finance\FinanceTransactionsFragmentTempOut.cs" />
+    <!-- Exclude duplicate AppResources.Designer -->
+    <Compile Remove="Main\AppResources1.Designer.cs" />
+    <!-- Exclude non-MAUI dependency implementations -->
+    <Compile Remove="Dependencies\DependencyDemo.cs" />
+    <Compile Remove="Dependencies\Directory_Droid.cs" />
+    <Compile Remove="Dependencies\Print_Droid.cs" />
+    <Compile Remove="Dependencies\Print_UWP.cs" />
+    <Compile Remove="Dependencies\Print_WINUI.cs" />
+    <Compile Remove="Dependencies\Print_WPF.cs" />
+    <Compile Remove="Dependencies\Screen_Droid.cs" />
+    <Compile Remove="Dependencies\Screen_UWP.cs" />
+    <Compile Remove="Dependencies\Screen_WPF.cs" />
+    <!-- Exclude Xamarin-era SMS/notification files -->
+    <Compile Remove="Finance\MyReceiver.cs" />
+    <Compile Remove="Finance\MultiSpinner.cs" />
+    <Compile Remove="Finance\Bitmap.cs" />
+    <!-- Utility\SmartLiveCharts2V2026.cs contains SmartLiveCharts2 (static class) needed by SmartUtilityV2022.cs -->
+    <!-- Finance\SmartLiveCharts2V2026.cs contains SmartLiveCharts2V2026 (different class) - no conflict -->
+    <!-- Exclude WinForms-only model -->
+    <Compile Remove="Models\DashboardModel.cs" />
+    <Compile Remove="Models\AndroidViewModel.cs" />
+    <!-- Exclude Android-only files (no #if guards, raw Android using statements) -->
+    <Compile Remove="Finance\SmartFinanceConnections.cs" />
+    <Compile Remove="Finance\SmartFinanceLogins.cs" />
+    <!-- Exclude duplicate NotificationListener (conflicts with NotificationListenerMAUI) -->
+    <Compile Remove="NotificationListener.cs" />
+    <!-- Exclude duplicate AppResources.Designer (Texts version conflicts with Main version) -->
+    <Compile Remove="Texts\AppResources.Designer.cs" />
+    <!-- Exclude WinForms-only utility scrapers (no #if guards, use System.Windows.Forms) -->
+    <Compile Remove="Utility\energylinxV2016.cs" />
+    <Compile Remove="Utility\CooperativeEnergyAnalyzeV2016cs.cs" />
+    <Compile Remove="Utility\ScottishPowerAnalyzeV2016.cs" />
+    <!-- Exclude Xamarin-era SmartFinanceScrape (uses Rg.Plugins.Popup/Xamarin.Forms) -->
+    <Compile Remove="Finance\SmartFinanceScrapeV2021_Main.cs" />
+    <!-- Exclude OtpHub (server-side SignalR Hub, not client) -->
+    <Compile Remove="Finance\OtpHub.cs" />
+    <!-- Exclude WebView2 bank scrapers (use CoreWebView2/WebView2 desktop types not available in MAUI) -->
+    <Compile Remove="Finance\AJBellWebView2V2025.cs" />
+    <Compile Remove="Finance\BankofScotlandWebView2V2025.cs" />
+    <Compile Remove="Finance\BarclaysV2025.cs" />
+    <Compile Remove="Finance\HalifaxWebView2V2025.cs" />
+    <Compile Remove="Finance\LloydsWebView2V2025.cs" />
+    <Compile Remove="Finance\NatWestWebView2V2025.cs" />
+    <Compile Remove="Finance\SantanderWebView2V2025.cs" />
+    <Compile Remove="Finance\TSBWebView2V2025.cs" />
+    <!-- Exclude WinForms-only utility/scraper files -->
+    <Compile Remove="Utility\USwitchV2019.cs" />
+    <Compile Remove="Finance\SantanderV2019.cs" />
+    <!-- Exclude duplicate ISMSHelper (Main version conflicts with Dependencies version) -->
+    <Compile Remove="Main\ISMSHelper.cs" />
+    <!-- Exclude WinForms-only UtilityLoginDetails (has WinForms Form base class) -->
+    <Compile Remove="Utility\UtilityLoginDetails.cs" />
+    <!-- Exclude SmartReceiver (WebView2-based OTP, desktop only) -->
+    <Compile Remove="Finance\SmartReceiver.cs" />
+    <!-- Exclude MAUI bank scrapers (depend on WebView properties not yet available) -->
+    <Compile Remove="Finance\NationwideClientMAUI.cs" />
+    <Compile Remove="Finance\RoyalBankofScotlandV2021.cs" />
+    <Compile Remove="Finance\AlliedIrishBankV2021.cs" />
+    <Compile Remove="Finance\HSBCV2021.cs" />
+    <Compile Remove="Finance\BarclaysV2021.cs" />
+    <Compile Remove="Finance\SantanderV2021.cs" />
+    <Compile Remove="Finance\NationwideCommon.cs" />
+    <Compile Remove="Finance\NationwideMAUI.cs" />
+  </ItemGroup>
+
+  <!-- XAML files are auto-included by the MAUI SDK -->
+  <ItemGroup>
+    <MauiXaml Remove="Platforms\**\*.xaml" />
+  </ItemGroup>
+
+  <!-- Exclude WinForms designer resources not compatible with MAUI -->
+  <ItemGroup>
+    <EmbeddedResource Remove="Utility\UtilityLoginDetails.resx" />
+    <Compile Remove="Utility\UtilityLoginDetails.Designer.cs" />
+  </ItemGroup>
+
+  <!-- Images -->
+  <ItemGroup>
+    <MauiImage Include="Images\*.jpg" Exclude="Images\appicon.jpg" />
+    <MauiImage Include="Images\*.png" />
+    <MauiImage Include="Images\*.jfif" />
+    <MauiIcon Include="Images\appicon.svg" />
+  </ItemGroup>
+
+  <!-- Language dictionaries -->
+  <ItemGroup>
+    <Content Include="Resources\*.xml">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
+  <!-- NuGet packages -->
+  <ItemGroup>
+    <PackageReference Include="MailKit" Version="4.17.0" />
+    <PackageReference Include="Microsoft.Maui.Controls" Version="$(MauiVersion)" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Debug" Version="9.0.*" />
+    <PackageReference Include="CommunityToolkit.Maui" Version="9.*" />
+    <PackageReference Include="itext7" Version="8.*" />
+    <PackageReference Include="itext7.bouncy-castle-adapter" Version="8.*" />
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.Maui" Version="2.*" />
+    <PackageReference Include="Microsoft.Toolkit.Uwp.Notifications" Version="7.1.3" />
+    <PackageReference Include="SkiaSharp.Views.Maui.Controls" Version="3.*" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.*" />
+    <PackageReference Include="sqlite-net-pcl" Version="1.*" />
+    <PackageReference Include="SQLitePCLRaw.bundle_green" Version="2.*" />
+    <PackageReference Include="morelinq" Version="4.*" />
+    <PackageReference Include="Microsoft.AspNetCore.SignalR.Client" Version="9.*" />
+    <PackageReference Include="OxyPlot.Maui.Skia" Version="1.*" />
+    <PackageReference Include="HtmlAgilityPack" Version="1.*" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="8.*" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" Version="8.*" />
+    <PackageReference Include="jose-jwt" Version="5.*" />
+    <PackageReference Include="Nethereum.Web3" Version="4.*" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.*" />
+  </ItemGroup>
+
+</Project>

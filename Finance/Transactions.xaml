@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<toolkit:Popup xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+               xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+               xmlns:toolkit="http://schemas.microsoft.com/dotnet/2022/maui/toolkit"
+               x:Class="SmartCubeMobile.Transactions">
+
+    <Border Style="{StaticResource CardFrame}"
+            BackgroundColor="{StaticResource CardBg}"
+            Stroke="{StaticResource BorderColor}"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 12"
+            Padding="16"
+            WidthRequest="400">
+        <VerticalStackLayout Spacing="12">
+            <Label Text="Transactions"
+                   Style="{StaticResource Heading2}"
+                   TextColor="{StaticResource TextPrimary}" />
+
+            <BoxView HeightRequest="1"
+                     Color="{StaticResource BorderColor}" />
+
+            <CollectionView>
+                <CollectionView.EmptyView>
+                    <Label Text="No transactions available"
+                           TextColor="{StaticResource TextMuted}"
+                           HorizontalTextAlignment="Center"
+                           Margin="0,20,0,0" />
+                </CollectionView.EmptyView>
+            </CollectionView>
+
+            <Button Text="Close"
+                    Style="{StaticResource SecondaryButton}"
+                    HorizontalOptions="End"
+                    Margin="0,8,0,0" />
+        </VerticalStackLayout>
+    </Border>
+
+</toolkit:Popup>

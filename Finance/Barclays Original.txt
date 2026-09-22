@@ -1,0 +1,2185 @@
+using System.Text.RegularExpressions;
+using System.Windows;
+using System.Text.Json;
+
+
+
+#if WINFORMS
+using System.Windows.Threading;
+using static SmartCubeMobile.MainViewModel;
+using Windows.UI.Notifications.Management;
+using Windows.UI.Notifications;
+using Microsoft.Web.WebView2.WinForms;
+using Microsoft.Web.WebView2.Core;
+using Windows.Foundation;
+#endif
+
+#if WPF
+using Windows.UI.Notifications.Management;
+using Windows.UI.Notifications;
+using Microsoft.Web.WebView2.Core;
+using Windows.Foundation;
+using Windows.Networking;
+using System.Windows.Controls;
+#endif
+
+#if UWP || WINUI
+using System.Threading.Tasks;
+using System.Collections.Generic;
+using System;
+using System.Linq;
+using System.Text.Json;
+using Microsoft.UI.Xaml.Controls;
+using Microsoft.Web.WebView2.Core;
+using Windows.Foundation;
+#endif
+
+#if WINUI
+using Microsoft.UI.Dispatching;
+#endif
+
+#if ANDROID
+using Android.Content;
+using Android.Provider;
+#endif
+
+#if !ANDROID
+namespace SmartCubeMobile
+{
+    
+    internal class BarclaysV2025
+    {
+        // Some 'necessary evil' globals
+        internal static int step = 0;
+        internal static string owner = "";
+        internal static List<AccountLink> AccountLinks { get; set; } = new();
+        internal static int CurrentAccountIndex { get; set; } = 0;
+        internal static bool IsProcessingAccounts { get; set; } = false;
+#if WINFORMS || WPF || UWP
+        internal static EventHandler<CoreWebView2NavigationCompletedEventArgs> InitialHandler = null;
+#endif
+#if WINUI
+        internal static TypedEventHandler<WebView2, CoreWebView2NavigationCompletedEventArgs> InitialHandler = null;
+#endif
+        internal static async Task RunBarclaysWebView2(
+#if WINFORMS
+                                                    SmartDashboard.MainProcess components,
+                                                    RichTextBox textBoxConsole,
+
+#endif
+                                                    MainViewModel ourviewmodel,
+                                                    FinanceViewModel financeviewmodel,
+                                                    SmartFinance.Logins loginInfo,
+                                                    string startUrl,
+                                                    string notificationTitle,
+                                                    string notificationPrefix,
+                                                    short notificationTagLength,
+                                                    short institution_code,
+                                                    short brand_code,
+                                                    List<SmartFinance.Transaction_Groups> transaction_groupsFound,
+                                                    List<SmartFinance.Transaction_Types> transaction_typesFound,
+                                                    string Parameter1,
+                                                    string Parameter2,
+                                                    string Parameter3,
+                                                    short loginMethod)
+        {
+            financeviewmodel.tcs1X = new TaskCompletionSource<bool>();
+#if WINFORMS
+            financeviewmodel.FinanceWebView.Visible = true;            
+#endif
+#if WPF
+            financeviewmodel.FinanceWebView.Visibility = Visibility.Visible;
+            financeviewmodel.FinanceWebView.HorizontalAlignment = HorizontalAlignment.Stretch;
+            financeviewmodel.FinanceWebView.VerticalAlignment = VerticalAlignment.Stretch;
+#endif
+#if WINFORMS
+            // See chatGPT standard setup for WebView2 Forms
+#endif
+            try
+            {
+                await financeviewmodel.FinanceWebView.EnsureCoreWebView2Async();
+                await financeviewmodel.FinanceWebView.CoreWebView2.Profile.ClearBrowsingDataAsync(CoreWebView2BrowsingDataKinds.DiskCache);
+                //var env = await CoreWebView2Environment.CreateAsync();
+                //await financeviewmodel.FinanceWebView.EnsureCoreWebView2Async(env);
+            }
+            catch (Exception ex)
+            {
+                financeviewmodel.errorMessage = "Ensure WebView2 failed: " + ex.Message;
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, financeviewmodel.errorMessage);
+                await Task.CompletedTask;
+            }
+
+            financeviewmodel.notificationHandledSource = new TaskCompletionSource<bool>();
+            financeviewmodel.FinanceWebView.CoreWebView2.NewWindowRequested += (sender, args) => args.Handled = true;
+#if WPF || UWP || WINUI
+            ourviewmodel.webviewLogging = false;
+            if (ourviewmodel.webviewLogging)
+            {
+                financeviewmodel.FinanceWebView.CoreWebView2.OpenDevToolsWindow();
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "WebView2 logging: Enabled");
+            }
+#endif
+            //int step = 0;
+            string logAction = string.Empty;
+            string errorMessage = string.Empty;
+
+            // Don't forget this shit!!! It's really useful!!!!
+            //financeviewmodel.FinanceWebView.CoreWebView2.OpenDevToolsWindow();
+
+            // Set up to receive messages
+#if WINFORMS || WPF
+            financeviewmodel.FinanceWebView.CoreWebView2.WebMessageReceived +=
+                    new EventHandler<CoreWebView2WebMessageReceivedEventArgs>((s, e) => CoreWebView2_WebMessageReceived(s, e,
+#if WINFORMS
+                                                    components,
+                                                    textBoxConsole,
+#endif
+                                                    ourviewmodel,
+                                                    financeviewmodel,
+                                                    loginInfo,
+                                                    notificationTitle,
+                                                    notificationPrefix,
+                                                    notificationTagLength,
+                                                    institution_code,
+                                                    brand_code,
+                                                    transaction_groupsFound,
+                                                    transaction_typesFound));
+#endif
+#if WINUI
+            financeviewmodel.FinanceWebView.CoreWebView2.WebMessageReceived +=
+                (s, e) => CoreWebView2_WebMessageReceived(s, e,
+                                ourviewmodel,
+                                financeviewmodel,
+                                loginInfo,
+                                notificationTitle,
+                                notificationPrefix,
+                                notificationTagLength,
+                                institution_code,
+                                brand_code,
+                                transaction_groupsFound,
+                                transaction_typesFound,
+                                Parameter1,
+                                Parameter2
+                );
+#endif
+            // Set up to deal with Navigation, we have to do it this
+            // way so we can uncouple it later to do the accounts
+
+
+
+
+            financeviewmodel.FinanceWebView.CoreWebView2.NavigationCompleted += async (s, args) =>
+            {
+                if (!args.IsSuccess)
+                {
+                    await Task.CompletedTask;
+                }
+                try
+                {
+                    switch (financeviewmodel.step)
+                    {
+                        case 0:
+                            // Inject this script to find the login link and send it to C# via postMessage
+                            await financeviewmodel.FinanceWebView.ExecuteScriptAsync(@"
+                                (function () {
+                                    let anchors = document.getElementsByTagName('a');
+                                    for (let i = 0; i < anchors.length; i++) {
+                                        let anchor = anchors[i];
+                                        if (anchor.textContent.trim() === 'Log in') {
+                                            window.chrome.webview.postMessage({ status: 'log_in', text: anchor.href });
+                                            return;
+                                        }
+                                    }
+                                    window.chrome.webview.postMessage({ status: 'failure', text: 'not_found'});
+                                })();");
+                            break;
+
+                        case 1:
+                            // Look for RadioButton 3
+                            string allparams = "";
+                            string radioButtonText = "";
+                            switch (loginMethod)
+                            {
+                                case 1:
+                                    radioButtonText = "membership number";
+                                    break;
+                                case 2:
+                                    radioButtonText = "card number";
+                                    break;
+                                case 3:
+                                    radioButtonText = "sort code and account number";
+                                    allparams = // Surname / Date of Birth
+                                                Parameter1 +
+                                                SmartParametersV2016.recordSeparator +
+                                                // SortCode / Account
+                                                Parameter2 +
+                                                SmartParametersV2016.recordSeparator +
+                                                // Passcode / Memorable
+                                                Parameter3;
+                                    break;
+                                default:
+                                    break;
+
+                            }
+                            await financeviewmodel.FinanceWebView.ExecuteScriptAsync(@"
+                                (function waitForRadioThenClick() {
+                                    const targetText = '" + radioButtonText.ToLowerInvariant() + @"';
+                                    let attemptsLeft = 20;
+
+                                    function checkAndClick() {
+                                        const labels = document.querySelectorAll('label.control-radio');
+                                        for (const label of labels) {
+                                            const textSpan = label.querySelector('span.ng-binding');
+                                            if (textSpan && textSpan.innerText.trim().toLowerCase() === targetText) {
+                                                label.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+                                                window.chrome.webview.postMessage({ status: 'clicked1', text: '" + allparams + @"' });
+                                                observer.disconnect();
+                                                clearInterval(timer);
+                                                return;
+                                            }
+                                        }
+
+                                        attemptsLeft--;
+                                        if (attemptsLeft <= 0) {
+                                            window.chrome.webview.postMessage({ status: 'failure', text: targetText });
+                                            observer.disconnect();
+                                            clearInterval(timer);
+                                        }
+                                    }
+
+                                    const observer = new MutationObserver(checkAndClick);
+                                    observer.observe(document.body, { childList: true, subtree: true });
+
+                                    const timer = setInterval(checkAndClick, 500); // Retry every 500ms
+                                })();
+                                ");
+
+                            break;
+                        case 2:
+                            //await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Waiting for OTP...");
+                            //financeviewmodel.step++;
+                            break;
+                        case 3:
+                            //await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Waiting for OTP...");
+                            //financeviewmodel.step++;
+                            break;
+                        case 5:
+                            if (!financeviewmodel.loggedIn)
+                            {
+                                // Task completed set in here
+                                await SmartBanksV2023.WebDriverDead(ourviewmodel, financeviewmodel);
+                                await Task.CompletedTask;
+                            }
+                            break;
+                        default:
+                            break;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, $"Step {financeviewmodel.step} failed: " + ex.Message);
+                    await Task.CompletedTask;
+                }
+            };
+
+            financeviewmodel.FinanceWebView.Source = new Uri(startUrl);
+            await financeviewmodel.tcs1X.Task;
+
+#pragma warning restore CA1416 // Validate platform compatibility
+        }
+
+
+        private static async void CoreWebView2_WebMessageReceived(object sender,
+                                                                CoreWebView2WebMessageReceivedEventArgs args,
+#if WINFORMS
+                                                                SmartDashboard.MainProcess  components,
+                                                                RichTextBox textBoxConsole,
+#endif
+                                                                MainViewModel ourviewmodel,
+                                                                FinanceViewModel financeviewmodel,
+                                                                SmartFinance.Logins loginInfo,
+                                                    string notificationTitle,
+                                                    string notificationPrefix,
+                                                    short notificationTagLength,
+                                                    short institution_code,
+                                                    short brand_code,
+                                                    List<SmartFinance.Transaction_Groups> transaction_groupsFound,
+                                                    List<SmartFinance.Transaction_Types> transaction_typesFound)
+        {
+            try
+            {
+                string memorable1 = "";  // your first memorable input value
+                string memorable2 = "";
+                string messageJson = args.WebMessageAsJson;
+                LoginHrefMessage message1 = JsonSerializer.Deserialize<LoginHrefMessage>(messageJson);
+
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Status: " + message1.status);
+
+                switch (message1.status)
+                {
+                    case "log_in":
+                        // Use message.Href as needed
+                        financeviewmodel.FinanceWebView.CoreWebView2.Navigate(message1.text);
+                        financeviewmodel.step = 1;
+                        break;
+                    case "clicked1":
+                        // Barclays is TOUGH
+
+                        string[] params1 = message1.text.Split(SmartParametersV2016.recordSeparator);
+                        if (params1.Length == 3) // 3 records
+                        {
+                            string lastName = "";
+
+                            string[] first = params1[0].Split('/');
+                            if (first.Length == 2)  // Name and DateOfBirth
+                            {
+                                lastName = first[0];
+                            }
+                            string[] second = params1[1].Split('/');
+                            if (second.Length == 2)
+                            {
+                                string sortcode = second[0];
+                                string sortcode1 = sortcode.Substring(0, 2);
+                                string sortcode2 = sortcode.Substring(2, 2);
+                                string sortcode3 = sortcode.Substring(4, 2);
+                                string accountNumber = second[1];
+
+                                string escapedText = message1.text.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "");
+
+                                await financeviewmodel.FinanceWebView.ExecuteScriptAsync($@"
+                            (function () {{
+                                function fillAndTrigger(id, value) {{
+                                    const input = document.getElementById(id);
+                                    if (!input) {{
+                                        console.log('❌ Not found:', id);
+                                        return false;
+                                    }}
+
+                                    input.focus();
+                                    input.value = value;
+
+                                    ['keydown', 'input', 'keyup', 'change', 'blur'].forEach(type => {{
+                                        const evt = new Event(type, {{ bubbles: true }});
+                                        input.dispatchEvent(evt);
+                                    }});
+
+                                    console.log('✅ Filled:', id);
+                                    return true;
+                                }}
+
+                                function tryFill(attemptsLeft = 20) {{
+                                    const filledAll = [
+                                        fillAndTrigger('surnameSortcode', '{lastName}'),
+                                        fillAndTrigger('sortCode-input-1', '{sortcode1}'),
+                                        fillAndTrigger('sortCode-input-2', '{sortcode2}'),
+                                        fillAndTrigger('sortCode-input-3', '{sortcode3}'),
+                                        fillAndTrigger('accountNumber', '{accountNumber}')
+                                    ].every(Boolean);
+
+                                    if (filledAll) {{
+                                        setTimeout(() => {{
+                                            const btn = document.getElementById('continue');
+                                            if (btn) {{
+                                                btn.focus();
+                                                btn.click();
+                                                console.log('✅ Clicked Continue');
+                                                window.chrome.webview.postMessage({{ status: 'UserId', text: ""{escapedText}"" }});
+                                            }} else {{
+                                                console.log('❌ Continue button not found');
+                                                window.chrome.webview.postMessage({{ status: 'failure', text: 'missing_continue_button' }});
+                                            }}
+                                        }}, 1000);
+                                    }} else {{
+                                        if (attemptsLeft > 0) {{
+                                            console.log('❌ Not all fields found yet, retrying... Attempts left:', attemptsLeft);
+                                            setTimeout(() => tryFill(attemptsLeft - 1), 500);
+                                        }} else {{
+                                            console.log('❌ Failed to fill fields after retries');
+                                            window.chrome.webview.postMessage({{ status: 'failure', text: 'failed_to_fill' }});
+                                        }}
+                                    }}
+                                }}
+
+                                if (document.readyState === 'complete' || document.readyState === 'interactive') {{
+                                    tryFill();
+                                }} else {{
+                                    window.addEventListener('DOMContentLoaded', tryFill);
+                                }}
+                            }})();");
+
+                            }
+                        }
+                        break;
+                    case "UserId":
+                        string[] params2 = message1.text.Split(SmartParametersV2016.recordSeparator);
+                        if (params2.Length == 3)
+                        {
+                            string DateOfBirth = "";
+                            string[] first = params2[0].Split('/');
+                            if (first.Length == 2)  // Name and DateOfBirth
+                            {
+                                DateOfBirth = first[1]; // DOB
+                                string birthDay = DateOfBirth.Substring(0, 2);
+                                string birthMonth = DateOfBirth.Substring(2, 2);
+                                string birthYear = DateOfBirth.Substring(4, 4);
+
+                                
+                                // Safely escape message1.Text for JavaScript
+                                string safeText = JsonSerializer.Serialize(message1.text);
+
+                                // Now insert it into the JS block
+                                await financeviewmodel.FinanceWebView.ExecuteScriptAsync($@"
+                                (async function() {{
+                                    function sleep(ms) {{
+                                        return new Promise(resolve => setTimeout(resolve, ms));
+                                    }}
+
+                                    async function waitForElement(id, timeout = 10000) {{
+                                        const interval = 200;
+                                        let elapsed = 0;
+                                        while (elapsed < timeout) {{
+                                            const el = document.getElementById(id);
+                                            if (el) return el;
+                                            await sleep(interval);
+                                            elapsed += interval;
+                                        }}
+                                        return null;
+                                    }}
+
+                                    function typeIntoField(input, value) {{
+                                        input.focus();
+                                        input.value = '';
+
+                                        for (let i = 0; i < value.length; i++) {{
+                                            const char = value[i];
+                                            input.value += char;
+
+                                            const keyEvent = new KeyboardEvent('keydown', {{
+                                                key: char,
+                                                bubbles: true
+                                            }});
+                                            input.dispatchEvent(keyEvent);
+
+                                            const inputEvent = new Event('input', {{ bubbles: true }});
+                                            input.dispatchEvent(inputEvent);
+                                        }}
+
+                                        input.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                                        input.dispatchEvent(new Event('blur', {{ bubbles: true }}));
+
+                                        console.log(`✅ Typed into #${{input.id}}:`, value);
+                                        return true;
+                                    }}
+
+                                    const dayInput = await waitForElement('dob-input-day');
+                                    const monthInput = await waitForElement('dob-input-month');
+                                    const yearInput = await waitForElement('dob-input-year');
+
+                                    if (!dayInput || !monthInput || !yearInput) {{
+                                        console.log('❌ One or more fields not found after waiting:', {{
+                                            dayFound: !!dayInput,
+                                            monthFound: !!monthInput,
+                                            yearFound: !!yearInput
+                                        }});
+                                        window.chrome.webview.postMessage({{ status: 'failure', text: 'field_not_found' }});
+                                        return;
+                                    }}
+
+                                    typeIntoField(dayInput, '{birthDay}');
+                                    typeIntoField(monthInput, '{birthMonth}');
+                                    typeIntoField(yearInput, '{birthYear}');
+
+                                    const btn = document.getElementById('Continue');
+                                    if (btn) {{
+                                        btn.focus();
+                                        btn.click();
+                                        console.log('✅ Clicked continue');
+                                        window.chrome.webview.postMessage({{ status: 'SortAccount', text: {safeText} }});
+                                    }} else {{
+                                        console.log('❌ Continue button not found');
+                                        window.chrome.webview.postMessage({{ status: 'failure', text: 'missing_continue_button' }});
+                                    }}
+                                }})();");
+
+
+                                financeviewmodel.step = 3;
+                            }
+                        }
+                        break;
+                    case "SortAccount":
+                        string[] params3 = message1.text.Split(SmartParametersV2016.recordSeparator);
+                        if (params3.Length == 3)
+                        {
+                            string[] first = params3[2].Split('/');
+                            if (first.Length == 2)  // Name and DateOfBirth
+                            {
+                                string passcode = first[0];
+
+                                string escapedMessageText = JsonSerializer.Serialize(message1.text);
+
+                                await financeviewmodel.FinanceWebView.ExecuteScriptAsync($@"
+                            (async function() {{
+                                function sleep(ms) {{
+                                    return new Promise(resolve => setTimeout(resolve, ms));
+                                }}
+
+                                async function waitForElement(id, timeout = 10000) {{
+                                    const interval = 200;
+                                    let elapsed = 0;
+                                    while (elapsed < timeout) {{
+                                        const el = document.getElementById(id);
+                                        if (el) return el;
+                                        await sleep(interval);
+                                        elapsed += interval;
+                                    }}
+                                    return null;
+                                }}
+
+                                function typeIntoField(input, value) {{
+                                    input.focus();
+                                    input.value = '';
+
+                                    for (let i = 0; i < value.length; i++) {{
+                                        const char = value[i];
+                                        input.value += char;
+
+                                        const keyEvent = new KeyboardEvent('keydown', {{
+                                            key: char,
+                                            bubbles: true
+                                        }});
+                                        input.dispatchEvent(keyEvent);
+
+                                        const inputEvent = new Event('input', {{ bubbles: true }});
+                                        input.dispatchEvent(inputEvent);
+                                    }}
+
+                                    input.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                                    input.dispatchEvent(new Event('blur', {{ bubbles: true }}));
+
+                                    console.log(`✅ Typed into #${{input.id}}:`, value);
+                                    return true;
+                                }}
+
+                                const input = await waitForElement('passcode');
+
+                                if (!input) {{
+                                    console.log('❌ Passcode field not found');
+                                    window.chrome.webview.postMessage({{ status: 'failure', text: 'passcode_not_found' }});
+                                    return;
+                                }}
+
+                                typeIntoField(input, '{passcode}');
+                                window.chrome.webview.postMessage({{ status: 'Passcode', text: {escapedMessageText} }});
+                            }})();");
+
+                            }
+                        }
+                        break;
+                    case "Passcode":
+                        string[] params4 = message1.text.Split(SmartParametersV2016.recordSeparator);
+                        if (params4.Length == 3)
+                        {
+                            string[] first = params4[2].Split('/');
+                            if (first.Length == 2)  // Passcode and Memorable
+                            {
+                                string memorable = first[1];
+
+                                string resultJson1 = await financeviewmodel.FinanceWebView.CoreWebView2.ExecuteScriptAsync(@"
+                                (function () {
+                                    const label = document.querySelector('label[for=""memorableCharacters-input-1""]');
+                                    return label ? label.innerText.trim() : null;
+                                })();");
+
+                                string labelText1 = JsonSerializer.Deserialize<string>(resultJson1);
+                                string mem1 = CleanText(memorable, labelText1);
+
+                                string resultJson2 = await financeviewmodel.FinanceWebView.CoreWebView2.ExecuteScriptAsync(@"
+                                (function () {
+                                    const label = document.querySelector('label[for=""memorableCharacters-input-2""]');
+                                    return label ? label.innerText.trim() : null;
+                                })();");
+
+                                string labelText2 = JsonSerializer.Deserialize<string>(resultJson2);
+                                string mem2 = CleanText(memorable, labelText2);
+
+                                memorable1 = mem1;  // your first memorable input value
+                                memorable2 = mem2;  // your second memorable input value
+
+                                await financeviewmodel.FinanceWebView.ExecuteScriptAsync($@"
+                            (async function() {{
+                                function sleep(ms) {{
+                                    return new Promise(resolve => setTimeout(resolve, ms));
+                                }}
+
+                                async function waitForElement(selector, timeout = 10000) {{
+                                    const interval = 200;
+                                    let elapsed = 0;
+                                    while (elapsed < timeout) {{
+                                        const el = document.querySelector(selector);
+                                        if (el) return el;
+                                        await sleep(interval);
+                                        elapsed += interval;
+                                    }}
+                                    return null;
+                                }}
+
+                                function typeIntoField(input, value) {{
+                                    input.focus();
+                                    input.value = '';
+
+                                    for (let i = 0; i < value.length; i++) {{
+                                        const char = value[i];
+                                        input.dispatchEvent(new KeyboardEvent('keydown', {{ key: char, bubbles: true }}));
+                                        input.value += char;
+                                        input.dispatchEvent(new KeyboardEvent('keypress', {{ key: char, bubbles: true }}));
+                                        input.dispatchEvent(new Event('input', {{ bubbles: true }}));
+                                        input.dispatchEvent(new KeyboardEvent('keyup', {{ key: char, bubbles: true }}));
+                                    }}
+
+                                    input.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                                    input.dispatchEvent(new Event('blur', {{ bubbles: true }}));
+
+                                    console.log(`✅ Typed into #${{input.id}}:`, value);
+                                    return true;
+                                }}
+
+                                const input1 = await waitForElement('#memorableCharacters-input-1');
+                                const input2 = await waitForElement('#memorableCharacters-input-2');
+
+                                if (!input1 || !input2) {{
+                                    console.log('❌ One or more fields not found');
+                                    window.chrome.webview.postMessage({{ status: 'failure', text: 'field_not_found' }});
+                                    return;
+                                }}
+
+                                typeIntoField(input1, '{memorable1}');
+                                typeIntoField(input2, '{memorable2}');
+
+                                // Try broader selectors for the submit button
+                                const btn = await waitForElement('#submitAuthentication, button[type=submit], .submit-button, [name=submitAuthentication]', 10000);
+
+                                if (btn) {{
+                                    btn.focus();
+                                    btn.click();
+                                    console.log('✅ Clicked continue');
+                                    window.chrome.webview.postMessage({{ status: 'Memorable', text: '' }});
+                                }} else {{
+                                    console.log('❌ Continue button not found');
+                                    window.chrome.webview.postMessage({{ status: 'failure', text: 'missing_continue_button' }});
+                                }}
+                            }})();");
+
+                            }
+                        }
+                        break;
+
+                    case "Memorable":
+
+                        await financeviewmodel.FinanceWebView.ExecuteScriptAsync(@"
+                            (async function() {
+                                function sleep(ms) {
+                                    return new Promise(resolve => setTimeout(resolve, ms));
+                                }
+
+                                async function waitForLink(maxAttempts = 20, delay = 1000) {
+                                    const targetText = 'or text a one time verification code to your mobile phone instead';
+                                    for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                                        const links = document.querySelectorAll('a');
+                                        for (const link of links) {
+                                            const linkText = link.innerText || link.textContent || '';
+                                            if (linkText.toLowerCase().includes(targetText)) {
+                                                return link;
+                                            }
+                                        }
+                                        await sleep(delay);
+                                    }
+                                    return null;
+                                }
+
+                                // Wait for DOM readiness just to be safe
+                                if (document.readyState !== 'complete' && document.readyState !== 'interactive') {
+                                    await new Promise(resolve => {
+                                        document.addEventListener('DOMContentLoaded', resolve);
+                                    });
+                                }
+
+                                const targetLink = await waitForLink();
+
+                                if (targetLink) {
+                                    targetLink.click();
+                                    console.log('✅ Clicked OTP link');
+                                    if (window.chrome && window.chrome.webview) {
+                                        window.chrome.webview.postMessage({ status: 'ClickedOTP', text: '' });
+                                    }
+                                } else {
+                                    console.log('❌ OTP link not found');
+                                    if (window.chrome && window.chrome.webview) {
+                                        window.chrome.webview.postMessage({ status: 'otp_link_not_found', text: '' });
+                                    }
+                                }
+                            })();");
+
+                        break;
+
+                    case "ClickedOTP":
+                        SmartBanksV2023.SetupOtpListener(
+#if WINFORMS
+                                            components,
+                                            textBoxConsole,
+#endif
+                                            ourviewmodel,
+                                            financeviewmodel,
+                                            loginInfo,
+                                            notificationTitle,
+                                            notificationPrefix,
+                                            notificationTagLength,
+                                            institution_code,
+                                            brand_code,
+                                            transaction_groupsFound,
+                                            transaction_typesFound);
+
+                        await financeviewmodel.FinanceWebView.ExecuteScriptAsync(@"
+                                (async function() {
+                                    function sleep(ms) {
+                                        return new Promise(resolve => setTimeout(resolve, ms));
+                                    }
+
+                                    async function waitForButton(text, maxAttempts = 20, delay = 500) {
+                                        for (let attempt = 0; attempt < maxAttempts; attempt++) {
+                                            const buttons = document.querySelectorAll('button');
+                                            for (const button of buttons) {
+                                                if (button.textContent.trim().toLowerCase() === text.toLowerCase()) {
+                                                    return button;
+                                                }
+                                            }
+                                            await sleep(delay);
+                                        }
+                                        return null;
+                                    }
+
+                                    const sendCodeButton = await waitForButton('Send code');
+
+                                    if (sendCodeButton) {
+                                        sendCodeButton.focus();
+                                        sendCodeButton.click();
+                                        console.log('✅ Clicked Send code button');
+                                        if (window.chrome && window.chrome.webview) {
+                                            window.chrome.webview.postMessage({ status: 'SendCode' });
+                                        }
+                                    } else {
+                                        console.log('❌ Send code button not found');
+                                        if (window.chrome && window.chrome.webview) {
+                                            window.chrome.webview.postMessage({ status: 'send_code_not_found' });
+                                        }
+                                    }
+                                })();
+                            ");
+
+                        break;
+                    case "SendCode":
+                        await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Status: Clicked send code");
+
+                        break;
+                    case "success_passcode":
+                        //financeviewmodel.step = 2;
+                        string oneTimePasscode = message1.text;
+                        await financeviewmodel.FinanceWebView.ExecuteScriptAsync($@"
+                                    (async function() {{
+                                        function sleep(ms) {{
+                                            return new Promise(resolve => setTimeout(resolve, ms));
+                                        }}
+
+                                        async function waitForElement(id, timeout = 10000) {{
+                                            const interval = 200;
+                                            let elapsed = 0;
+                                            while (elapsed < timeout) {{
+                                                const el = document.getElementById(id);
+                                                if (el) return el;
+                                                await sleep(interval);
+                                                elapsed += interval;
+                                            }}
+                                            return null;
+                                        }}
+
+                                        function typeIntoField(input, value) {{
+                                            input.focus();
+                                            input.value = '';
+
+                                            for (let i = 0; i < value.length; i++) {{
+                                                const char = value[i];
+                                                input.value += char;
+
+                                                const keyEvent = new KeyboardEvent('keydown', {{
+                                                    key: char,
+                                                    bubbles: true
+                                                }});
+                                                input.dispatchEvent(keyEvent);
+
+                                                const inputEvent = new Event('input', {{ bubbles: true }});
+                                                input.dispatchEvent(inputEvent);
+                                            }}
+
+                                            input.dispatchEvent(new Event('change', {{ bubbles: true }}));
+                                            input.dispatchEvent(new Event('blur', {{ bubbles: true }}));
+
+                                            console.log(`✅ Typed into ${{input.id}}:`, value);
+                                            return true;
+                                        }}
+
+                                        const input1 = await waitForElement('scaVerificationCode', 10000);
+
+                                        if (!input1) {{
+                                            console.log('❌ OTP input not found');
+                                            window.chrome.webview.postMessage({{ status: 'failure', text: 'otp_input_not_found' }});
+                                            return;
+                                        }}
+
+                                        typeIntoField(input1, '" + oneTimePasscode + $@"');    
+
+                                        console.log('✅ Filled in oneTimePasscode');
+                            
+                                        const sendCodeButton = await waitForElement('saveScaAuthentication');
+
+                                        if (sendCodeButton) {{
+                                            sendCodeButton.focus();
+                                            sendCodeButton.click();
+                                            console.log('✅ Clicked Log in button');
+                                            if (window.chrome && window.chrome.webview) {{
+                                                window.chrome.webview.postMessage({{ status: 'SubmitOTP' }});
+                                            }}
+                                        }} else {{
+                                            console.log('❌ Send code button not found');
+                                            if (window.chrome && window.chrome.webview) {{
+                                                window.chrome.webview.postMessage({{ status: 'send_code_not_found' }});
+                                            }}
+                                        }}
+                                        }})();");
+                        break;
+
+
+                    case "SubmitOTP":
+                        await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "OTP submitted ...");
+
+                        break;
+                    default:
+                        await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Failure: " + message1.status);
+                        break;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "JS message: " + ex.Message);
+
+            }
+            return;
+        }
+
+        internal static string CleanText(string memorable, string text)
+        {
+            int index = 0;
+            if (text.Length > 0)
+            {
+                string chars = text.Replace("Please enter ", string.Empty);
+                chars = chars.Replace(" character of ", string.Empty);
+                chars = chars.Replace("your", string.Empty);
+                chars = chars.Replace("you", string.Empty);
+                chars = chars.Replace(" memorable word", string.Empty).Trim();
+                if (chars.Length > 0)
+                {
+                    chars = chars.Substring(0, chars.Length - 2);
+                }
+                try
+                {
+                    index = Convert.ToInt32(chars);
+                    return memorable.Substring(index - 1, 1);
+                }
+                catch (Exception ex)
+                {
+                    System.Console.WriteLine(ex.Message);
+                }
+            }
+            return "";
+        }
+
+        // Message class to deserialize the JS object
+        public class LoginHrefMessage
+        {
+            // Names are case-sensitive - don't change these
+            public string status { get; set; }
+            public string text { get; set; }
+        }
+
+
+        internal static async Task<bool> Part3Async(
+#if WINFORMS
+                                                    SmartDashboard.MainProcess components,
+                                                    RichTextBox textBoxConsole,
+#endif
+                                                    MainViewModel ourviewmodel,
+                                                    FinanceViewModel financeviewmodel)
+        {
+            const string script = @"
+                                (function() {
+                                    const anchors = Array.from(document.querySelectorAll('a'));
+                                    const logoutLink = anchors.find(el =>
+                                        el.textContent.trim().toLowerCase() === 'log out');
+                                    if (logoutLink) {
+                                        logoutLink.click();
+                                        return 'clicked';
+                                    } else {
+                                        return 'not found';
+                                    }
+                                })();";
+
+            try
+            {
+                string result = await financeviewmodel.FinanceWebView.ExecuteScriptAsync(script);
+
+                if (!result.Contains("clicked"))
+                {
+                    financeviewmodel.errorMessage = "Couldn't find logout button";
+                    await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "No logout button found");
+                    financeviewmodel.tcs1X.TrySetResult(true); // <-- Signal failure no success whatever
+                }
+
+                financeviewmodel.loggedIn = false;
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Logout button: Clicked");
+                // Completion gets set in WebDead routine
+                return true;
+            }
+            catch (Exception ex)
+            {
+                financeviewmodel.errorMessage = $"Logout failed: {ex.Message}";
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Logout button click fail: " + ex.Message);
+                financeviewmodel.tcs1X.TrySetResult(true); // <-- Signal failure no success whatever
+                return false;
+            }
+        }
+
+        internal static async Task ClickLinkAndWaitAsync(CoreWebView2 webView, string script, string href)
+        {
+            var tcs = new TaskCompletionSource<bool>();
+
+            void Handler(object sender, CoreWebView2NavigationCompletedEventArgs e)
+            {
+                webView.NavigationCompleted -= Handler;
+                tcs.TrySetResult(true);
+            }
+
+            webView.NavigationCompleted += Handler;
+
+            var result = await webView.ExecuteScriptAsync(script);
+            if (result == "false")
+            {
+                webView.NavigationCompleted -= Handler;
+                throw new InvalidOperationException("No link found for " + href);
+            }
+            await tcs.Task; // Wait for navigation to complete
+        }
+
+        internal static async Task<bool> FindAddressAsync(
+                                                        MainViewModel ourviewmodel,
+                                                        FinanceViewModel financeviewmodel,
+                                                        SmartFinance.Logins loginInfo,
+                                                        string owner)
+        {
+            try
+            {
+                financeviewmodel.UDPRN = "";
+
+                // Well, I have Dan to thank for showing me chatGPT because
+                // it certainly saved my sorry arse at 07:37 today 27th May 2025
+                // as I have been struggling for an entire TWO DAYS to get this
+                // bitch working ... but here it is: a routine that finds
+                // the anchor containing the href ... clicks it and WAITS
+                // for the fucking page to load!  Now .. can I use this bastard
+                // anywhere else??  Time for a cuppa, Ray! Time for a cuppa ...
+                string hrefContains = "MaintainTelephoneAndAddress";
+                string escapedHref = hrefContains.Replace("'", "\\'");
+                string script = $@"
+                            (() => {{
+                                const link = Array.from(document.querySelectorAll('a[href]')).find(a => a.href.includes('{escapedHref}'));
+                                if (link) {{
+                                    link.click();
+                                    return true;
+                                }} else {{
+                                    return false;
+                                }}
+                            }})()";
+                // Navigate to the href and wait for navigation complete event
+                //await ClickLinkAndWaitAsync(webView, script, "MTA");
+
+                // Call FindDetails - you must have a WebView2 version of this method
+                financeviewmodel.UDPRN = await FindDetailsAsync(ourviewmodel,
+                                                                financeviewmodel,
+                                                                loginInfo,
+                                                                owner);
+
+                if (string.IsNullOrEmpty(financeviewmodel.UDPRN))
+                {
+                    await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "UDPRN: <empty>");
+                    financeviewmodel.errorMessage = "UDPRN is empty";
+                    return false;
+                }
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "UDPRN good: " + financeviewmodel.UDPRN);
+            }
+            catch (Exception ex)
+            {
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Find Address: " + ex.Message);
+            }
+            return true;
+        }
+
+        internal static async Task<string> FindDetailsAsync(MainViewModel ourviewmodel,
+                                                            FinanceViewModel financeviewmodel,
+                                                            SmartFinance.Logins loginInfo,
+                                                            string owner)
+        {
+            string udprn = "";
+            try
+            {
+                // Step 1: Find the address text inside <address> tags
+                string getAddressScript = @"
+                                    (function() {
+                                        let addresses = document.getElementsByTagName('address');
+                                        if (addresses.length === 0) return '';
+                                        let addrText = addresses[0].innerText || '';
+                                        addrText = addrText.replace(/\r?\n/g, ' ').trim();
+                                        addrText = addrText.replace(/\s{2,}/g, ' ');
+                                        return addrText;
+                                    })();";
+
+                string addressJson = await financeviewmodel.FinanceWebView.ExecuteScriptAsync(getAddressScript);
+                string bankaddress = System.Text.Json.JsonSerializer.Deserialize<string>(addressJson);
+
+                if (string.IsNullOrWhiteSpace(bankaddress))
+                {
+                    financeviewmodel.errorMessage = "Bank address empty - cannot continue";
+                    return udprn;
+                }
+
+                // Step 2: Lookup existing address in your database or cache
+                var addresses_found = SmartSpikeV2017.UsersLookupTextAddress(ourviewmodel, bankaddress);
+                if (addresses_found.Count > 0)
+                {
+                    if (string.IsNullOrEmpty(addresses_found.First().UDPRN))
+                    {
+                        financeviewmodel.errorMessage = "Address record has no UDPRN - cannot continue";
+                        return udprn;
+                    }
+                    udprn = addresses_found.First().UDPRN;
+                }
+                else
+                {
+                    // Step 5: New address - lookup via external service
+                    SmartUsers.AddressesView ideal_address = await SmartRoutinesV2018.UsersUDPRNLookup(ourviewmodel, bankaddress);
+                    if (string.IsNullOrEmpty(ideal_address.UDPRN))
+                    {
+                        financeviewmodel.errorMessage = "Cannot determine UDPRN - cannot continue";
+                        return udprn;
+                    }
+                    udprn = ideal_address.UDPRN;
+
+                    // Add new address record logic here (similar to your original code) ...
+                    // ...
+                }
+                // Step 7: Extract email and phone from page via JS
+                string getEmailScript = @"
+                                        (function() {
+                                            let el = document.getElementById('CurrentEmailAddress');
+                                            return el ? el.value : '';
+                                        })();";
+                string emailJson = await financeviewmodel.FinanceWebView.ExecuteScriptAsync(getEmailScript);
+                string emailValue = System.Text.Json.JsonSerializer.Deserialize<string>(emailJson);
+
+                if (loginInfo.CONTACT_EMAIL != emailValue)
+                {
+                    loginInfo.CONTACT_EMAIL = emailValue;
+                    loginInfo.Updated = true;
+                }
+
+                string getPhoneScript = @"
+                                        (function() {
+                                            let el = document.getElementById('MobilePhoneNumber');
+                                            return el ? el.value : '';
+                                        })();
+                                    ";
+                string phoneJson = await financeviewmodel.FinanceWebView.ExecuteScriptAsync(getPhoneScript);
+                string phoneValue = System.Text.Json.JsonSerializer.Deserialize<string>(phoneJson);
+
+                if (loginInfo.CONTACT_PHONENO != phoneValue)
+                {
+                    loginInfo.CONTACT_PHONENO = phoneValue;
+                    loginInfo.Updated = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                financeviewmodel.errorMessage = ex.Message;
+                return udprn;
+            }
+
+            // Update owner if changed
+            if (owner != loginInfo.OWNER)
+            {
+                loginInfo.OWNER = owner;
+                loginInfo.Updated = true;
+            }
+            if (loginInfo.Updated)
+            {
+                financeviewmodel.PLO.finance_logins_changesList.Add(loginInfo);
+            }
+            return udprn;
+        }
+
+        private class AccountLink
+        {
+            public string Href { get; set; }
+            public string InnerHTML { get; set; }
+        }
+
+        internal static async Task<bool> NationwideBuildAccountList(
+#if WINFORMS
+                                                                    SmartDashboard.MainProcess components,
+                                                                    RichTextBox textBoxConsole,
+#endif
+                                                                    MainViewModel ourviewmodel,
+                                                                    FinanceViewModel financeviewmodel,
+                                                                    short institution_code,
+                                                                    short brand_code,
+                                                                    string UDPRN,
+                                                                    List<SmartFinance.Transaction_Groups> transaction_groupsFound,
+                                                                    List<SmartFinance.Transaction_Types> transaction_typesFound)
+        {
+            try
+            {
+                string hrefContains = "AccountList/AccountList";
+                string escapedHref = hrefContains.Replace("'", "\\'");
+
+                // Navigate to the href and wait for navigation complete event
+                string script = $@"
+                            (() => {{
+                                const link = Array.from(document.querySelectorAll('a[href]')).find(a => a.href.includes('{escapedHref}'));
+                                if (link) {{
+                                    link.click();
+                                    return true;
+                                }} else {{
+                                    return false;
+                                }}
+                            }})()";
+                //await ClickLinkAndWaitAsync(webView, script, "AL");                
+
+                List<AccountLink> accounts = new List<AccountLink>();
+                // Run JavaScript to find the links under element with class 'active' with href containing "/AccountList/Account/RedirectToDefaultPage"
+                string scriptList = @"
+                                (function() {
+                                    let results = [];
+                                    let activeElement = document.querySelector('.active');
+                                    if (!activeElement) return JSON.stringify(results);
+                                    let anchors = activeElement.getElementsByTagName('a');
+                                    for(let i=0; i<anchors.length; i++) {
+                                        let href = anchors[i].href || '';
+                                        if(href.includes('/AccountList/Account/RedirectToDefaultPage')) {
+                                            results.push({
+                                                href: href,
+                                                innerHTML: anchors[i].innerHTML
+                                            });
+                                        }
+                                    }
+                                    return JSON.stringify(results);
+                                })();";
+
+                string jsonResult = await financeviewmodel.FinanceWebView.ExecuteScriptAsync(scriptList);
+
+
+                // Step 1: Trim leading/trailing quotes from JS result because we have a string not an array
+                if (jsonResult.StartsWith("\"") && jsonResult.EndsWith("\""))
+                {
+                    jsonResult = jsonResult.Substring(1, jsonResult.Length - 2);
+                }
+                // Step 2: Unescape the JSON string
+                string unescapedJson = System.Text.RegularExpressions.Regex.Unescape(jsonResult);
+
+                // Step 3: Deserialize JSON string to a list of link info objects
+                accounts = System.Text.Json.JsonSerializer.Deserialize<List<AccountLink>>(unescapedJson);
+
+                if (accounts == null || accounts.Count == 0)
+                {
+                    financeviewmodel.errorMessage = "No accounts found.";
+                    return false;
+                }
+
+                foreach (AccountLink account in accounts)
+                {
+                    string accountInfo1 = "";
+                    string accountInfo2;
+                    string accountName = "";
+                    string balance = "";
+                    string symbol = "";
+                    char categoryCode = SmartParametersV2016.defaultChar;
+
+                    // Parse account details from innerHTML
+                    NewAccountBalance(financeviewmodel, account.InnerHTML, ref accountInfo1, ref balance, ref symbol);
+
+                    if (string.IsNullOrEmpty(accountInfo1))
+                    {
+                        financeviewmodel.errorMessage = "Couldn't parse account info: " + accountInfo1;
+                        return false;
+                    }
+
+                    accountInfo2 = SplitAccountName(financeviewmodel, accountInfo1, ref accountName);
+                    if (string.IsNullOrEmpty(accountName))
+                    {
+                        financeviewmodel.errorMessage = "Account name empty";
+                        return false;
+                    }
+                    if (string.IsNullOrEmpty(accountInfo2))
+                    {
+                        financeviewmodel.errorMessage = "Account sortcode/account empty";
+                        return false;
+                    }
+
+                    short currency_ordinal = SmartSpikeV2017.GetCurrencyOrdinal(ourviewmodel, symbol);
+
+                    categoryCode = SmartParametersV2016.Banks; // default
+                    if (accountName.Contains("Savings", StringComparison.OrdinalIgnoreCase))
+                    {
+                        categoryCode = SmartParametersV2016.Savings;
+                    }
+
+                    string[] accstuff = accountInfo2.Split(SmartParametersV2016.spacechar);
+                    string sortcode = "";
+                    string account_no = "";
+
+                    if (accstuff.Length > 1)
+                    {
+                        sortcode = accstuff[0].Replace("-", "");
+                        account_no = accstuff[1];
+                    }
+                    else
+                    {
+                        account_no = accstuff[0];
+                    }
+
+                    bool decoded = await DecodeAccount(ourviewmodel,
+                                                        financeviewmodel,
+                                                        accountName,
+                                                        sortcode,
+                                                        account_no,
+                                                        currency_ordinal,
+                                                        institution_code,
+                                                        brand_code,
+                                                        UDPRN,
+                                                        categoryCode);
+                    if (!decoded)
+                    {
+                        return false;
+                    }
+                    if (!await ProcessAccountAsync(
+#if WINFORMS
+                        components,
+                        textBoxConsole,
+#endif
+                        ourviewmodel,
+                        financeviewmodel,
+                        categoryCode,
+                        account.Href,
+                        institution_code,
+                        brand_code,
+                        sortcode,
+                        account_no,
+                        financeviewmodel.UDPRN,
+                        0, // accountOrdinal (not used here, adjust if needed)
+                        symbol,
+                        transaction_groupsFound,
+                        transaction_typesFound))
+                    {
+#if WPF || UWP || WINUI
+                        await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Process Account: " + financeviewmodel.errorMessage);
+#endif
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                financeviewmodel.errorMessage = ex.Message;
+                return false;
+            }
+            return true;
+        }
+
+        internal static void NewAccountBalance(FinanceViewModel financeviewmodel,
+                                                string innerHtml,
+                                                ref string accountName,
+                                                ref string balance,
+                                                ref string symbol)
+        {
+            try
+            {
+                innerHtml = innerHtml.Replace("<br>", "|");
+                string[] innertext = innerHtml.Split("|");
+                if (innertext.Length > 0)
+                {
+                    accountName = innertext[0];
+                    if (innertext.Length > 1)
+                    {
+                        balance = innertext[1];
+                        bool negative = false;
+                        if (balance.Length > 0)
+                        {
+                            if (balance.Substring(0, 1) == "-")
+                            {
+                                balance = balance.Replace("-", "");
+                                negative = true;
+                            }
+                        }
+                        if (balance.Length > 0)
+                        {
+                            symbol = balance.Substring(0, 1);
+                            {
+                                balance = balance.Replace(symbol, "");
+                            }
+                            if (negative)
+                            {
+                                balance = "-" + balance;
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                financeviewmodel.errorMessage = ex.Message;
+            }
+            return;
+        }
+
+        internal static string SplitAccountName(FinanceViewModel financeviewmodel,
+                                                string accountInfo,
+                                                ref string accountName)
+        {
+            string ourid = "";
+            string account_no;
+            string sortcode = "";
+
+            // Now ... split the text up.
+            // assume the FIRST is an account name (or part of one)
+            // assume the LAST is always the balance ... good luck!
+            try
+            {
+                string[] items = accountInfo.Split(SmartParametersV2016.spaceSplit);
+                int itemCount = items.Length;
+                if (itemCount < 2)
+                {
+                    // Not enough items  what about "/" accounts?
+                    return "";
+                }
+                int itemPosLow = 0;
+                int itemPosHigh = itemCount - 1; // 2
+                if (items[itemPosLow] == "")
+                {
+                    // Can't find account name
+                    return "";
+                }
+                accountName = items[itemPosLow]; // FlexAccount
+                itemPosLow++;  // 1
+                // Now ... everything is betwwen these two
+                if (itemPosLow >= itemPosHigh)  // 1 >= 2
+                {
+                    // Can't find sort code and or acc num
+                    return "";
+                }
+                // Should always have ONE acc number
+                account_no = items[itemPosHigh];    // 10722017
+                itemPosHigh--;                      // 1
+                // Now ... everything is between these two
+                while (itemPosLow <= itemPosHigh)  // 1 < 1
+                {
+                    // Is first character a digit?
+                    char abc = Convert.ToChar(items[itemPosLow][0]); // items[1] = 070116?
+                    if (Char.IsDigit(abc))
+                    {
+                        sortcode = items[itemPosLow];
+                    }
+                    else
+                    {
+                        accountName += SmartParametersV2016.space + items[itemPosLow];
+                    }
+                    itemPosLow++;
+                }
+                ourid = sortcode +
+                    SmartParametersV2016.space +
+                    account_no;
+            }
+            catch (Exception ex)
+            {
+                financeviewmodel.errorMessage = ex.Message;
+            }
+            return ourid;
+        }
+
+        internal static async Task<bool> DecodeAccount(MainViewModel ourviewmodel,
+                                            FinanceViewModel financeviewmodel,
+                                            string accountName,
+                                            string sortcode,
+                                            string account_no,
+                                            short accountOrdinal,
+                                            short institutionCode,
+                                            short brandCode,
+                                            string udprn,
+                                            char categoryCode)
+        {
+            // We pick up the Balance from the very last transaction item
+            try
+            {
+                // 0 = sortcode
+                // 1 = account_no
+                // 2 = udprn
+                // 3 = currency
+                string vaalue = sortcode + SmartParametersV2016.fieldSeparator +
+                                account_no + SmartParametersV2016.fieldSeparator +
+                                udprn + SmartParametersV2016.fieldSeparator +
+                                accountOrdinal;   // Assume we can find it in Banking
+                vaalue = vaalue.Replace("&amp;", "&");                                                                           // Safety check
+                string[] itemArray = vaalue.Split(SmartParametersV2016.fieldSeparator);
+
+                financeviewmodel.account_id++;
+
+                FinanceViewModel.AccountItem account_item = new FinanceViewModel.AccountItem
+                {
+                    AccountID = financeviewmodel.account_id,
+                    Content = accountName,
+                    // Here we have [0] = sort_code
+                    //              [1] = account_no
+                    //              [2] = udprn
+                    //              [3] = account ordinal 
+                    Value = string.Join(SmartParametersV2016.bar.ToString(), itemArray)
+                };
+                financeviewmodel.accountItems.Add(account_item);
+
+                // We've found one, now do we need to add it to Accounts?
+                List<SmartFinance.Accounts> accounts_found =
+                    SmartSpikeFinanceV2017.Finance_Lookup_AccountsCategory(ourviewmodel,
+                                                                    financeviewmodel,
+                                                                    institutionCode,
+                                                                    brandCode,
+                                                                    categoryCode,
+                                                                    sortcode,
+                                                                    account_no,
+                                                                    udprn,
+                                                                    accountOrdinal);
+                if (accounts_found.Count == 0)
+                {
+                    // Dummy these two up
+                    int balance = 0;    // For now
+                    char status = SmartParametersV2016.AccountStatus;
+                    DateTime accountCreated = DateTime.UtcNow;  // UTC time
+                    // Its not in the Accounts List so add it in
+                    SmartFinance.Accounts account_record =
+                        SmartFinanceV2025.Account_Template(ourviewmodel,
+                                                            financeviewmodel,
+                                                            institutionCode,
+                                                            brandCode,
+                                                            sortcode,
+                                                            account_no,
+                                                            udprn,
+                                                            accountCreated,
+                                                            categoryCode,
+                                                            accountOrdinal,
+                                                            accountName,   // Title
+                                                            balance,
+                                                            status);
+                    financeviewmodel.PLO.finance_accounts_changesList.Add(account_record);
+                    // Do this now so the Account table is up to date
+                    if (!await SmartFinanceScrapeV2023.DoAllSmartFinance(ourviewmodel,
+                                                                        financeviewmodel,
+                                                                        true,
+                                                                        SmartParametersV2016.sqliteformat))
+                    {
+#if WPF || UWP || WINUI
+                        MainMeter.financeviewmodel.errorMessage = "Cannot update accounts(3) - cannot continue";
+                        await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, financeviewmodel.errorMessage);
+                        // This is a bit fatal, because if we can't do this, there's
+                        // every chance we can't do lots of things we need to further on
+                        return false;
+#endif
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                financeviewmodel.errorMessage = ex.Message;
+            }
+            return true;
+        }
+
+        internal static async Task<bool> ProcessAccountAsync(
+#if WINFORMS
+                                                        SmartDashboard.MainProcess components,
+                                                        RichTextBox textBoxConsole,
+#endif
+                                                        MainViewModel ourviewmodel,
+                                                        FinanceViewModel financeviewmodel,
+                                                        char categoryCode,
+                                                        string href,
+                                                        short institution_code,
+                                                        short brand_code,
+                                                        string sortcode,
+                                                        string account_no,
+                                                        string UDPRN,
+                                                        short accountOrdinal,
+                                                        string symbol,
+                                                        List<SmartFinance.Transaction_Groups> transaction_groupsFound,
+                                                        List<SmartFinance.Transaction_Types> transaction_typesFound)
+        {
+            try
+            {
+                //string hrefContains = "AccountList/AccountList";
+                string escapedHref = href.Replace("'", "\\'");
+                string script = $@"
+                            (() => {{
+                                const link = Array.from(document.querySelectorAll('a[href]')).find(a => a.href.includes('{escapedHref}'));
+                                if (link) {{
+                                    link.click();
+                                    return true;
+                                }} else {{
+                                    return false;
+                                }}
+                            }})()";
+                // Navigate to the href and wait for navigation complete event
+                // await ClickLinkAndWaitAsync(webView, script, "ALD");
+
+                string oneyearago = DateTime.Now.AddYears(-1).ToString("dd/MM/yyyy");
+                //await webView.ExecuteScriptAsync(@"document.getElementById('statement-from-date').value = '" + oneyearago + "';");
+
+                //await webView.ExecuteScriptAsync(@"document.getElementById('date-filter-update').click();");
+
+                //await Task.Delay(2000);
+                string[] transactions = new string[0];
+                // // Wait for table body to be updated – use a polling loop with timeout
+                string tableScript = @"
+                                (function(){
+                                    let tbody = document.querySelector('tbody');
+                                    return tbody ? tbody.innerText : '';
+                                })();";
+                string jsonResult = await financeviewmodel.FinanceWebView.ExecuteScriptAsync(tableScript);
+                if (jsonResult.StartsWith("\"") && jsonResult.EndsWith("\""))
+                {
+                    jsonResult = jsonResult.Substring(1, jsonResult.Length - 2);
+                }
+                jsonResult = Regex.Unescape(jsonResult);
+                transactions = jsonResult.Split('\n');
+                if (transactions.Length == 0)
+                {
+                    financeviewmodel.errorMessage = "No accounts found.";
+                    return false;
+                }
+#if WPF || UWP || WINUI
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Transactions found: " + transactions.Length);
+#endif
+
+                DateTime accountCreated = SmartParametersV2016.defaultDate;
+                List<SmartFinance.Accounts> accounts_found = financeviewmodel.PLO.finance_accountsList
+                    .Where(a => a.INSTITUTION_CODE == institution_code &&
+                                a.BRAND_CODE == brand_code &&
+                                a.SORTCODE == sortcode &&
+                                a.ACCOUNT_NO == account_no &&
+                                a.UDPRN == UDPRN)
+                    .OrderByDescending(a => a.ACCOUNT_CREATED)
+                    .ToList();
+
+                if (accounts_found.Count > 0)
+                {
+                    accountCreated = accounts_found.First().ACCOUNT_CREATED;
+                }
+                financeviewmodel.sequence_no = SmartFinanceV2025.UnixSequenceNo();
+
+                if (!await NationwideTransactions(
+#if WINFORMS
+                                            components,
+                                            textBoxConsole,
+#endif
+                                            ourviewmodel,
+                                            financeviewmodel,
+                                            categoryCode,
+                                            transactions,
+                                            institution_code,
+                                            brand_code,
+                                            sortcode,
+                                            account_no,
+                                            UDPRN,
+                                            symbol,
+                                            transaction_groupsFound,
+                                            transaction_typesFound,
+                                            accountCreated))
+                {
+                    await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Transactions failed ");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Exception in ProcessAccount: " + ex.Message);
+                return false;
+            }
+            return true;
+        }
+
+        //internal static async Task<bool> WebDriverDead(MainViewModel ourviewmodel,
+        //                                        FinanceViewModel financeviewmodel)
+        //{
+        //    if (financeviewmodel.FinanceWebView != null)
+        //    {
+        //        financeviewmodel.FinanceWebView.Stop(); // Stops navigation/loading
+        //    }
+        //    await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "FinanceWebView: " + "Quit completed");
+        //    financeviewmodel.tcs1X.SetResult(true);
+        //    return true;
+        //}
+
+        internal static async Task<bool> NationwideTransactions(
+#if WINFORMS
+                                                                SmartDashboard.MainProcess components,
+                                                                RichTextBox textBoxConsole,
+#endif
+                                                                MainViewModel ourviewmodel,
+                                                                FinanceViewModel financeviewmodel,
+                                                                char categoryCode,
+                                                                string[] transactions,
+                                                                short institutionCode,
+                                                                short brandCode,
+                                                                string sortcode,
+                                                                string account_no,
+                                                                string UDPRN,
+                                                                string symbol,
+                                                                List<SmartFinance.Transaction_Groups> transaction_groupsFound,
+                                                                List<SmartFinance.Transaction_Types> transaction_typesFound,
+                                                                DateTime accountCreated)
+        {
+            // This selects the ones we want (!!) with an EXTRA FUCKER which has no 'id' so
+            // the Chimps don't let us filter that one out with a selector - we
+            // have to FUCK ABOUT and do it ourselves .. I don't know how to
+            // do 'multiple selectors' i.e. acLink AND href=/AccountList
+            string date = "",
+                    description = "",
+                    transaction_type = "";
+            bool isPaidIn = false;
+            bool balancePaidIn = false;
+            string type = "";
+            double cryptoAmount = 0;
+            short cryptoAmountOrdinal = 0;
+            double amount = 0;
+            short amountOrdinal = 0;
+            double balance = 0;
+            short balanceOrdinal = 0;
+            DateTime transactionDate = SmartParametersV2016.defaultDate;
+
+            string amountSymbol = "";
+            string balanceSymbol = "";
+            // These bank transactions are in DESCENDING date order (I think!)            
+            // So we find the last, and work backwards down the list to the first
+            try
+            {
+                int howmany = transactions.Length - 1;
+                while (howmany >= 0)
+                {
+                    string[] items = transactions[howmany].Split(SmartParametersV2016.tab);
+                    if (items.Length == 6)
+                    {
+                        int itemIndex = 0;
+                        foreach (string item in items)
+                        {
+                            switch (itemIndex)
+                            {
+                                case 0: // Date
+                                    try
+                                    {
+                                        date = item.Trim();
+                                        transactionDate = SmartRoutinesV2018.DateTimeParse(date);
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        await SmartBobV2017.ListenerAsync(ourviewmodel, financeviewmodel.financeToken, institutionCode, brandCode, "NW date", ex.Message + ": " + date);
+                                        return false;
+                                    }
+                                    break;
+                                case 1: // Transaction type
+                                    transaction_type = item.Trim();
+                                    break;
+                                case 2: // Description
+                                    description = item.Trim();
+                                    break;
+                                case 3: // Paid Out
+                                    if (item.Length > 0)
+                                    {
+                                        string AMOUNT = item.Trim();
+                                        if (AMOUNT == "")
+                                        {
+                                            isPaidIn = true;
+                                        }
+                                        else
+                                        {
+                                            isPaidIn = false;
+                                            // All amounts as Negative
+                                            // May need to find first NON-DIGIT here, but for the time being ...
+                                            amountSymbol = AMOUNT.Substring(0, 1); // Get LEADING currency symbol
+
+                                            double VALUE = Convert.ToDouble(AMOUNT.Replace(amountSymbol, "").Replace(SmartParametersV2016.defaultCurrencySeparator.ToString(), ""));
+                                            amount = VALUE;    // Even Paid out values are positive
+                                            //Fiat currencies are legal tender controlled by governments.
+                                            //Crypto currencies are digital assets that use blockchain technology.
+                                            amountOrdinal = SmartSpikeV2017.GetCurrencyOrdinal(ourviewmodel, amountSymbol); // Er, might work
+
+                                        }
+                                    }
+                                    else
+                                    {
+                                        isPaidIn = true;
+                                    }
+                                    break;
+                                case 4: // Paid In
+                                    if (item.Length > 0)
+                                    {
+                                        string AMOUNT = item.Trim();
+                                        if (AMOUNT == "")
+                                        {
+                                            isPaidIn = false;
+                                        }
+                                        else
+                                        {
+                                            isPaidIn = true;
+                                            // All amounts as Positive
+                                            // May need to find first NON-DIGIT here, but for the time being ...
+                                            amountSymbol = AMOUNT.Substring(0, 1); // Get LEADING currency symbol
+
+                                            double VALUE = Convert.ToDouble(AMOUNT.Replace(amountSymbol, "").Replace(SmartParametersV2016.defaultCurrencySeparator.ToString(), ""));
+                                            amount = VALUE;
+                                            //Fiat currencies are legal tender cont rolled by governments.
+                                            //Crypto currencies are digital assets that use blockchain technology.
+                                            amountOrdinal = SmartSpikeV2017.GetCurrencyOrdinal(ourviewmodel, amountSymbol); // Er, might work
+                                        }
+                                    }
+                                    else
+                                    {
+                                        isPaidIn = false;
+                                    }
+                                    break;
+                                case 5: // Balance
+                                    if (item.Length > 0)
+                                    {
+                                        string AMOUNT = item.Trim();
+                                        // All amounts as Positive
+                                        // May need to find first NON-DIGIT here, but for the time being ...
+                                        balanceSymbol = AMOUNT.Substring(0, 1); // Get LEADING currency symbol
+
+                                        double VALUE = Convert.ToDouble(AMOUNT.Replace(balanceSymbol, "").Replace(SmartParametersV2016.defaultCurrencySeparator.ToString(), ""));
+                                        balance = VALUE; // Might be + or -
+                                        if (balance < 0)
+                                        {
+                                            balancePaidIn = false;
+                                        }
+                                        else
+                                        {
+                                            balancePaidIn = true;
+                                        }
+                                        balanceOrdinal = SmartSpikeV2017.GetCurrencyOrdinal(ourviewmodel, balanceSymbol); // Er, might work
+                                    }
+                                    break;
+                                default:
+                                    break;
+                            }
+                            itemIndex++;
+                        }
+                        short[] transCodes = SmartSpikeFinanceV2017.Finance_Lookup_TransactionTypes(financeviewmodel,
+                                                                                        transaction_groupsFound,
+                                                                                        transaction_typesFound,
+                                                                                        isPaidIn,
+                                                                                        transaction_type,
+                                                                                        false,
+                                                                                        institutionCode,
+                                                                                        brandCode,
+                                                                                        categoryCode);
+                        if (transCodes.Length != 2)
+                        {
+#if WPF || UWP || WINUI
+                            await SmartBobV2017.ListenerAsync(ourviewmodel, financeviewmodel.financeToken, institutionCode, brandCode, "NW Trans Lookup", "Trans type  failed: " + transaction_type);
+#endif
+                            // Carry on
+                        }
+                        else
+                        {
+                            if (transCodes[0] == 0 || transCodes[1] == 0)
+                            {
+#if WPF || UWP || WINUI
+                                await SmartBobV2017.ListenerAsync(ourviewmodel, financeviewmodel.financeToken, institutionCode, brandCode, "NW Trans Lookup", "Trans type  failed: " + transaction_type);
+#endif
+                                // Carry on - we have others to do
+                            }
+                        }
+                        // This is ALL WRONG ... hmm not sure it is
+                        // need this
+                        DateTime startDate = accountCreated;                    // Latest account
+                        DateTime endDate = Convert.ToDateTime(transactionDate);     // Transaction Date
+
+                        int diff = SmartDanV2025.GetMonthsDifference(startDate, endDate);
+
+                        short statementNo = Convert.ToInt16(diff + SmartParametersV2016.NWMonthsAdjustment);
+
+                        // Calculate (Kludge City lives on) the statement date and no
+                        DateTime statementDate = SmartDanV2025.GetFirstOfNextMonth(transactionDate);
+
+                        // Have we already got this one? (Ignore sequence_no)
+                        List<SmartFinance.TransactionsCategories>
+                            bt_found = SmartSpikeFinanceV2017.Finance_Lookup_BankTransaction(financeviewmodel,
+                                                    ourviewmodel.UserName,
+                                                    financeviewmodel.cubeface_code,
+                                                    institutionCode,
+                                                    brandCode,
+                                                    sortcode,
+                                                    account_no,
+                                                    UDPRN,
+                                                    statementDate,
+                                                    statementNo,
+                                                    transactionDate,
+                                                    isPaidIn,
+                                                    transCodes,
+                                                    description,
+                                                    type,               // Crypto Type
+                                                    cryptoAmount,       // Crypto
+                                                    cryptoAmountOrdinal,// Crypto
+                                                    amount,
+                                                    amountOrdinal,
+                                                    balance,
+                                                    balanceOrdinal,
+                                                    balancePaidIn);
+                        // Only add it in if we can't find it
+                        if (bt_found.Count == 0)
+                        {
+                            // Before we add it in, check to see if we have its header
+
+                            // Now! We are about to add it in, but does it have a header?
+                            // Lets go and see in the Transactions list ...
+                            SmartFinance.Transactions transHeader = new SmartFinance.Transactions()
+                            {
+                                USERNAME = ourviewmodel.UserName,
+                                CUBEFACE_CODE = SmartParametersV2016.Finance,
+                                INSTITUTION_CODE = institutionCode,
+                                BRAND_CODE = brandCode,
+                                SORTCODE = sortcode,
+                                ACCOUNT_NO = account_no,
+                                UDPRN = UDPRN,
+                                STATEMENT_DATE = statementDate,
+                                STATEMENT_NO = statementNo
+                            };
+                            // Try and find the Header in PLO
+                            List<SmartFinance.Transactions> transheaders_found =
+                                   new List<SmartFinance.Transactions>
+                            (from Header in financeviewmodel.PLO.transactionsList
+                             where Header.USERNAME == transHeader.USERNAME &&
+                                    Header.CUBEFACE_CODE == transHeader.CUBEFACE_CODE &&
+                                    Header.INSTITUTION_CODE == transHeader.INSTITUTION_CODE &&
+                                    Header.BRAND_CODE == transHeader.BRAND_CODE &&
+                                    Header.SORTCODE == transHeader.SORTCODE &&
+                                    Header.ACCOUNT_NO == transHeader.ACCOUNT_NO &&
+                                    Header.UDPRN == transHeader.UDPRN &&
+                                    Header.STATEMENT_DATE == transHeader.STATEMENT_DATE &&
+                                    Header.STATEMENT_NO == transHeader.STATEMENT_NO
+                             select Header).ToList();
+                            if (transheaders_found.Count == 0)
+                            {
+                                // Not there? Is it already in our changes?
+                                // Don't want to add it in twice!!
+                                transheaders_found =
+                                   new List<SmartFinance.Transactions>
+                                    (from Header in financeviewmodel.PLO.transactions_changesList
+                                     where Header.USERNAME == transHeader.USERNAME &&
+                                            Header.CUBEFACE_CODE == transHeader.CUBEFACE_CODE &&
+                                            Header.INSTITUTION_CODE == transHeader.INSTITUTION_CODE &&
+                                            Header.BRAND_CODE == transHeader.BRAND_CODE &&
+                                            Header.SORTCODE == transHeader.SORTCODE &&
+                                            Header.ACCOUNT_NO == transHeader.ACCOUNT_NO &&
+                                            Header.UDPRN == transHeader.UDPRN &&
+                                            Header.STATEMENT_DATE == transHeader.STATEMENT_DATE &&
+                                            Header.STATEMENT_NO == transHeader.STATEMENT_NO
+
+                                     select Header).ToList();
+                                if (transheaders_found.Count == 0)
+                                {
+                                    // Add it in
+                                    transHeader.RANDOMKEY1 = SmartRoutinesV2018.GetNextRandomNew(ourviewmodel.randomR);
+                                    transHeader.Updated = false; // Its new
+                                    financeviewmodel.PLO.transactions_changesList.Add(transHeader);
+                                }
+                            }
+
+                            financeviewmodel.sequence_no++;
+                            // Still want to add it in even if we can't analyze the transaction ...
+                            int random1 = SmartRoutinesV2018.GetNextRandomNew(ourviewmodel.randomR);
+                            int random2 = SmartRoutinesV2018.GetNextRandomNew(ourviewmodel.randomR);
+                            // Use common template
+                            SmartFinance.TransactionsCategories bankTransaction =
+                                SmartDanV2025.TransactionCategory_Template(ourviewmodel,
+                                                                        financeviewmodel,
+                                                                        institutionCode,
+                                                                        brandCode,
+                                                                        sortcode,
+                                                                        account_no,
+                                                                        UDPRN,
+                                                                        statementDate,
+                                                                        statementNo,
+                                                                        financeviewmodel.sequence_no,
+                                                                        random1,
+                                                                        transactionDate,
+                                                                        isPaidIn,
+                                                                        transCodes,
+                                                                        description,
+                                                                        type,
+                                                                        cryptoAmount,
+                                                                        cryptoAmountOrdinal,
+                                                                        amount,
+                                                                        amountOrdinal,  // Should be 1 for GBP!
+                                                                        balance,
+                                                                        balanceOrdinal, // Should be 1 for GBP
+                                                                        balancePaidIn,
+                                                                        random2,
+                                                                        false);         // Updated
+                            financeviewmodel.PLO.transactionscategories_changesList.Add(bankTransaction);
+                            financeviewmodel.transactions_count++;
+                        }
+                    }
+                    howmany--;
+                }
+            }
+            catch (Exception ex)
+            {
+                if (!await SmartRoutinesV2018.CheckTrace(ourviewmodel, financeviewmodel.financeToken, institutionCode, brandCode, "NationwideTransactions" + ": " + ex.Message))
+                {
+                    return false;
+                }
+                return false;
+            }
+            return true;
+        }
+
+        internal static async Task<bool> NationwideFindInputs(
+                                                        MainViewModel ourviewmodel,
+                                                        FinanceViewModel financeviewmodel,
+                                                        CoreWebView2 webView,
+                                                        string customerNumber,
+                                                        string day,
+                                                        string year)
+        {
+            bool status = false;
+
+            bool customernumber_found = false,
+                 dateofbirthday_found = false,
+                 dateofbirthyear_found = false;
+
+            try
+            {
+                await webView.ExecuteScriptAsync($"document.querySelector(\"input[name='CustomerNumber']\").value = '{customerNumber}';");
+                customernumber_found = true;
+            }
+            catch (Exception ex)
+            {
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Not filled: CustomerId " + ex.Message);
+                return false;
+            }
+
+            try
+            {
+                await webView.ExecuteScriptAsync($"document.querySelector(\"input[name='DateOfBirthDay']\").value = '{day}';");
+                dateofbirthday_found = true;
+            }
+            catch (Exception ex)
+            {
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Not filled: DateOfBirthDay " + ex.Message);
+                return false;
+            }
+
+            try
+            {
+                await webView.ExecuteScriptAsync($"document.querySelector(\"input[name='DateOfBirthYear']\").value = '{year}';");
+                dateofbirthyear_found = true;
+            }
+            catch (Exception ex)
+            {
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, "Not filled: DateOfBirthYear " + ex.Message);
+                return false;
+            }
+
+            if (customernumber_found && dateofbirthday_found && dateofbirthyear_found)
+            {
+                status = true;
+            }
+
+            return status;
+        }
+
+        public static async Task<bool> SelectRadioButtonAsync(
+                                        CoreWebView2 webView,
+                                        Action<string> logAction)
+        {
+            try
+            {
+                string script = @"
+                                (() => {
+                                    const radio = document.querySelector(""input[type='radio'][value='PassNumberAndSMSOTP']"");
+                                    if (radio && radio.offsetParent !== null) {  // Checks for visibility
+                                        radio.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                                        radio.click();
+                                        return 'Clicked';
+                                    } else {
+                                        return 'NotFound';
+                                    }
+                                })()";
+
+                string result = await webView.ExecuteScriptAsync(script);
+                if (result.Contains("Clicked"))
+                {
+                    logAction("Radio button clicked");
+                    return true;
+                }
+                else
+                {
+                    logAction("Radio button cannot be clicked");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                logAction($"Error clicking radio button: {ex.Message}");
+                return false;
+            }
+        }
+        internal static async Task<bool> NationwideFindPasscodesAsync(
+#if WINFORMS
+                                                                        SmartDashboard.MainProcess components,
+                                                                        RichTextBox textBoxConsole,
+#endif
+                                                                        //MainViewModel ourviewmodel,
+                                                                        //FinanceViewModel financeviewmodel,
+                                                                        CoreWebView2 webView,
+                                                                        string PASSCODE,
+                                                                        Action<string> logAction,
+                                                                        Action<string> setError)
+        {
+            try
+            {
+                // Step 1: Get spans with class 'control__label__title'
+                string script = @"
+                                (() => {
+                                    const spans = Array.from(document.querySelectorAll('span.control__label__title'));
+                                    const result = [];
+                                    for (let span of spans) {
+                                        if (span.innerText.includes('digits from your passnumber')) {
+                                            result.push(span.innerText);
+                                        }
+                                    }
+                                    return result;
+                                })()";
+                var resultJson = await webView.ExecuteScriptAsync(script);
+                var spanTexts = System.Text.Json.JsonSerializer.Deserialize<List<string>>(resultJson);
+
+                if (spanTexts == null || spanTexts.Count == 0)
+                {
+                    logAction("Couldn't find 'passcodes' span class");
+                    return false;
+                }
+
+                string text = spanTexts[0]; // Use the first match
+                int index = 0;
+                int[] zzz = new int[3];
+
+                if (text.Contains("1st")) zzz[index++] = 0;
+                if (text.Contains("2nd")) zzz[index++] = 1;
+                if (text.Contains("3rd")) zzz[index++] = 2;
+                if (text.Contains("4th")) zzz[index++] = 3;
+                if (text.Contains("5th")) zzz[index++] = 4;
+                if (text.Contains("6th")) zzz[index++] = 5;
+
+                string[] dropdownNames = { "FirstPassnumberValue", "SecondPassnumberValue", "ThirdPassnumberValue" };
+
+                for (int j = 0; j < 3; j++)
+                {
+                    int digitIndex = zzz[j];
+                    string digit = PASSCODE.Substring(digitIndex, 1);
+                    string selectScript = $@"
+                                        (() => {{
+                                            let select = document.querySelector('select[name=""{dropdownNames[j]}""]');
+                                            if (!select) return 'Missing';
+                                            for (let option of select.options) {{
+                                                if (option.label === '{digit}') {{
+                                                    select.value = option.value;
+                                                    select.dispatchEvent(new Event('change'));
+                                                    return 'Success';
+                                                }}
+                                            }}
+                                            return 'NotFound';
+                                        }})()";
+                    string selectionResult = await webView.ExecuteScriptAsync(selectScript);
+                    if (selectionResult.Contains("Missing"))
+                    {
+                        logAction($"Couldn't find '{dropdownNames[j]}' drop-down input");
+                        return false;
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                setError(ex.Message);
+                return false;
+            }
+        }
+
+#if WINFORMS || WPF || UWP || WINUI
+        public static async void AddWaitTimer(MainViewModel ourviewmodel, FinanceViewModel financeviewmodel, string key, int seconds, Action<string> onTick, Action<string, MainViewModel.TimerFinishReason> onComplete)
+        {
+            if (IsRunning(financeviewmodel, key))
+            {
+#if WINFORMS
+                System.Windows.Forms.MessageBox.Show($"Timer {key} is already running.");
+#endif
+
+                //MessageBox.Show($"Timer {key} is already running.");
+                await SmartRoutinesV2018.TextBlockUpdate(ourviewmodel, $"Timer {key} is already running");
+                return;
+            }
+            financeviewmodel.timers[key] = new MainViewModel.TimerEntry
+            {
+                RemainingSeconds = seconds,
+                OnTick = onTick,
+                OnComplete = onComplete
+            };
+
+            // Fire initial tick so UI can show full duration immediately            
+            //onTick.Invoke(key); <= Don't think I need this here
+        }
+        public static bool IsRunning(FinanceViewModel financeviewmodel, string key) => financeviewmodel.timers.ContainsKey(key);
+
+        public static void CancelTimer(FinanceViewModel financeviewmodel, string key)
+        {
+            if (financeviewmodel.timers.TryGetValue(key, out var timer))
+            {
+                timer.OnComplete.Invoke(key, MainViewModel.TimerFinishReason.Cancelled);
+                financeviewmodel.timers.Remove(key);
+            }
+            return;
+        }
+
+        // Not so sure this is ever needed?
+        internal static int GetRemainingSeconds(FinanceViewModel financeviewmodel, string key)
+        {
+            if (financeviewmodel.timers.TryGetValue(key, out var timer))
+            {
+                return timer.RemainingSeconds;
+            }
+            return 0;
+        }
+#endif
+    }
+}
+#endif

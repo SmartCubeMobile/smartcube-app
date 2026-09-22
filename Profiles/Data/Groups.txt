@@ -1,0 +1,5 @@
+USERNAME nvarchar(18)	GROUPNAME nvarchar(18)	ACTIVEFLAG bit(1)	MARKER datetime(8)	PDEK nvarchar(64)	SENDF bit(1)	FDEK nvarchar(64)	SENDU bit(1)	UDEK nvarchar(64)	RECEIVEALL bit(1)	DISPLAYNAME nvarchar(64)
+ANNA	RAY	1	01/01/1900 00:00:00		1		0		1	Daddums
+MARIA	RAY	1	01/01/1900 00:00:00		0		1		0	Mrs H
+RAY	ANNA	1	01/01/1900 00:00:00		0		0		1	Dort-io
+RAY	MARIA	1	01/01/1900 00:00:00		0		0		1	WAG

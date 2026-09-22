@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.Faces.SubscriptionsFace"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid ColumnDefinitions="*,*" Padding="16" ColumnSpacing="12">
+
+        <!-- Left Column -->
+        <ScrollView Grid.Column="0">
+        <VerticalStackLayout Spacing="12">
+
+            <!-- Summary Card -->
+            <Border x:Name="SummaryCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Monthly Subscriptions" Style="{StaticResource Heading2}" />
+                    <Grid ColumnDefinitions="*,*,*" RowSpacing="8">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2" HorizontalOptions="Center">
+                            <Label x:Name="TotalMonthlyLabel" Text="£0.00"
+                                   TextColor="{StaticResource Warning}" FontSize="22"
+                                   FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                            <Label Text="per month" TextColor="{StaticResource TextMuted}"
+                                   FontSize="11" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
+                            <Label x:Name="TotalYearlyLabel" Text="£0.00"
+                                   TextColor="{StaticResource Danger}" FontSize="22"
+                                   FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                            <Label Text="per year" TextColor="{StaticResource TextMuted}"
+                                   FontSize="11" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="2" Spacing="2" HorizontalOptions="Center">
+                            <Label x:Name="SubCountLabel" Text="0"
+                                   TextColor="{StaticResource Primary}" FontSize="22"
+                                   FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                            <Label Text="active" TextColor="{StaticResource TextMuted}"
+                                   FontSize="11" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Subscriptions List -->
+            <Border x:Name="SubsListCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Active Subscriptions" Style="{StaticResource Heading2}" />
+                        <Button Grid.Column="1" x:Name="AddSubBtn" Text="+ Add"
+                                BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                FontSize="11" FontAttributes="Bold"
+                                CornerRadius="8" Padding="10,2"
+                                HeightRequest="26"
+                                Clicked="OnAddSubscriptionClicked" />
+                    </Grid>
+                    <VerticalStackLayout x:Name="SubsList" Spacing="8" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Right Column -->
+        <ScrollView Grid.Column="1">
+        <VerticalStackLayout Spacing="12">
+
+            <!-- Category Breakdown -->
+            <Border x:Name="CategoryCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="By Category" Style="{StaticResource Heading2}" />
+                    <VerticalStackLayout x:Name="CategoryList" Spacing="6" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Cancellation Tips -->
+            <Border x:Name="TipsCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Cancel a Subscription" Style="{StaticResource Heading2}" />
+                    <Label Text="Select a subscription from the list and tap Cancel to see how to cancel it. Most UK subscriptions can be cancelled:"
+                           TextColor="{StaticResource TextMuted}" FontSize="12" />
+                    <Label Text="• Direct Debit — cancel via your bank app or call them&#10;• Online — log into the service and cancel in settings&#10;• Phone — call the provider (they must process it)&#10;&#10;Under the Payment Services Regulations 2017, your bank MUST cancel a Direct Debit when you ask."
+                           TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentView>

@@ -1,0 +1,1055 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.Faces.ProfileFace"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid ColumnDefinitions="*,*" Padding="16" ColumnSpacing="12">
+
+        <!-- Vehicle lookup overlay -->
+        <Grid x:Name="LookupOverlay" Grid.ColumnSpan="2" IsVisible="False"
+              BackgroundColor="#FF0A0F1E" ZIndex="100" Padding="40">
+            <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+                <HorizontalStackLayout Grid.Row="0" Spacing="10" HorizontalOptions="Center">
+                    <ActivityIndicator IsRunning="True" Color="{StaticResource Primary}"
+                                       HeightRequest="20" WidthRequest="20" />
+                    <Label x:Name="LookupStatusLabel" Text="Looking up vehicle..."
+                           TextColor="{StaticResource TextPrimary}" FontSize="14" VerticalOptions="Center" />
+                </HorizontalStackLayout>
+                <Border Grid.Row="1" StrokeShape="RoundRectangle 8" Stroke="#1E293B" StrokeThickness="1">
+                    <WebView x:Name="LookupWebView" />
+                </Border>
+                <Label Grid.Row="2" Text="Vehicle data will be extracted automatically once the page loads"
+                       TextColor="{StaticResource TextMuted}" FontSize="11" HorizontalTextAlignment="Center" />
+            </Grid>
+        </Grid>
+
+        <!-- Maintenance overlay -->
+        <Grid x:Name="MaintenanceOverlay" Grid.ColumnSpan="2" IsVisible="False"
+              BackgroundColor="#FF0A0F1E" ZIndex="100" Padding="20">
+            <!-- Header -->
+            <Grid RowDefinitions="Auto,*" RowSpacing="12">
+                <Grid ColumnDefinitions="*,Auto" Padding="0,0,0,4">
+                    <Label x:Name="MaintTitle" Text="Vehicle Maintenance"
+                           TextColor="{StaticResource TextPrimary}" FontSize="20"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                    <Button Grid.Column="1" Text="Close"
+                            BackgroundColor="#3B1A1A" TextColor="#EF4444"
+                            FontSize="12" CornerRadius="8" Padding="14,4"
+                            HeightRequest="30"
+                            Clicked="OnCloseMaintenanceClicked" />
+                </Grid>
+
+                <!-- Two-column layout -->
+                <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="12">
+
+                    <!-- LEFT COLUMN -->
+                    <ScrollView Grid.Column="0">
+                    <VerticalStackLayout Spacing="12">
+
+                        <!-- MOT Status -->
+                        <Border x:Name="MotStatusCard" Style="{StaticResource CardFrame}" Padding="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                                    <Label Text="MOT Status" Style="{StaticResource Heading2}" />
+                                    <Button Grid.Column="1" x:Name="SetMotReminderBtn" Text="Set Reminder"
+                                            BackgroundColor="#3B2E1A" TextColor="#F59E0B"
+                                            FontSize="10" FontAttributes="Bold"
+                                            CornerRadius="6" Padding="10,2"
+                                            HeightRequest="26"
+                                            Clicked="OnSetMotReminderClicked" />
+                                    <Button Grid.Column="2" x:Name="RefreshMotBtn" Text="Refresh MOT"
+                                            BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                            FontSize="10" FontAttributes="Bold"
+                                            CornerRadius="6" Padding="10,2"
+                                            HeightRequest="26"
+                                            Clicked="OnRefreshMotClicked" />
+                                </Grid>
+                                <Border x:Name="MotCountdownBadge"
+                                        BackgroundColor="#0A3D2E"
+                                        StrokeShape="RoundRectangle 8" Stroke="Transparent"
+                                        Padding="12,8" HorizontalOptions="Fill">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <VerticalStackLayout Spacing="2">
+                                            <Label x:Name="MotExpiryLabel" Text="MOT expires: —"
+                                                   TextColor="#E2E8F0" FontSize="13" FontAttributes="Bold" />
+                                            <Label x:Name="MotCountdownLabel" Text=""
+                                                   TextColor="#94A3B8" FontSize="11" />
+                                        </VerticalStackLayout>
+                                        <Label Grid.Column="1" x:Name="MotStatusIcon" Text=""
+                                               FontSize="24" VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="8">
+                                    <Label Grid.Row="0" Grid.Column="0" Text="Last Test Date"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="0" Grid.Column="1" x:Name="MaintTestDateLabel" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="1" Grid.Column="0" Text="Last Test Result"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="1" Grid.Column="1" x:Name="MaintTestResultLabel" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="2" Grid.ColumnSpan="2" x:Name="MotReminderLabel" Text=""
+                                           TextColor="#F59E0B" FontSize="10" IsVisible="False" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Vehicle Diagram -->
+                        <Border x:Name="DiagramCard" Style="{StaticResource CardFrame}" Padding="14" IsVisible="False">
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="Advisory Locations" Style="{StaticResource Heading2}" />
+                                <Grid HorizontalOptions="Center" WidthRequest="180" HeightRequest="260" Margin="0,4">
+                                    <!-- Car body outline -->
+                                    <Border BackgroundColor="#0D1322" Stroke="#2A3A5C" StrokeThickness="2"
+                                            StrokeShape="{RoundRectangle CornerRadius='34,34,16,16'}"
+                                            Margin="32,0" />
+                                    <!-- Windscreen -->
+                                    <Border BackgroundColor="#131B2E" Stroke="#2A3A5C" StrokeThickness="1"
+                                            StrokeShape="{RoundRectangle CornerRadius='14,14,4,4'}"
+                                            Margin="46,38,46,0" HeightRequest="40" VerticalOptions="Start" />
+                                    <!-- Rear window -->
+                                    <Border BackgroundColor="#131B2E" Stroke="#2A3A5C" StrokeThickness="1"
+                                            StrokeShape="{RoundRectangle CornerRadius='4,4,10,10'}"
+                                            Margin="46,0,46,30" HeightRequest="32" VerticalOptions="End" />
+                                    <!-- FRONT label -->
+                                    <Label Text="FRONT" FontSize="8" TextColor="#4A5A7C"
+                                           HorizontalOptions="Center" VerticalOptions="Start" Margin="0,8,0,0" />
+                                    <!-- REAR label -->
+                                    <Label Text="REAR" FontSize="8" TextColor="#4A5A7C"
+                                           HorizontalOptions="Center" VerticalOptions="End" Margin="0,0,0,8" />
+                                    <!-- NS label -->
+                                    <Label Text="N/S" FontSize="7" TextColor="#4A5A7C" Rotation="-90"
+                                           HorizontalOptions="Start" VerticalOptions="Center" Margin="1,0,0,0" />
+                                    <!-- OS label -->
+                                    <Label Text="O/S" FontSize="7" TextColor="#4A5A7C" Rotation="90"
+                                           HorizontalOptions="End" VerticalOptions="Center" Margin="0,0,1,0" />
+
+                                    <!-- Wheels: Nearside Front -->
+                                    <Border x:Name="WheelNF" BackgroundColor="#1C2744" Stroke="#2A3A5C" StrokeThickness="2"
+                                            StrokeShape="{RoundRectangle CornerRadius=3}"
+                                            WidthRequest="14" HeightRequest="28"
+                                            HorizontalOptions="Start" VerticalOptions="Start" Margin="18,34" />
+                                    <!-- Wheels: Offside Front -->
+                                    <Border x:Name="WheelOF" BackgroundColor="#1C2744" Stroke="#2A3A5C" StrokeThickness="2"
+                                            StrokeShape="{RoundRectangle CornerRadius=3}"
+                                            WidthRequest="14" HeightRequest="28"
+                                            HorizontalOptions="End" VerticalOptions="Start" Margin="18,34" />
+                                    <!-- Wheels: Nearside Rear -->
+                                    <Border x:Name="WheelNR" BackgroundColor="#1C2744" Stroke="#2A3A5C" StrokeThickness="2"
+                                            StrokeShape="{RoundRectangle CornerRadius=3}"
+                                            WidthRequest="14" HeightRequest="28"
+                                            HorizontalOptions="Start" VerticalOptions="End" Margin="18,0,18,42" />
+                                    <!-- Wheels: Offside Rear -->
+                                    <Border x:Name="WheelOR" BackgroundColor="#1C2744" Stroke="#2A3A5C" StrokeThickness="2"
+                                            StrokeShape="{RoundRectangle CornerRadius=3}"
+                                            WidthRequest="14" HeightRequest="28"
+                                            HorizontalOptions="End" VerticalOptions="End" Margin="18,0,18,42" />
+
+                                    <!-- Highlight markers -->
+                                    <Border x:Name="MarkerNF" BackgroundColor="#F59E0B" Opacity="0.35"
+                                            StrokeShape="{RoundRectangle CornerRadius=6}" Stroke="Transparent"
+                                            WidthRequest="42" HeightRequest="54"
+                                            HorizontalOptions="Start" VerticalOptions="Start" Margin="10,22"
+                                            IsVisible="False" />
+                                    <Border x:Name="MarkerOF" BackgroundColor="#F59E0B" Opacity="0.35"
+                                            StrokeShape="{RoundRectangle CornerRadius=6}" Stroke="Transparent"
+                                            WidthRequest="42" HeightRequest="54"
+                                            HorizontalOptions="End" VerticalOptions="Start" Margin="10,22"
+                                            IsVisible="False" />
+                                    <Border x:Name="MarkerNR" BackgroundColor="#F59E0B" Opacity="0.35"
+                                            StrokeShape="{RoundRectangle CornerRadius=6}" Stroke="Transparent"
+                                            WidthRequest="42" HeightRequest="54"
+                                            HorizontalOptions="Start" VerticalOptions="End" Margin="10,0,10,30"
+                                            IsVisible="False" />
+                                    <Border x:Name="MarkerOR" BackgroundColor="#F59E0B" Opacity="0.35"
+                                            StrokeShape="{RoundRectangle CornerRadius=6}" Stroke="Transparent"
+                                            WidthRequest="42" HeightRequest="54"
+                                            HorizontalOptions="End" VerticalOptions="End" Margin="10,0,10,30"
+                                            IsVisible="False" />
+
+                                    <!-- Marker icons -->
+                                    <Label x:Name="MarkerNFIcon" Text="⚠" FontSize="14" TextColor="#F59E0B"
+                                           HorizontalOptions="Start" VerticalOptions="Start" Margin="22,38"
+                                           IsVisible="False" />
+                                    <Label x:Name="MarkerOFIcon" Text="⚠" FontSize="14" TextColor="#F59E0B"
+                                           HorizontalOptions="End" VerticalOptions="Start" Margin="0,38,22,0"
+                                           IsVisible="False" />
+                                    <Label x:Name="MarkerNRIcon" Text="⚠" FontSize="14" TextColor="#F59E0B"
+                                           HorizontalOptions="Start" VerticalOptions="End" Margin="22,0,0,46"
+                                           IsVisible="False" />
+                                    <Label x:Name="MarkerORIcon" Text="⚠" FontSize="14" TextColor="#F59E0B"
+                                           HorizontalOptions="End" VerticalOptions="End" Margin="0,0,22,46"
+                                           IsVisible="False" />
+                                </Grid>
+                                <!-- Legend -->
+                                <HorizontalStackLayout HorizontalOptions="Center" Spacing="6">
+                                    <Border BackgroundColor="#F59E0B" Opacity="0.5" WidthRequest="10" HeightRequest="10"
+                                            StrokeShape="{RoundRectangle CornerRadius=3}" Stroke="Transparent"
+                                            VerticalOptions="Center" />
+                                    <Label Text="Advisory area" FontSize="10" TextColor="{StaticResource TextMuted}"
+                                           VerticalOptions="Center" />
+                                </HorizontalStackLayout>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Find Part -->
+                        <Border Style="{StaticResource CardFrame}" Padding="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Find Part Number" Style="{StaticResource Heading2}" />
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
+                                    <Border BackgroundColor="#0D1322" Stroke="#2A3A5C" StrokeThickness="1"
+                                            StrokeShape="{RoundRectangle CornerRadius=6}" Padding="0">
+                                        <Entry x:Name="FindPartEntry" Placeholder="e.g. shock absorber, windscreen"
+                                               PlaceholderColor="#4A5A7C" TextColor="#E2E8F0"
+                                               BackgroundColor="Transparent" FontSize="12"
+                                               Completed="OnFindPartSearch" />
+                                    </Border>
+                                    <Button Grid.Column="1" x:Name="FindPartBtn" Text="Search"
+                                            BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                            FontSize="10" FontAttributes="Bold"
+                                            CornerRadius="6" Padding="10,2"
+                                            HeightRequest="26"
+                                            Clicked="OnFindPartSearchClicked" />
+                                </Grid>
+                                <VerticalStackLayout x:Name="PartSearchResults" Spacing="4" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+                    </ScrollView>
+
+                    <!-- RIGHT COLUMN -->
+                    <ScrollView Grid.Column="1">
+                    <VerticalStackLayout Spacing="12">
+
+                        <!-- Advisories -->
+                        <Border x:Name="AdvisoriesCard" Style="{StaticResource CardFrame}" Padding="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="MOT Advisories" Style="{StaticResource Heading2}" />
+                                    <Button Grid.Column="1" x:Name="GetAllEstimatesBtn" Text="Get All Estimates"
+                                            BackgroundColor="#3B2E1A" TextColor="#F59E0B"
+                                            FontSize="10" FontAttributes="Bold"
+                                            CornerRadius="6" Padding="10,2"
+                                            HeightRequest="26" IsVisible="False"
+                                            Clicked="OnGetAllEstimatesClicked" />
+                                </Grid>
+                                <VerticalStackLayout x:Name="AdvisoriesList" Spacing="5" />
+                                <Label x:Name="AdvisoriesEmptyLabel"
+                                       Text="No advisories recorded — use Refresh MOT to fetch from DVSA"
+                                       TextColor="{StaticResource TextMuted}" FontSize="11"
+                                       HorizontalTextAlignment="Center" Margin="0,4" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Mileage -->
+                        <Border x:Name="MileageCard" Style="{StaticResource CardFrame}" Padding="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Mileage History" Style="{StaticResource Heading2}" />
+                                <!-- Odometer clock -->
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                                    <Border x:Name="OdometerContainer" BackgroundColor="#0D1322" Stroke="#2A3A5C" StrokeThickness="1"
+                                            StrokeShape="{RoundRectangle CornerRadius=8}" Padding="0"
+                                            HorizontalOptions="Fill">
+                                        <Grid x:Name="OdometerGrid" ColumnSpacing="2" Padding="8,6"
+                                              HorizontalOptions="Center">
+                                            <!-- Digit borders built in code-behind -->
+                                        </Grid>
+                                    </Border>
+                                    <Button Grid.Column="1" x:Name="SetMileageBtn" Text="Set"
+                                            BackgroundColor="#0A3D2E" TextColor="#34D399"
+                                            FontSize="11" FontAttributes="Bold"
+                                            CornerRadius="6" Padding="12,2"
+                                            HeightRequest="30"
+                                            Clicked="OnSetMileageClicked" />
+                                </Grid>
+                                <Label x:Name="OdometerHint" Text="Scroll over digits to adjust"
+                                       TextColor="#4A5A7C" FontSize="9" HorizontalTextAlignment="Center" />
+                                <VerticalStackLayout x:Name="MileageList" Spacing="5" />
+                                <Label x:Name="MileageEmptyLabel"
+                                       Text="No mileage entries yet"
+                                       TextColor="{StaticResource TextMuted}" FontSize="11"
+                                       HorizontalTextAlignment="Center" Margin="0,4" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Preferred Garage -->
+                        <Border x:Name="GarageCard" Style="{StaticResource CardFrame}" Padding="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="Preferred Garage" Style="{StaticResource Heading2}" />
+                                    <Button Grid.Column="1" x:Name="AddGarageBtn" Text="+ Add Garage"
+                                            BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                            FontSize="10" FontAttributes="Bold"
+                                            CornerRadius="6" Padding="10,2"
+                                            HeightRequest="26"
+                                            Clicked="OnAddGarageClicked" />
+                                </Grid>
+                                <VerticalStackLayout x:Name="GarageList" Spacing="5" />
+                                <Label x:Name="GarageEmptyLabel"
+                                       Text="No garage added — tap + Add Garage to save your preferred MOT/service centre"
+                                       TextColor="{StaticResource TextMuted}" FontSize="11"
+                                       HorizontalTextAlignment="Center" Margin="0,4" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+                    </ScrollView>
+
+                </Grid>
+            </Grid>
+
+            <!-- Hidden WebView for MOT refresh -->
+            <Border StrokeShape="RoundRectangle 8" Stroke="#1E293B" StrokeThickness="1"
+                    HeightRequest="0" IsVisible="False" ZIndex="-1">
+                <WebView x:Name="MaintWebView" />
+            </Border>
+        </Grid>
+
+        <!-- Property Maintenance overlay -->
+        <Grid x:Name="PropMaintOverlay" Grid.ColumnSpan="2" IsVisible="False"
+              BackgroundColor="#FF0A0F1E" ZIndex="100" Padding="20">
+            <Grid RowDefinitions="Auto,*" RowSpacing="12">
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Padding="0,0,0,4">
+                    <Label x:Name="PropMaintTitle" Text="Property Maintenance"
+                           TextColor="{StaticResource TextPrimary}" FontSize="20"
+                           FontAttributes="Bold" VerticalOptions="Center" />
+                    <ActivityIndicator Grid.Column="1" x:Name="PropRefreshSpinner"
+                                       IsRunning="False" IsVisible="False"
+                                       Color="#60A5FA" HeightRequest="20" WidthRequest="20"
+                                       VerticalOptions="Center" />
+                    <Button Grid.Column="2" x:Name="RefreshPropBtn" Text="Refresh Details"
+                            BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                            FontSize="10" FontAttributes="Bold"
+                            CornerRadius="6" Padding="10,2"
+                            HeightRequest="26"
+                            Clicked="OnRefreshPropDetailsClicked" />
+                    <Button Grid.Column="3" Text="Close"
+                            BackgroundColor="#3B1A1A" TextColor="#EF4444"
+                            FontSize="12" CornerRadius="8" Padding="14,4"
+                            HeightRequest="30"
+                            Clicked="OnClosePropMaintClicked" />
+                </Grid>
+
+                <Grid Grid.Row="1" ColumnDefinitions="*,*" ColumnSpacing="12">
+
+                    <!-- LEFT COLUMN -->
+                    <ScrollView Grid.Column="0">
+                    <VerticalStackLayout Spacing="12">
+
+                        <!-- Property Details -->
+                        <Border Style="{StaticResource CardFrame}" Padding="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Property Details" Style="{StaticResource Heading2}" />
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="8">
+                                    <Label Grid.Row="0" Grid.Column="0" Text="Address"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="0" Grid.Column="1" x:Name="PropMaintAddress" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="1" Grid.Column="0" Text="Postcode"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="1" Grid.Column="1" x:Name="PropMaintPostcode" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="2" Grid.Column="0" Text="Type"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="2" Grid.Column="1" x:Name="PropMaintType" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="3" Grid.Column="0" Text="Bedrooms"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="3" Grid.Column="1" x:Name="PropMaintBedrooms" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="4" Grid.Column="0" Text="Tenure"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="4" Grid.Column="1" x:Name="PropMaintTenure" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="5" Grid.Column="0" Text="Primary"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="5" Grid.Column="1" x:Name="PropMaintPrimary" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Financials -->
+                        <Border Style="{StaticResource CardFrame}" Padding="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Financials" Style="{StaticResource Heading2}" />
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="8">
+                                    <Label Grid.Row="0" Grid.Column="0" Text="Estimated Value"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="0" Grid.Column="1" x:Name="PropMaintEstValue" Text="—"
+                                           TextColor="#34D399" FontSize="11" FontAttributes="Bold" />
+                                    <Label Grid.Row="1" Grid.Column="0" Text="Last Sale"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="1" Grid.Column="1" x:Name="PropMaintLastSale" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="2" Grid.Column="0" Text="Purchase Price"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="2" Grid.Column="1" x:Name="PropMaintPurchasePrice" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="3" Grid.Column="0" Text="Purchase Date"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="3" Grid.Column="1" x:Name="PropMaintPurchaseDate" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="4" Grid.Column="0" Text="Council Tax Band"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="4" Grid.Column="1" x:Name="PropMaintCouncilTax" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                </Grid>
+                                <Border x:Name="PropMaintEpcBadge"
+                                        BackgroundColor="#0A3D2E"
+                                        StrokeShape="RoundRectangle 8" Stroke="Transparent"
+                                        Padding="12,8" HorizontalOptions="Fill">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <Label x:Name="PropMaintEpcLabel" Text="EPC Rating: —"
+                                               TextColor="#E2E8F0" FontSize="13" FontAttributes="Bold" />
+                                        <Label Grid.Column="1" x:Name="PropMaintEpcExpiry" Text=""
+                                               TextColor="#94A3B8" FontSize="10" VerticalOptions="Center" />
+                                    </Grid>
+                                </Border>
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Building Details (from EPC) -->
+                        <Border x:Name="BuildingDetailsCard" Style="{StaticResource CardFrame}" Padding="14" IsVisible="False">
+                            <VerticalStackLayout Spacing="8">
+                                <Label Text="Building Details" Style="{StaticResource Heading2}" />
+                                <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="8">
+                                    <Label Grid.Row="0" Grid.Column="0" Text="Floor Area"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="0" Grid.Column="1" x:Name="PropMaintFloorArea" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="1" Grid.Column="0" Text="Walls"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="1" Grid.Column="1" x:Name="PropMaintWalls" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="2" Grid.Column="0" Text="Roof"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="2" Grid.Column="1" x:Name="PropMaintRoof" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="3" Grid.Column="0" Text="Heating"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="3" Grid.Column="1" x:Name="PropMaintHeating" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="4" Grid.Column="0" Text="Windows"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="4" Grid.Column="1" x:Name="PropMaintWindows" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                    <Label Grid.Row="5" Grid.Column="0" Text="Hot Water"
+                                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                                    <Label Grid.Row="5" Grid.Column="1" x:Name="PropMaintHotWater" Text="—"
+                                           TextColor="{StaticResource TextPrimary}" FontSize="11" />
+                                </Grid>
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+                    </ScrollView>
+
+                    <!-- RIGHT COLUMN -->
+                    <ScrollView Grid.Column="1">
+                    <VerticalStackLayout Spacing="12">
+
+                        <!-- Maintenance Log -->
+                        <Border Style="{StaticResource CardFrame}" Padding="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="Maintenance Log" Style="{StaticResource Heading2}" />
+                                    <Button Grid.Column="1" x:Name="AddPropMaintBtn" Text="+ Add Entry"
+                                            BackgroundColor="#0A3D2E" TextColor="#34D399"
+                                            FontSize="10" FontAttributes="Bold"
+                                            CornerRadius="6" Padding="10,2"
+                                            HeightRequest="26"
+                                            Clicked="OnAddPropMaintEntryClicked" />
+                                </Grid>
+                                <VerticalStackLayout x:Name="PropMaintLogList" Spacing="5" />
+                                <Label x:Name="PropMaintLogEmpty"
+                                       Text="No maintenance entries — tap + Add Entry to log work done"
+                                       TextColor="{StaticResource TextMuted}" FontSize="11"
+                                       HorizontalTextAlignment="Center" Margin="0,4" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                        <!-- Contractors -->
+                        <Border Style="{StaticResource CardFrame}" Padding="14">
+                            <VerticalStackLayout Spacing="8">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <Label Text="Contractors" Style="{StaticResource Heading2}" />
+                                    <Button Grid.Column="1" x:Name="AddContractorBtn" Text="+ Add"
+                                            BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                            FontSize="10" FontAttributes="Bold"
+                                            CornerRadius="6" Padding="10,2"
+                                            HeightRequest="26"
+                                            Clicked="OnAddContractorClicked" />
+                                </Grid>
+                                <VerticalStackLayout x:Name="ContractorList" Spacing="5" />
+                                <Label x:Name="ContractorEmpty"
+                                       Text="No contractors added — tap + Add to save tradespeople"
+                                       TextColor="{StaticResource TextMuted}" FontSize="11"
+                                       HorizontalTextAlignment="Center" Margin="0,4" />
+                            </VerticalStackLayout>
+                        </Border>
+
+                    </VerticalStackLayout>
+                    </ScrollView>
+
+                </Grid>
+            </Grid>
+
+            <!-- Property lookup overlay (visible during refresh) -->
+            <Grid x:Name="PropLookupPanel" IsVisible="False" BackgroundColor="#FF0A0F1E" ZIndex="50" Padding="40">
+                <Grid RowDefinitions="Auto,*,Auto" RowSpacing="12">
+                    <HorizontalStackLayout Grid.Row="0" Spacing="10" HorizontalOptions="Center">
+                        <ActivityIndicator IsRunning="True" Color="{StaticResource Primary}"
+                                           HeightRequest="20" WidthRequest="20" />
+                        <Label x:Name="PropMaintStatus" Text="Fetching property details..."
+                               TextColor="{StaticResource TextPrimary}" FontSize="14" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Border Grid.Row="1" StrokeShape="RoundRectangle 8" Stroke="#1E293B" StrokeThickness="1">
+                        <WebView x:Name="PropLookupWebView" />
+                    </Border>
+                    <Label Grid.Row="2" Text="If a verification page appears, please complete it — data will be extracted automatically"
+                           TextColor="{StaticResource TextMuted}" FontSize="11" HorizontalTextAlignment="Center" />
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <!-- Left Column -->
+        <ScrollView Grid.Column="0">
+        <VerticalStackLayout Spacing="12">
+
+            <!-- User Info Card -->
+            <Border x:Name="UserCard" Style="{StaticResource CardFrame}" Padding="20">
+                <VerticalStackLayout Spacing="12">
+                    <HorizontalStackLayout Spacing="16">
+                        <Border BackgroundColor="{StaticResource Primary}"
+                                StrokeShape="RoundRectangle 24"
+                                Stroke="Transparent"
+                                WidthRequest="48" HeightRequest="48">
+                            <Label x:Name="AvatarInitials" Text="" TextColor="White"
+                                   FontSize="18" FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                        <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                            <Label x:Name="ProfileName" Text=""
+                                   TextColor="{StaticResource TextPrimary}"
+                                   FontSize="18" FontAttributes="Bold" />
+                            <Label x:Name="ProfileEmail" Text=""
+                                   Style="{StaticResource SubHeading}" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="8" ColumnSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Username" TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="ProfileUsername" Text="RAY"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="1" Grid.Column="0" Text="Culture" TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="ProfileCulture" Text="en-GB"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="2" Grid.Column="0" Text="Currency" TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="2" Grid.Column="1" x:Name="ProfileCurrency" Text="GBP"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="3" Grid.Column="0" Text="Member Since" TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="3" Grid.Column="1" x:Name="ProfileSince" Text="April 2016"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Personal Details -->
+            <Border x:Name="PersonalCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="6">
+                        <Label Text="Personal Details" Style="{StaticResource Heading2}" />
+                        <Button Grid.Column="1" x:Name="UploadLicenceBtn" Text="Licence"
+                                BackgroundColor="#1A2E1A" TextColor="#22C55E"
+                                FontSize="11" CornerRadius="6" Padding="8,2"
+                                HeightRequest="26"
+                                Clicked="OnUploadLicenceClicked" />
+                        <Button Grid.Column="2" x:Name="UploadPayslipBtn" Text="Payslip"
+                                BackgroundColor="#2E1A2E" TextColor="#C084FC"
+                                FontSize="11" CornerRadius="6" Padding="8,2"
+                                HeightRequest="26"
+                                Clicked="OnUploadPayslipClicked" />
+                        <Button Grid.Column="3" x:Name="UploadPassportBtn" Text="Passport"
+                                BackgroundColor="#1A2E2E" TextColor="#2DD4BF"
+                                FontSize="11" CornerRadius="6" Padding="8,2"
+                                HeightRequest="26"
+                                Clicked="OnUploadPassportClicked" />
+                        <Button Grid.Column="4" x:Name="EditPersonalBtn" Text="Edit"
+                                BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                FontSize="11" CornerRadius="6" Padding="8,2"
+                                HeightRequest="26"
+                                Clicked="OnEditPersonalClicked" />
+                    </Grid>
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
+                          RowSpacing="6" ColumnSpacing="10">
+                        <Label Grid.Row="0" Text="Full Name" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="PersonalNameLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="1" Text="Date of Birth" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="PersonalDobLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="2" Text="Gender" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="2" Grid.Column="1" x:Name="PersonalGenderLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="3" Text="Phone" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="3" Grid.Column="1" x:Name="PersonalPhoneLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="4" Text="NI Number" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="4" Grid.Column="1" x:Name="PersonalNiLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="5" Text="Employment" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="5" Grid.Column="1" x:Name="PersonalEmploymentLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="6" Text="Employer" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="6" Grid.Column="1" x:Name="PersonalEmployerLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="7" Text="Annual Income" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="7" Grid.Column="1" x:Name="PersonalIncomeLabel" Text="—"
+                               TextColor="{StaticResource Warning}" FontSize="12" FontAttributes="Bold" />
+                        <Label Grid.Row="8" Text="Tax Code" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="8" Grid.Column="1" x:Name="PersonalTaxCodeLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                    <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6" ColumnSpacing="10">
+                        <Label Grid.Row="0" Text="Licence No." TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="PersonalLicenceLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="1" Text="Licence Expiry" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="PersonalLicenceExpiryLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="2" Text="Categories" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="2" Grid.Column="1" x:Name="PersonalCategoriesLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="3" Text="Passport No." TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="3" Grid.Column="1" x:Name="PersonalPassportLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="4" Text="Passport Expiry" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="4" Grid.Column="1" x:Name="PersonalPassportExpiryLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="5" Text="Nationality" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="5" Grid.Column="1" x:Name="PersonalNationalityLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="6" Text="Place of Birth" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="6" Grid.Column="1" x:Name="PersonalPobLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="7" Text="Credit Score" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="7" Grid.Column="1" x:Name="PersonalCreditLabel" Text="—"
+                               TextColor="{StaticResource Success}" FontSize="12" FontAttributes="Bold" />
+                        <Label Grid.Row="8" Text="Provider" TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                        <Label Grid.Row="8" Grid.Column="1" x:Name="PersonalCreditProviderLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Properties -->
+            <Border x:Name="PropertiesCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Properties" Style="{StaticResource Heading2}" />
+                        <Button Grid.Column="1" x:Name="AddPropertyBtn" Text="+ Add"
+                                BackgroundColor="#0A3D2E" TextColor="#34D399"
+                                FontSize="11" FontAttributes="Bold"
+                                CornerRadius="8" Padding="10,2"
+                                HeightRequest="26"
+                                Clicked="OnAddPropertyClicked" />
+                    </Grid>
+                    <VerticalStackLayout x:Name="PropertiesList" Spacing="8" />
+                    <Label x:Name="PropertiesEmptyLabel"
+                           Text="No properties added"
+                           TextColor="{StaticResource TextMuted}" FontSize="12"
+                           HorizontalTextAlignment="Center" Margin="0,4" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Vehicles -->
+            <Border x:Name="VehiclesCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Vehicles" Style="{StaticResource Heading2}" />
+                        <Button Grid.Column="1" x:Name="AddVehicleBtn" Text="+ Add by Reg"
+                                BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                FontSize="11" FontAttributes="Bold"
+                                CornerRadius="8" Padding="10,2"
+                                HeightRequest="26"
+                                Clicked="OnAddVehicleClicked" />
+                    </Grid>
+                    <VerticalStackLayout x:Name="VehiclesList" Spacing="8" />
+                    <Label x:Name="VehiclesEmptyLabel"
+                           Text="No vehicles added — enter a registration to look up details automatically"
+                           TextColor="{StaticResource TextMuted}" FontSize="12"
+                           HorizontalTextAlignment="Center" Margin="0,4" />
+                </VerticalStackLayout>
+            </Border>
+
+
+        </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Right Column -->
+        <ScrollView Grid.Column="1">
+        <VerticalStackLayout Spacing="12">
+
+            <!-- Session Info -->
+            <Border x:Name="SessionCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Session" Style="{StaticResource Heading2}" />
+                        <Button Grid.Column="1" x:Name="SignOutBtn" Text="Sign Out"
+                                BackgroundColor="#3B1A1A" TextColor="#EF4444"
+                                FontSize="11" FontAttributes="Bold"
+                                CornerRadius="8" Padding="10,2"
+                                HeightRequest="26"
+                                Clicked="OnSignOutClicked" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="6" ColumnSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Last Login" TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="LastLoginLabel" Text=""
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="1" Grid.Column="0" Text="Trace" TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="TraceLabel" Text="Enabled"
+                               TextColor="{StaticResource Success}" FontSize="12" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Smart Scan -->
+            <Border x:Name="SmartScanCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="8">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Smart Scan" Style="{StaticResource Heading2}" />
+                        <Button Grid.Column="1" x:Name="SmartScanKeyBtn" Text="Enter Key"
+                                BackgroundColor="#0A3D2E" TextColor="#34D399"
+                                FontSize="11" FontAttributes="Bold"
+                                CornerRadius="8" Padding="10,2"
+                                HeightRequest="26"
+                                Clicked="OnSmartScanKeyClicked" />
+                    </Grid>
+                    <Label Text="Reads insurance policies and other documents automatically when you drop them in."
+                           TextColor="{StaticResource TextMuted}" FontSize="12" />
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="8">
+                        <Label Grid.Column="0" Text="Licence" TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Column="1" x:Name="SmartScanStatusLabel" Text="Not entered"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Credit Score -->
+            <Border x:Name="CreditScoreCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Credit Score" Style="{StaticResource Heading2}" />
+                        <Button Grid.Column="1" x:Name="UpdateScoreBtn" Text="Update Score"
+                                BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                FontSize="11" FontAttributes="Bold"
+                                CornerRadius="8" Padding="10,2"
+                                HeightRequest="26"
+                                Clicked="OnUpdateScoreClicked" />
+                    </Grid>
+
+                    <!-- Score Gauge -->
+                    <Grid HorizontalOptions="Center" WidthRequest="220" HeightRequest="130">
+                        <!-- Background arc -->
+                        <Border x:Name="GaugeBg" BackgroundColor="#0D1322"
+                                StrokeShape="RoundRectangle 12" Stroke="#1E2D4A"
+                                StrokeThickness="1" />
+                        <!-- Score display -->
+                        <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center" Spacing="2">
+                            <Label x:Name="CreditScoreValue" Text="—"
+                                   TextColor="#22C55E" FontSize="42" FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                            <Label x:Name="CreditScoreRating" Text="No score recorded"
+                                   TextColor="#94A3B8" FontSize="12"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                        <!-- Score bar -->
+                        <Grid VerticalOptions="End" Padding="12,0,12,12" HeightRequest="24">
+                            <Border BackgroundColor="#1E2D4A" StrokeShape="RoundRectangle 4"
+                                    Stroke="Transparent" HeightRequest="8"
+                                    VerticalOptions="Center" />
+                            <Border x:Name="CreditScoreBar"
+                                    StrokeShape="RoundRectangle 4" Stroke="Transparent"
+                                    HeightRequest="8" WidthRequest="0"
+                                    HorizontalOptions="Start" VerticalOptions="Center" />
+                            <Grid ColumnDefinitions="*,*,*,*,*" Margin="0,0,0,0"
+                                  VerticalOptions="End">
+                                <Label Text="0" TextColor="#64748B" FontSize="8" HorizontalOptions="Start" />
+                                <Label Grid.Column="1" Text="200" TextColor="#64748B" FontSize="8" HorizontalOptions="Start" />
+                                <Label Grid.Column="2" Text="400" TextColor="#64748B" FontSize="8" HorizontalOptions="Center" />
+                                <Label Grid.Column="3" Text="600" TextColor="#64748B" FontSize="8" HorizontalOptions="Center" />
+                                <Label Grid.Column="4" Text="999" TextColor="#64748B" FontSize="8" HorizontalOptions="End" />
+                            </Grid>
+                        </Grid>
+                    </Grid>
+
+                    <!-- Provider -->
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="4" ColumnSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Provider"
+                               TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="CreditProviderLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="1" Grid.Column="0" Text="Last Checked"
+                               TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="CreditLastCheckedLabel" Text="—"
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                    </Grid>
+
+                    <!-- Score History -->
+                    <VerticalStackLayout x:Name="CreditHistoryList" Spacing="4" />
+
+                    <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                    <!-- Free check links -->
+                    <Label Text="Check for free" TextColor="{StaticResource TextMuted}" FontSize="11" />
+                    <Grid ColumnDefinitions="*,*,*" ColumnSpacing="6">
+                        <Button x:Name="CheckClearScoreBtn" Text="ClearScore"
+                                BackgroundColor="#0A3D2E" TextColor="#34D399"
+                                FontSize="10" FontAttributes="Bold"
+                                CornerRadius="6" HeightRequest="30"
+                                Clicked="OnCheckClearScoreClicked" />
+                        <Button Grid.Column="1" x:Name="CheckCreditKarmaBtn" Text="Credit Karma"
+                                BackgroundColor="#2E1A2E" TextColor="#C084FC"
+                                FontSize="10" FontAttributes="Bold"
+                                CornerRadius="6" HeightRequest="30"
+                                Clicked="OnCheckCreditKarmaClicked" />
+                        <Button Grid.Column="2" x:Name="CheckMseBtn" Text="MSE Club"
+                                BackgroundColor="#1A2E3B" TextColor="#38BDF8"
+                                FontSize="10" FontAttributes="Bold"
+                                CornerRadius="6" HeightRequest="30"
+                                Clicked="OnCheckMseClicked" />
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Email Bill Scanner -->
+            <Border x:Name="EmailCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Email Bill Scanner" Style="{StaticResource Heading2}" />
+                    <Label Text="Connect your email to automatically find and import bills from your energy and water suppliers."
+                           TextColor="{StaticResource TextMuted}" FontSize="12" />
+
+                    <HorizontalStackLayout Spacing="8">
+                        <Label x:Name="EmailStatusIcon" Text="&#x1F534;" FontSize="14" VerticalOptions="Center" />
+                        <Label x:Name="EmailStatusLabel" Text="Not Connected"
+                               TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+
+                    <VerticalStackLayout x:Name="EmailFormPanel" Spacing="8">
+                        <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto" RowSpacing="8" ColumnSpacing="10">
+                            <Label Grid.Row="0" Text="Email" TextColor="{StaticResource TextMuted}"
+                                   FontSize="12" VerticalOptions="Center" />
+                            <Entry Grid.Row="0" Grid.Column="1" x:Name="EmailAddressEntry"
+                                   Placeholder="your.email@gmail.com"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="{StaticResource TextMuted}"
+                                   BackgroundColor="{StaticResource CardBgLight}"
+                                   FontSize="12" Keyboard="Email"
+                                   TextChanged="OnEmailAddressChanged" />
+                            <Label Grid.Row="1" Text="App Password" TextColor="{StaticResource TextMuted}"
+                                   FontSize="12" VerticalOptions="Center" />
+                            <Entry Grid.Row="1" Grid.Column="1" x:Name="EmailPasswordEntry"
+                                   Placeholder="xxxx xxxx xxxx xxxx"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="{StaticResource TextMuted}"
+                                   BackgroundColor="{StaticResource CardBgLight}"
+                                   FontSize="12" IsPassword="True" />
+                            <Label Grid.Row="2" Text="IMAP Server" TextColor="{StaticResource TextMuted}"
+                                   FontSize="12" VerticalOptions="Center" />
+                            <Entry Grid.Row="2" Grid.Column="1" x:Name="EmailImapEntry"
+                                   Placeholder="auto-detected"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   PlaceholderColor="{StaticResource TextMuted}"
+                                   BackgroundColor="{StaticResource CardBgLight}"
+                                   FontSize="12" />
+                        </Grid>
+                        <Label Text="Use an App Password, not your normal password. Gmail: Google Account → Security → App Passwords"
+                               TextColor="{StaticResource TextMuted}" FontSize="10" />
+                    </VerticalStackLayout>
+
+                    <Label x:Name="EmailProgressLabel" Text="" IsVisible="False"
+                           TextColor="{StaticResource Primary}" FontSize="12" />
+
+                    <HorizontalStackLayout Spacing="8">
+                        <Button x:Name="ConnectEmailBtn" Text="&#x1F4E7; Connect Email"
+                                FontSize="13" FontAttributes="Bold"
+                                CornerRadius="8" HeightRequest="36"
+                                Padding="16,0"
+                                Clicked="OnConnectEmailClicked" />
+                        <Button x:Name="ScanEmailBtn" Text="&#x1F50D; Scan for Bills"
+                                BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                FontSize="13" FontAttributes="Bold"
+                                CornerRadius="8" HeightRequest="36"
+                                Padding="16,0" IsVisible="False"
+                                Clicked="OnScanEmailClicked" />
+                        <Button x:Name="DisconnectEmailBtn" Text="Disconnect"
+                                BackgroundColor="#3B1A1A" TextColor="#EF4444"
+                                FontSize="11" CornerRadius="8" HeightRequest="36"
+                                Padding="12,0" IsVisible="False"
+                                Clicked="OnDisconnectEmailClicked" />
+                    </HorizontalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Connect Bank -->
+            <Border x:Name="ConnectBankCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Open Banking" Style="{StaticResource Heading2}" />
+                    <Label Text="Connect your real bank accounts via TrueLayer to see live balances and transactions."
+                           TextColor="{StaticResource TextMuted}" FontSize="12" />
+                    <HorizontalStackLayout Spacing="8">
+                        <Label x:Name="BankStatusIcon" Text="&#x1F534;" FontSize="14" VerticalOptions="Center" />
+                        <Label x:Name="BankStatusLabel" Text="Not Connected"
+                               TextColor="{StaticResource TextMuted}" FontSize="12" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                    <Button x:Name="ConnectBankBtn" Text="&#x1F3E6; Connect Bank"
+                            FontSize="14" FontAttributes="Bold"
+                            CornerRadius="10" HeightRequest="44"
+                            HorizontalOptions="Fill"
+                            Clicked="OnConnectBankClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Reports -->
+            <Border x:Name="ReportsCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="12">
+                    <Label Text="Reports" Style="{StaticResource Heading2}" />
+                    <Label Text="Full portfolio report across all sectors — banking, utility, crypto, and investments."
+                           TextColor="{StaticResource TextMuted}" FontSize="12" />
+                    <Button x:Name="ViewReportBtn" Text="&#x1F4CA; View Full Report"
+                            FontSize="14" FontAttributes="Bold"
+                            CornerRadius="10" HeightRequest="44"
+                            HorizontalOptions="Fill"
+                            Clicked="OnViewReportClicked" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Documents -->
+            <Border x:Name="DocumentsCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Documents" Style="{StaticResource Heading2}" />
+                        <Button Grid.Column="1" x:Name="AddDocumentBtn" Text="+ Upload"
+                                BackgroundColor="#0A3D2E" TextColor="#34D399"
+                                FontSize="11" FontAttributes="Bold"
+                                CornerRadius="8" Padding="10,2"
+                                HeightRequest="26"
+                                Clicked="OnAddDocumentClicked" />
+                    </Grid>
+                    <VerticalStackLayout x:Name="DocumentsList" Spacing="6" />
+                    <Label x:Name="DocumentsEmptyLabel"
+                           Text="No documents yet — upload licence, passport, payslip photos or other files"
+                           TextColor="{StaticResource TextMuted}" FontSize="12"
+                           HorizontalTextAlignment="Center" Margin="0,4" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Mortgage Tracker -->
+            <Border x:Name="MortgageCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Mortgage Tracker" Style="{StaticResource Heading2}" />
+                        <Button Grid.Column="1" x:Name="EditMortgageBtn" Text="Edit"
+                                BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                FontSize="11" CornerRadius="6" Padding="10,2"
+                                HeightRequest="26"
+                                Clicked="OnEditMortgageClicked" />
+                    </Grid>
+
+                    <Border x:Name="MortgageAlert"
+                            StrokeShape="RoundRectangle 8"
+                            Stroke="Transparent"
+                            Padding="12,8"
+                            IsVisible="False">
+                        <Label x:Name="MortgageAlertText" FontSize="12"
+                               FontAttributes="Bold" />
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto"
+                          RowSpacing="6" ColumnSpacing="8">
+                        <Label Grid.Row="0" Grid.Column="0" Text="Lender"
+                               TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="0" Grid.Column="1" x:Name="MortLender" Text=""
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="1" Grid.Column="0" Text="Outstanding"
+                               TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="1" Grid.Column="1" x:Name="MortBalance" Text=""
+                               TextColor="{StaticResource Warning}" FontSize="12"
+                               FontAttributes="Bold" />
+                        <Label Grid.Row="2" Grid.Column="0" Text="Monthly Payment"
+                               TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="2" Grid.Column="1" x:Name="MortPayment" Text=""
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="3" Grid.Column="0" Text="Current Rate"
+                               TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="3" Grid.Column="1" x:Name="MortRate" Text=""
+                               TextColor="{StaticResource Success}" FontSize="12"
+                               FontAttributes="Bold" />
+                        <Label Grid.Row="4" Grid.Column="0" Text="LTV"
+                               TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="4" Grid.Column="1" x:Name="MortLtv" Text=""
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                        <Label Grid.Row="5" Grid.Column="0" Text="Property Value"
+                               TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        <Label Grid.Row="5" Grid.Column="1" x:Name="MortProperty" Text=""
+                               TextColor="{StaticResource TextPrimary}" FontSize="12" />
+                    </Grid>
+
+                    <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                    <Label x:Name="MortFixTitle" Text=""
+                           TextColor="{StaticResource TextPrimary}" FontSize="13"
+                           FontAttributes="Bold" />
+                    <Label x:Name="MortFixDetail" Text=""
+                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+
+                    <Border x:Name="SvrImpactCard" BackgroundColor="#1C2744"
+                            StrokeShape="RoundRectangle 8" Stroke="Transparent"
+                            Padding="12,8" IsVisible="False">
+                        <VerticalStackLayout Spacing="3">
+                            <Label x:Name="SvrTitle" Text=""
+                                   TextColor="{StaticResource Danger}" FontSize="12"
+                                   FontAttributes="Bold" />
+                            <Label x:Name="SvrDetail" Text=""
+                                   TextColor="{StaticResource TextMuted}" FontSize="11" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border x:Name="BestRatesCard" BackgroundColor="#131B2E"
+                            StrokeShape="RoundRectangle 8"
+                            Stroke="#22C55E30"
+                            Padding="12,8" IsVisible="False">
+                        <VerticalStackLayout Spacing="3">
+                            <Label Text="Current Best Rates (indicative)"
+                                   TextColor="{StaticResource Success}" FontSize="12"
+                                   FontAttributes="Bold" />
+                            <Label x:Name="BestRatesDetail" Text=""
+                                   TextColor="{StaticResource TextMuted}" FontSize="11" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Cube Faces -->
+            <Border x:Name="CubeFacesCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="8">
+                    <Label Text="Cube Faces" Style="{StaticResource Heading2}" />
+                    <VerticalStackLayout x:Name="CubeFacesContainer" Spacing="6" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentView>

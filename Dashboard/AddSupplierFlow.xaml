@@ -1,0 +1,233 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.AddSupplierFlow"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid RowDefinitions="Auto,*" Padding="0">
+
+        <!-- Header -->
+        <Border BackgroundColor="{StaticResource NavBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="0,0,0,1"
+                Padding="24,14">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Text="← Back" BackgroundColor="Transparent"
+                        TextColor="{StaticResource TextSecondary}"
+                        FontSize="13" Padding="8,4"
+                        Clicked="OnBackClicked" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
+                    <Label x:Name="PageTitle" Text="Add Supplier"
+                           FontSize="20" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           HorizontalOptions="Center" />
+                    <Label x:Name="PageSubtitle" Text="Choose supplier type"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+                <Label Grid.Column="2" x:Name="StepIndicator" Text="Step 1 of 2"
+                       TextColor="{StaticResource TextMuted}" FontSize="12"
+                       VerticalOptions="Center" Margin="0,0,8,0" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+
+            <!-- Step 1: Choose type -->
+            <ScrollView x:Name="Step1" Padding="32,20">
+                <VerticalStackLayout Spacing="12" HorizontalOptions="Center" WidthRequest="500">
+
+                    <Border x:Name="ElecOption" Style="{StaticResource CardFrame}" Padding="18">
+                        <HorizontalStackLayout Spacing="14">
+                            <Label Text="⚡" FontSize="28" VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label Text="Electricity" TextColor="{StaticResource TextPrimary}"
+                                       FontSize="16" FontAttributes="Bold" />
+                                <Label Text="Energy supplier" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <Border x:Name="GasOption" Style="{StaticResource CardFrame}" Padding="18">
+                        <HorizontalStackLayout Spacing="14">
+                            <Label Text="🔥" FontSize="28" VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label Text="Gas" TextColor="{StaticResource TextPrimary}"
+                                       FontSize="16" FontAttributes="Bold" />
+                                <Label Text="Energy supplier" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <Border x:Name="WaterOption" Style="{StaticResource CardFrame}" Padding="18">
+                        <HorizontalStackLayout Spacing="14">
+                            <Label Text="💧" FontSize="28" VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label Text="Water" TextColor="{StaticResource TextPrimary}"
+                                       FontSize="16" FontAttributes="Bold" />
+                                <Label Text="Water company" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <Border x:Name="BroadbandOption" Style="{StaticResource CardFrame}" Padding="18">
+                        <HorizontalStackLayout Spacing="14">
+                            <Label Text="📡" FontSize="28" VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label Text="Broadband" TextColor="{StaticResource TextPrimary}"
+                                       FontSize="16" FontAttributes="Bold" />
+                                <Label Text="Internet provider" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <Border x:Name="MobileOption" Style="{StaticResource CardFrame}" Padding="18">
+                        <HorizontalStackLayout Spacing="14">
+                            <Label Text="📱" FontSize="28" VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label Text="Mobile" TextColor="{StaticResource TextPrimary}"
+                                       FontSize="16" FontAttributes="Bold" />
+                                <Label Text="Phone contract" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <Border x:Name="CouncilTaxOption" Style="{StaticResource CardFrame}" Padding="18">
+                        <HorizontalStackLayout Spacing="14">
+                            <Label Text="🏛" FontSize="28" VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label Text="Council Tax" TextColor="{StaticResource TextPrimary}"
+                                       FontSize="16" FontAttributes="Bold" />
+                                <Label Text="Local authority" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <Border x:Name="InsuranceOption" Style="{StaticResource CardFrame}" Padding="18">
+                        <HorizontalStackLayout Spacing="14">
+                            <Label Text="🛡" FontSize="28" VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label Text="Insurance" TextColor="{StaticResource TextPrimary}"
+                                       FontSize="16" FontAttributes="Bold" />
+                                <Label Text="Home, car, life etc." TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <Border x:Name="OtherOption" Style="{StaticResource CardFrame}" Padding="18">
+                        <HorizontalStackLayout Spacing="14">
+                            <Label Text="📋" FontSize="28" VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label Text="Other" TextColor="{StaticResource TextPrimary}"
+                                       FontSize="16" FontAttributes="Bold" />
+                                <Label Text="TV licence, subscriptions etc." TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- Step 2: Details form -->
+            <ScrollView x:Name="Step2" IsVisible="False" Padding="32,20">
+                <VerticalStackLayout Spacing="16" HorizontalOptions="Center" WidthRequest="480">
+                    <Border Style="{StaticResource CardFrame}" Padding="24">
+                        <VerticalStackLayout Spacing="16">
+
+                            <HorizontalStackLayout Spacing="12">
+                                <Label x:Name="FormIcon" FontSize="28" VerticalOptions="Center" />
+                                <Label x:Name="FormTitle" FontSize="18" FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                            <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                            <!-- Supplier name -->
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="Supplier Name" TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 10" Padding="4,0">
+                                    <Entry x:Name="SupplierNameEntry" Placeholder="e.g. British Gas, Octopus"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Tariff name -->
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="Tariff / Plan Name" TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 10" Padding="4,0">
+                                    <Entry x:Name="TariffNameEntry" Placeholder="e.g. Fixed Jan 2027"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Tariff detail -->
+                            <VerticalStackLayout Spacing="6">
+                                <Label x:Name="TariffDetailLabel" Text="Rate Details"
+                                       TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 10" Padding="4,0">
+                                    <Entry x:Name="TariffDetailEntry" Placeholder="e.g. 24.50p/kWh · 53.35p/day"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Bill month -->
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="Bill Month" TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 10" Padding="4,0">
+                                    <Picker x:Name="BillMonthPicker"
+                                            TextColor="{StaticResource TextPrimary}"
+                                            FontSize="14" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Monthly cost -->
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="Bill Amount (£)" TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 10" Padding="4,0">
+                                    <Entry x:Name="MonthlyCostEntry" Placeholder="e.g. 94.50"
+                                           Keyboard="Numeric"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Account ref -->
+                            <VerticalStackLayout Spacing="6">
+                                <Label Text="Account Reference (optional)" TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 10" Padding="4,0">
+                                    <Entry x:Name="AccountRefEntry" Placeholder="e.g. BG-8841920"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <Button x:Name="AddBtn" Text="Add Supplier"
+                                    FontSize="15" FontAttributes="Bold"
+                                    CornerRadius="12" HeightRequest="48"
+                                    HorizontalOptions="Fill"
+                                    Clicked="OnAddClicked" />
+
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+
+        </Grid>
+    </Grid>
+
+</ContentPage>

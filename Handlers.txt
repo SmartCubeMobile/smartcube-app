@@ -1,0 +1,10 @@
+/Handlers/Webproxy.ashx	webproxy_url	2022-06-01	2022-06-01		1900-01-01
+/Handlers/Listener.ashx	listener_url	2022-06-01	2022-06-01		1900-01-01
+/Handlers/DBServer.ashx	dbserver_url	2022-06-01	2022-06-01		1900-01-01
+/Handlers/Connect.ashx	connect_url	2022-06-01	2022-06-01		1900-01-01
+/Handlers/InsertCOMMON.ashx	insertcommon_url	2022-06-01	2022-06-01		1900-01-01
+/Handlers/StoredProcedure.ashx	storedprocedures_url	2022-06-01	2022-06-01		1900-01-01
+/Handlers/LookupLOGO.ashx	lookuplogo_url	2022-06-01	2022-06-01		1900-01-01
+/Handlers/LookupDNO.ashx	lookupdno_url	2022-06-01	2022-06-01		1900-01-01
+/Handlers/LoadTable.ashx	loadtable_url	2022-06-01	2022-06-01		1900-01-01
+/Handlers/Download_PDF.ashx	downloadpdf_url	2022-06-01	2022-06-01		1900-01-01

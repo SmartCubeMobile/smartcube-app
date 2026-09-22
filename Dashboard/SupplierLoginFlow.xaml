@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.SupplierLoginFlow"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid RowDefinitions="Auto,*" Padding="0">
+
+        <!-- Header -->
+        <Border BackgroundColor="{StaticResource NavBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="0,0,0,1"
+                Padding="24,14">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Text="← Back" BackgroundColor="Transparent"
+                        TextColor="{StaticResource TextSecondary}"
+                        FontSize="13" Padding="8,4"
+                        Clicked="OnBackClicked" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
+                    <Label x:Name="PageTitle" Text="Connect Supplier"
+                           FontSize="20" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           HorizontalOptions="Center" />
+                    <Label x:Name="PageSubtitle" Text="Choose your supplier"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+                <Button x:Name="ExtractBtn" Grid.Column="2" Text="Extract Data"
+                        BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                        FontSize="12" FontAttributes="Bold"
+                        CornerRadius="8" Padding="12,4"
+                        HeightRequest="32" IsVisible="False"
+                        Clicked="OnExtractClicked" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+
+            <!-- Step 1: Supplier picker -->
+            <ScrollView x:Name="Step1" Padding="32,20">
+                <VerticalStackLayout Spacing="10" HorizontalOptions="Center" WidthRequest="520">
+
+                    <Label Text="Energy" TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" FontAttributes="Bold" Margin="0,0,0,4" />
+                    <VerticalStackLayout x:Name="EnergyList" Spacing="8" />
+
+                    <Label Text="Water" TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" FontAttributes="Bold" Margin="0,12,0,4" />
+                    <VerticalStackLayout x:Name="WaterList" Spacing="8" />
+
+                    <Label Text="Broadband &amp; Mobile" TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" FontAttributes="Bold" Margin="0,12,0,4" />
+                    <VerticalStackLayout x:Name="TelecomList" Spacing="8" />
+
+                    <Label Text="Other" TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" FontAttributes="Bold" Margin="0,12,0,4" />
+                    <VerticalStackLayout x:Name="OtherList" Spacing="8" />
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- Step 2: WebView login -->
+            <Grid x:Name="Step2" IsVisible="False" RowDefinitions="Auto,*">
+                <Border BackgroundColor="{StaticResource CardBgLight}"
+                        Padding="12,8" Margin="0">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label x:Name="UrlLabel" Text="" TextColor="{StaticResource TextMuted}"
+                               FontSize="11" VerticalOptions="Center" LineBreakMode="MiddleTruncation" />
+                        <ActivityIndicator x:Name="LoadingIndicator" Grid.Column="1"
+                                           IsRunning="False" Color="{StaticResource Primary}"
+                                           HeightRequest="20" WidthRequest="20" />
+                    </Grid>
+                </Border>
+                <WebView x:Name="SupplierWebView" Grid.Row="1"
+                         Navigating="OnWebViewNavigating"
+                         Navigated="OnWebViewNavigated" />
+            </Grid>
+
+
+        </Grid>
+    </Grid>
+
+</ContentPage>

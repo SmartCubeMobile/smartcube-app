@@ -1,0 +1,85 @@
+﻿<ResourceDictionary>
+	
+	<!-- SignIn strings -->
+	<string Key="UsernameBox">Benutzername</string>
+	<string Key="PasswordBox">Passwort</string>
+	<string Key="LoginStatusMessage">Zum Ausführen von SmartSwitch müssen Sie angemeldet sein</string>
+	<string Key="Signin">Anmeldung</string>
+	<string Key="ResetUTC">UTC zurücksetzen</string>
+	<string Key="Fatalerror">Schwerwiegender Fehler</string>
+	<string Key="CreateHandlerFailure">Uri-Handler konnte nicht erstellt werden</string>
+	<string Key="EnsureConnectedToInternet">Stellen Sie vor der Anmeldung sicher, dass Ihr Gerät mit dem Internet verbunden ist</string>
+	<string Key="Problem UTC">Problem beim Abrufen von UTC ... bitte Reset drücken</string>
+	<string Key="PleaseSignin">Melden Sie sich bitte an, um fortzufahren</string>
+	<string Key="CannotSignin">Anmeldung zurzeit nicht möglich</string>
+	<string Key="EnterUsernameAndPassword">Bitte geben Sie Ihren Benutzernamen und Ihr Passwort vor der Anmeldung ein</string>
+	<string Key="InvalidSignin">Anmeldung ungültig</string>
+	<string Key="CannotLoadFromMothership">Laden von Mothership nicht möglich</string>
+	<string Key="UnableToAuthenticate">Authentifizierung nicht möglich - Sie sind nicht angemeldet</string>
+	<string Key="CancellationTokenNone">Stornotoken Keine</string>
+	<string Key="CreateAccount">Konto erstellen</string>
+
+	<!-- MessageBox strings -->
+	<string Key="ReallyLeave">Möchten Sie SmartSwitch wirklich verlassen?</string>
+	<string Key="ConfirmationRequired">Bestätigung erforderlich</string>
+	<string Key="Yes">Ja</string>
+	<string Key="No">Nein</string>
+
+	<string Key="SubscribersOnly">Bitte werden Sie Abonnent, um diese Funktion nutzen zu können</string>
+
+	<string Key="ZoomTooltip">Drücken Sie diese Taste, um den Vollbildmodus umzuschalten</string>
+	<string Key="AutoSwitchTooltip">Drücken Sie diese Taste, um die connectionmatische Umschaltung zu starten</string>
+	<string Key="OpenCloseTooltip">Drücken Sie diese Taste, um die Zählertüren zu betätigen</string>
+	<string Key="QuitTooltip">Drücken Sie um SmartSwitch zu beenden</string>
+
+	<string Key="SaveProfileTooltip">Informationen im lokalen oder Remote-Speicher speichern</string>
+	<string Key="AddGroupsTooltip">Fügen Sie eine neue Gruppe für die Multi-Meter-Verarbeitung hinzu</string>
+	
+    <string Key="FinanceSubmitTooltip">Drücken Sie, um die Kontotransaktionen Ihres Anbieters zu erfassen</string>
+	<string Key="FinanceCancelTooltip">Drücken Sie diese Taste, um etwaige Verarbeitungsfehler des Anbieters zu löschen</string>
+	<string Key="FinanceInstitutionsTooltip">Wählen Sie Ihre Institution aus der Dropdown-Liste aus und doppelklicken Sie dann darauf, um die Verbindung einzurichten</string>
+	<string Key="FinanceProvidersTooltip">Wählen Sie Anbieter, um die Anzeige zu verfeinern</string>
+	<string Key="FinanceAccountsTooltip">Wählen Sie „Konten“, um die Anzeige zu verfeinern</string>
+	<string Key="FinanceTransactionsTooltip">Wählen Sie Transaktionen, um die Anzeige zu verfeinern</string>
+	<string Key="FinanceBanksTooltip">Klicken Sie hier für Bankdaten</string>
+	<string Key="FinanceSavingsTooltip">Klicken Sie hier, um die Spardaten anzuzeigen</string>
+	<string Key="FinanceInvestmentsTooltip">Klicken Sie hier für Investitionsdaten</string>
+	<string Key="FinanceCryptosTooltip">Klicken Sie hier für Kryptowährungsdaten</string>
+	<string Key="FinanceAddressesTooltip">Wählen Sie eine Adresse, um die angezeigten Daten zu verfeinern</string>
+	<string Key="FinanceStartDateTooltip">Wählen Sie ein Startdatum, um die angezeigten Daten zu verfeinern</string>
+	<string Key="FinanceResetDatesTooltip">Drücken Sie , um die Transaktionsdaten zurückzusetzen</string>
+	<string Key="FinanceEndDateTooltip">Wählen Sie ein Enddatum, um die angezeigten Daten zu verfeinern</string>
+	<string Key="FinanceResultStartDateTooltip">Startdatum der angezeigten Daten</string>
+	<string Key="FinanceResultEndDateTooltip">Enddatum der angezeigten Daten</string>
+	<string Key="FinancePostCodeTooltip">Die Postleitzahl der angezeigten Adresse</string>
+	<string Key="FinanceCultureTooltip">Drücken Sie diese Taste, um die Kultur für alle Datums-/Uhrzeit- und Währungsformate festzulegen</string>
+	<string Key="ConversionsTooltip">Zinssätze sind Näherungswerte und sollten *NICHT* für finanzielle Entscheidungen verwendet werden</string>
+
+	<string Key="N">Nein</string>
+	<string Key="Y">Ja</string>
+
+	<string Key="NoValidConnections">Keine gültigen Verbindungen verfügbar</string>
+	<string Key="NoProvidersLoginMethods">Kein Anbieter bietet kostenlose Anmeldemethoden an</string>
+	<string Key="ProviderNoLoginMethods">Der Anbieter bietet keine Anmeldemethoden an</string>
+	<string Key="NoFreeLoginMethods">Es sind keine kostenlosen Anmeldemethoden verfügbar</string>
+	<string Key="Parameter1Empty">Parameter1 darf nicht leer sein</string>
+	<string Key="Parameter1Failed">Die Validierung von Parameter1 ist fehlgeschlagen</string>
+	<string Key="LoginMethodNotSelected">Die Anmeldemethode muss ausgewählt werden</string>
+	<string Key="LoginExists">Anmeldung existiert bereits</string>
+	<string Key="ConnectionDeleteFail">Verbindung kann nicht gelöscht werden</string>
+	<string Key="ConnectionUpdateFail">Verbindung kann nicht aktualisiert werden</string>
+	<string Key="ConnectionAddFail">Verbindung kann nicht hinzugefügt werden</string>
+	<string Key="ConnectionDeleteSuccess">Verbindung gelöscht</string>
+	<string Key="ConnectionUpdateSuccess">Verbindung aktualisiert</string>
+	<string Key="ConnectionAddSuccess">Verbindung hinzugefügt</string>
+	<string Key="LoginDeleteFail">Anmeldung kann nicht gelöscht werden</string>
+	<string Key="LoginUpdateFail">Anmeldung kann nicht aktualisiert werden</string>
+	<string Key="LoginAddFail">Anmeldung kann nicht hinzugefügt werden</string>
+	<string Key="LoginDeleteSuccess">Anmeldung gelöscht</string>
+	<string Key="LoginUpdateSuccess">Anmeldung aktualisiert</string>
+	<string Key="LoginAddSuccess">Anmeldung hinzugefügt</string>
+	<string Key="ConfirmDelete">Bestätigen Sie Löschen</string>
+	<string Key="DeleteConnection">Verbindung löschen</string>
+	<string Key="AllAssociatedLogins">Alle zugehörigen Anmeldedaten werden ebenfalls gelöscht</string>
+	<string Key="DeleteLogin">Sind Sie sicher, dass Sie den Login-Anbieter löschen möchten</string>
+</ResourceDictionary>

@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation= "vertical"
+    android:background="@android:color/white">
+    
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"            
+            android:text="@string/BookingDate"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "center"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"            
+            android:text="@string/SortCode"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "center"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"            
+            android:text="@string/AccountNo"
+            android:layout_width = "100dp"
+            android:layout_weight = "1"
+            android:gravity = "center"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"            
+            android:text="@string/Description"
+            android:layout_width = "300dp"
+            android:layout_weight = "2"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"            
+            android:text="@string/Credits"
+            android:layout_width = "100dp"
+            android:layout_weight = "1"
+            android:gravity = "right"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"            
+            android:text="@string/Debits"
+            android:layout_width = "100dp"
+            android:layout_weight = "1"
+            android:gravity = "right"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"            
+            android:text="@string/Balance"
+            android:layout_width = "120dp"
+            android:layout_weight = "1"
+            android:gravity = "right"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>        
+    </LinearLayout>
+    
+    <!-- Leave the background in as BLUE so you can see if
+        it appears anywhere behind - it shouldn't!! -->
+    <FrameLayout
+        android:background="@android:color/holo_blue_light"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true">
+
+        <androidx.recyclerview.widget.RecyclerView 
+            android:background="@android:color/white"        
+            android:id="@+id/financeTransactions"      
+            android:scrollbars="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </FrameLayout>
+    
+</LinearLayout>
