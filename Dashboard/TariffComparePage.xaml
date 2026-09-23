@@ -1,0 +1,117 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.TariffComparePage"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="24,20" RowSpacing="14">
+
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="12">
+            <Button Grid.Column="0" Text="← Back" BackgroundColor="#131B2E" TextColor="#94A3B8"
+                    FontSize="12" CornerRadius="8" Padding="12,4" HeightRequest="32" Clicked="OnBackClicked" />
+            <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                <Label x:Name="TitleLabel" Text="Energy Tariffs" FontSize="22" FontAttributes="Bold" TextColor="#F1F5F9" />
+                <Label x:Name="SubtitleLabel" Text="" FontSize="12" TextColor="#64748B" />
+            </VerticalStackLayout>
+            <Button Grid.Column="2" x:Name="AllSuppliersBtn" Text="Show all suppliers" BackgroundColor="#164E3A" TextColor="#22C55E"
+                    FontSize="11" FontAttributes="Bold" CornerRadius="8" Padding="10,2" HeightRequest="28" IsVisible="False" Clicked="OnShowAllClicked" />
+            <Button Grid.Column="3" x:Name="PostcodeBtn" Text="Change postcode" BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                    FontSize="11" FontAttributes="Bold" CornerRadius="8" Padding="10,2" HeightRequest="28" Clicked="OnChangePostcodeClicked" />
+            <Button Grid.Column="4" x:Name="UsageBtn" Text="Change usage" BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                    FontSize="11" FontAttributes="Bold" CornerRadius="8" Padding="10,2" HeightRequest="28" Clicked="OnChangeUsageClicked" />
+        </Grid>
+
+        <Border Grid.Row="1" BackgroundColor="#131B2E" Stroke="#1E2D4A" StrokeThickness="1" Padding="14,10"
+                StrokeShape="RoundRectangle 12">
+            <Grid ColumnDefinitions="*,*,*,*,*" ColumnSpacing="12">
+                <VerticalStackLayout Grid.Column="4" Spacing="2">
+                    <Label Text="You pay now" TextColor="#64748B" FontSize="11" />
+                    <Label x:Name="SpendLabel" Text="—" TextColor="#F59E0B" FontSize="14" FontAttributes="Bold" />
+                    <Label x:Name="SpendSourceLabel" Text="" TextColor="#475569" FontSize="10" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="0" Spacing="2">
+                    <Label Text="Postcode" TextColor="#64748B" FontSize="11" />
+                    <Label x:Name="PostcodeLabel" Text="—" TextColor="#F1F5F9" FontSize="14" FontAttributes="Bold" />
+                    <Label x:Name="PostcodeSourceLabel" Text="" TextColor="#475569" FontSize="10" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="2">
+                    <Label Text="Supply region" TextColor="#64748B" FontSize="11" />
+                    <Label x:Name="RegionLabel" Text="—" TextColor="#06B6D4" FontSize="14" FontAttributes="Bold" />
+                    <Label x:Name="RegionSourceLabel" Text="" TextColor="#475569" FontSize="10" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="2" Spacing="2">
+                    <Label Text="Your usage" TextColor="#64748B" FontSize="11" />
+                    <Label x:Name="UsageLabel" Text="—" TextColor="#F1F5F9" FontSize="14" FontAttributes="Bold" />
+                    <Label x:Name="UsageSourceLabel" Text="" TextColor="#475569" FontSize="10" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="3" Spacing="2">
+                    <Label Text="Prices collected" TextColor="#64748B" FontSize="11" />
+                    <Label x:Name="FetchedLabel" Text="—" TextColor="#F1F5F9" FontSize="14" FontAttributes="Bold" />
+                    <Label x:Name="CountLabel" Text="" TextColor="#475569" FontSize="10" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <ScrollView Grid.Row="2">
+            <VerticalStackLayout Spacing="10">
+                <Border x:Name="ChartCard" BackgroundColor="#131B2E" Stroke="#1E2D4A" StrokeThickness="1" Padding="16,12"
+                        StrokeShape="RoundRectangle 12" IsVisible="False">
+                    <VerticalStackLayout Spacing="6">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Annual cost comparison" TextColor="#94A3B8" FontSize="12" FontAttributes="Bold" />
+                            <Label Grid.Column="1" x:Name="ChartCaption" Text="" TextColor="#64748B" FontSize="11" />
+                        </Grid>
+                        <GraphicsView x:Name="ChartView" HeightRequest="132" />
+                    </VerticalStackLayout>
+                </Border>
+                <Label x:Name="StatusLabel" Text="" TextColor="#94A3B8" FontSize="13" IsVisible="False" />
+                <VerticalStackLayout x:Name="TariffList" Spacing="8" />
+                <Label x:Name="FootnoteLabel" Text="" TextColor="#475569" FontSize="10" LineBreakMode="WordWrap" Margin="0,8,0,20" />
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Loading Overlay (same as the dashboard's) -->
+        <Grid x:Name="LoadingOverlay"
+              Grid.Row="0" Grid.RowSpan="3"
+              Margin="-24,-20"
+              BackgroundColor="#E60A0F1E"
+              IsVisible="False"
+              ZIndex="100"
+              InputTransparent="False">
+            <VerticalStackLayout Spacing="24"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center">
+                <Image x:Name="LoadingImage"
+                       Source="smartcube_loading.png"
+                       WidthRequest="180" HeightRequest="180"
+                       Aspect="AspectFit" />
+                <Label x:Name="LoadingTitle"
+                       Text="Loading..."
+                       TextColor="#E2E8F0"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center" />
+                <Grid WidthRequest="260" HeightRequest="6"
+                      HorizontalOptions="Center">
+                    <Border BackgroundColor="#1E2D4A"
+                            StrokeShape="RoundRectangle 3"
+                            Stroke="Transparent"
+                            HeightRequest="6" />
+                    <Border x:Name="LoadingBar"
+                            BackgroundColor="#3B82F6"
+                            StrokeShape="RoundRectangle 3"
+                            Stroke="Transparent"
+                            HeightRequest="6"
+                            HorizontalOptions="Start"
+                            WidthRequest="0" />
+                </Grid>
+                <Label x:Name="LoadingDetail"
+                       Text=""
+                       TextColor="#64748B"
+                       FontSize="12"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Grid>
+    </Grid>
+</ContentPage>

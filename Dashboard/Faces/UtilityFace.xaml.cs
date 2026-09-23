@@ -177,8 +177,18 @@ namespace SmartCubeMobile.Dashboard.Faces
                 });
                 return;
             }
+            var hints = new Dictionary<string, Label>(StringComparer.OrdinalIgnoreCase);
             foreach (var s in suppliers)
             {
+                var info = CreateSupplierInfo(s);
+                var isEnergy = IsEnergy(s.Type);
+                if (isEnergy)
+                {
+                    var hint = new Label { Text = "Tap to see this supplier's tariffs", TextColor = Color.FromArgb("#22C55E"), FontSize = 10 };
+                    info.Children.Add(hint);
+                    if (!string.IsNullOrEmpty(s.Name)) hints[s.Name] = hint;
+                }
+
                 var card = new Border
                 {
                     BackgroundColor = Color.FromArgb("#1C2744"),
@@ -197,7 +207,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                         Children =
                         {
                             CreateSupplierBadge(s.Name),
-                            CreateSupplierInfo(s),
+                            info,
                             CreateSupplierCost(s, culture),
                         }
                     }
@@ -209,11 +219,73 @@ namespace SmartCubeMobile.Dashboard.Faces
                     {
                         await card.ScaleTo(0.97, 80, Easing.CubicOut);
                         await card.ScaleTo(1.0, 80, Easing.CubicOut);
-                        await OpenSwitchSupplier(supplier);
+                        if (IsEnergy(supplier.Type))
+                            await OpenSupplierTariffs(supplier);
+                        else
+                            await OpenSwitchSupplier(supplier);
                     })
                 });
                 SupplierList.Children.Add(card);
             }
+
+            if (hints.Count > 0)
+                _ = AnnotateSupplierCards(hints);
+        }
+
+        private static bool IsEnergy(string type) =>
+            string.Equals(type, "Electricity", StringComparison.OrdinalIgnoreCase) ||
+            string.Equals(type, "Gas", StringComparison.OrdinalIgnoreCase);
+
+        private async Task OpenSupplierTariffs(MockSupplier supplier)
+        {
+            try
+            {
+                var nav = Application.Current?.Windows.FirstOrDefault()?.Page?.Navigation ?? Navigation;
+                await nav.PushAsync(new TariffComparePage(supplier.Name));
+            }
+            catch (Exception ex)
+            {
+                var host = Application.Current?.Windows.FirstOrDefault()?.Page;
+                if (host != null) await host.DisplayAlert("Tariffs", ex.Message, "OK");
+            }
+        }
+
+        // Fills in "N tariffs · save up to £X/yr" on each energy supplier card once the server answers.
+        private async Task AnnotateSupplierCards(Dictionary<string, Label> hints)
+        {
+            try
+            {
+                var (postcode, _) = TariffService.ResolvePostcode();
+                if (string.IsNullOrEmpty(postcode)) return;
+                var (elec, gas) = TariffService.EstimateAnnualKwh();
+                var spend = TariffService.EstimateAnnualSpend();
+                var r = await TariffService.GetTariffs(postcode, elec, gas);
+                if (!r.Ok || !r.Available) return;
+
+                var culture = new CultureInfo("en-GB");
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    foreach (var (name, label) in hints)
+                    {
+                        var mine = r.Tariffs.Where(t => SupplierMatches(name, t.SupplierName)).OrderBy(t => t.CostForYou).ToList();
+                        if (mine.Count == 0) { label.Text = "No tariffs listed on EnergyLinx · tap to compare all"; label.TextColor = Color.FromArgb("#64748B"); continue; }
+                        var best = mine[0].CostForYou;
+                        var save = spend.HasValue ? spend.Value - best : 0;
+                        label.Text = $"{mine.Count} tariff{(mine.Count == 1 ? "" : "s")} available"
+                            + (save >= 1 ? $" · save up to {save.ToString("C0", culture)}/yr" : "")
+                            + " · tap to view";
+                    }
+                });
+            }
+            catch { }
+        }
+
+        private static bool SupplierMatches(string a, string b)
+        {
+            if (string.IsNullOrEmpty(a) || string.IsNullOrEmpty(b)) return false;
+            a = a.ToLowerInvariant().Replace(" energy", "").Replace(".", "").Trim();
+            b = b.ToLowerInvariant().Replace(" energy", "").Replace(".", "").Trim();
+            return a == b || a.Contains(b) || b.Contains(a);
         }
 
         private async void OnAddSupplierClicked(object sender, EventArgs e)
@@ -228,12 +300,17 @@ namespace SmartCubeMobile.Dashboard.Faces
 
         private async void OnCompareTariffsClicked(object sender, EventArgs e)
         {
-            var flow = new EnergylinxCompareFlow();
-            flow.TariffsUpdated += () =>
+            try
             {
-                MainThread.BeginInvokeOnMainThread(RefreshData);
-            };
-            await Navigation.PushAsync(flow);
+                var nav = Application.Current?.Windows.FirstOrDefault()?.Page?.Navigation ?? Navigation;
+                await nav.PushAsync(new TariffComparePage());
+            }
+            catch (Exception ex)
+            {
+                var host = Application.Current?.Windows.FirstOrDefault()?.Page;
+                if (host != null)
+                    await host.DisplayAlert("Compare Tariffs", "Could not open the tariff comparison:\n" + ex.Message, "OK");
+            }
         }
 
         private async Task OpenSwitchSupplier(MockSupplier supplier)
