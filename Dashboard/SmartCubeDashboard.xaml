@@ -24,8 +24,9 @@
                        Margin="12,16,12,12"
                        HorizontalOptions="Center" />
 
-                <!-- Face Buttons with indicator -->
-                <Grid Grid.Row="1" Padding="0,0,0,0">
+                <!-- Face Buttons with indicator (scrolls if the window is too short to show them all) -->
+                <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
+                <Grid Padding="0,0,0,0">
                     <!-- Active Indicator Bar -->
                     <BoxView x:Name="NavIndicator"
                              Color="{StaticResource Primary}"
@@ -91,6 +92,7 @@
 
                     </VerticalStackLayout>
                 </Grid>
+                </ScrollView>
 
                 <!-- Bottom: Time -->
                 <VerticalStackLayout Grid.Row="2"
