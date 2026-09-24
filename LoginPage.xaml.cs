@@ -88,12 +88,32 @@ public partial class LoginPage : ContentPage
             return;
         }
 
+        var code = CodeSection.IsVisible ? CodeEntry.Text?.Trim() : null;
+        if (CodeSection.IsVisible && string.IsNullOrEmpty(code))
+        {
+            ShowStatus("Enter the code from your authenticator app.");
+            CodeEntry.Focus();
+            return;
+        }
+
         SetBusy(true, "Signing you in…");
-        var (ok, error) = await SessionService.Login(login, password, RememberCheck.IsChecked);
+        var (ok, error, twoFactor) = await SessionService.Login(login, password, RememberCheck.IsChecked, code);
         if (!ok)
         {
+            if (twoFactor)
+            {
+                // Password was right; now ask for the authenticator code (keep the password).
+                SetBusy(false, string.IsNullOrEmpty(code) ? null : error);
+                StatusLabel.TextColor = Color.FromArgb("#94A3B8");
+                if (string.IsNullOrEmpty(code)) ShowStatus("Two-factor is on for this account.");
+                CodeSection.IsVisible = true;
+                CodeEntry.Text = "";
+                CodeEntry.Focus();
+                return;
+            }
             SetBusy(false, error);
             PasswordEntry.Text = "";
+            CodeSection.IsVisible = false;
             PasswordEntry.Focus();
             return;
         }
@@ -105,6 +125,7 @@ public partial class LoginPage : ContentPage
         SignInBtn.IsEnabled = !busy;
         LoginEntry.IsEnabled = !busy;
         PasswordEntry.IsEnabled = !busy;
+        CodeEntry.IsEnabled = !busy;
         RememberCheck.IsEnabled = !busy;
         SignInBtn.Text = busy ? "Please wait…" : "Sign In";
         StatusLabel.TextColor = busy ? Color.FromArgb("#94A3B8") : Color.FromArgb("#F87171");

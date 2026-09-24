@@ -66,6 +66,38 @@ namespace SmartCubeMobile.Dashboard.Faces
             if (nav != null) await nav.PushAsync(new ChangePasswordPage(forced: false));
         }
 
+        private async void OnTwoFactorClicked(object sender, EventArgs e)
+        {
+            var nav = Application.Current?.Windows.FirstOrDefault()?.Page?.Navigation;
+            if (nav == null) return;
+            var page = new TwoFactorPage();
+            page.Disappearing += (_, _) => RefreshTwoFactor();
+            await nav.PushAsync(page);
+        }
+
+        private async void RefreshTwoFactor()
+        {
+            if (SessionService.Current == null)
+            {
+                TwoFactorLabel.Text = "Sign in to manage two-factor.";
+                TwoFactorBtn.IsEnabled = false;
+                return;
+            }
+            var (ok, error, enabled, codesLeft) = await SessionService.GetTwoFactorStatus();
+            if (!ok)
+            {
+                TwoFactorLabel.Text = error;
+                TwoFactorBtn.IsEnabled = false;
+                return;
+            }
+            TwoFactorLabel.Text = enabled
+                ? $"On · {codesLeft} recovery code{(codesLeft == 1 ? "" : "s")} left"
+                : "Off · protect your account with an authenticator app";
+            TwoFactorLabel.TextColor = enabled ? Color.FromArgb("#22C55E") : Color.FromArgb("#94A3B8");
+            TwoFactorBtn.Text = enabled ? "Manage" : "Set Up";
+            TwoFactorBtn.IsEnabled = true;
+        }
+
         private async void OnSignOutClicked(object sender, EventArgs e)
         {
             var window = Application.Current?.Windows.FirstOrDefault();
@@ -108,6 +140,7 @@ namespace SmartCubeMobile.Dashboard.Faces
             LastLoginLabel.Text = profile.LastLogin.ToString("dd MMM yyyy HH:mm");
             TraceLabel.Text = profile.TraceEnabled ? "Enabled" : "Disabled";
             TraceLabel.TextColor = profile.TraceEnabled ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
+            RefreshTwoFactor();
 
             LoadPersonalData();
             LoadProperties();
