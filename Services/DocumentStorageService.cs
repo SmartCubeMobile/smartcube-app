@@ -112,7 +112,7 @@ namespace SmartCubeMobile.Services
             {
                 if (File.Exists(_indexPath))
                 {
-                    var json = File.ReadAllText(_indexPath);
+                    var json = SecureFile.ReadAllText(_indexPath);
                     _documents = JsonConvert.DeserializeObject<List<StoredDocument>>(json) ?? new();
                     _documents.RemoveAll(d => !File.Exists(d.FilePath));
                 }
@@ -133,7 +133,7 @@ namespace SmartCubeMobile.Services
             {
                 var dir = Path.GetDirectoryName(_indexPath);
                 Directory.CreateDirectory(dir);
-                File.WriteAllText(_indexPath, JsonConvert.SerializeObject(_documents, Formatting.Indented));
+                SecureFile.WriteAllText(_indexPath, JsonConvert.SerializeObject(_documents, Formatting.Indented));
             }
             catch { }
         }

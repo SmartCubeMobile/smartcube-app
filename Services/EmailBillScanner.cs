@@ -56,7 +56,7 @@ namespace SmartCubeMobile.Services
         public static EmailSettings LoadSettings()
         {
             if (!File.Exists(SettingsPath)) return null;
-            try { return JsonSerializer.Deserialize<EmailSettings>(File.ReadAllText(SettingsPath)); }
+            try { return JsonSerializer.Deserialize<EmailSettings>(SecureFile.ReadAllText(SettingsPath)); }
             catch { return null; }
         }
 
@@ -64,7 +64,7 @@ namespace SmartCubeMobile.Services
         {
             var dir = Path.GetDirectoryName(SettingsPath);
             Directory.CreateDirectory(dir);
-            File.WriteAllText(SettingsPath, JsonSerializer.Serialize(settings));
+            SecureFile.WriteAllText(SettingsPath, JsonSerializer.Serialize(settings));
         }
 
         public static void ClearSettings()

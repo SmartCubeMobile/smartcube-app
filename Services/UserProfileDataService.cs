@@ -151,7 +151,7 @@ namespace SmartCubeMobile.Services
                 var dir = Path.GetDirectoryName(_filePath);
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
-                File.WriteAllText(_filePath, JsonConvert.SerializeObject(_profile, Formatting.Indented));
+                SecureFile.WriteAllText(_filePath, JsonConvert.SerializeObject(_profile, Formatting.Indented));
             }
             catch { }
         }
@@ -187,7 +187,7 @@ namespace SmartCubeMobile.Services
             try
             {
                 if (!File.Exists(_filePath)) return;
-                var json = File.ReadAllText(_filePath);
+                var json = SecureFile.ReadAllText(_filePath);
                 _profile = JsonConvert.DeserializeObject<UserProfileData>(json);
             }
             catch { _profile = new UserProfileData(); }

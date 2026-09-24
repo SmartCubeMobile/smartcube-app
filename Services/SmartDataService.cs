@@ -336,7 +336,7 @@ namespace SmartCubeMobile.Services
             {
                 if (File.Exists(_accountsCachePath))
                 {
-                    var json = File.ReadAllText(_accountsCachePath);
+                    var json = SecureFile.ReadAllText(_accountsCachePath);
                     var cached = JsonConvert.DeserializeObject<List<MockAccount>>(json);
                     if (cached != null && cached.Count > 0)
                     {
@@ -360,7 +360,7 @@ namespace SmartCubeMobile.Services
             {
                 if (File.Exists(_transactionsCachePath))
                 {
-                    var json = File.ReadAllText(_transactionsCachePath);
+                    var json = SecureFile.ReadAllText(_transactionsCachePath);
                     var cached = JsonConvert.DeserializeObject<List<MockTransaction>>(json);
                     if (cached != null && cached.Count > 0)
                         return cached;
@@ -376,7 +376,7 @@ namespace SmartCubeMobile.Services
             {
                 var dir = Path.GetDirectoryName(_accountsCachePath);
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                File.WriteAllText(_accountsCachePath, JsonConvert.SerializeObject(accounts, Formatting.Indented));
+                SecureFile.WriteAllText(_accountsCachePath, JsonConvert.SerializeObject(accounts, Formatting.Indented));
             }
             catch { }
         }
@@ -387,7 +387,7 @@ namespace SmartCubeMobile.Services
             {
                 var dir = Path.GetDirectoryName(_transactionsCachePath);
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                File.WriteAllText(_transactionsCachePath, JsonConvert.SerializeObject(transactions, Formatting.Indented));
+                SecureFile.WriteAllText(_transactionsCachePath, JsonConvert.SerializeObject(transactions, Formatting.Indented));
             }
             catch { }
         }
@@ -528,7 +528,7 @@ namespace SmartCubeMobile.Services
             {
                 if (!File.Exists(_configPath)) return;
 
-                var json = File.ReadAllText(_configPath);
+                var json = SecureFile.ReadAllText(_configPath);
                 var connections = JsonConvert.DeserializeObject<List<BankConnection>>(json);
                 if (connections == null) return;
 
@@ -565,7 +565,7 @@ namespace SmartCubeMobile.Services
                     Directory.CreateDirectory(dir);
 
                 var json = JsonConvert.SerializeObject(_connections, Formatting.Indented);
-                File.WriteAllText(_configPath, json);
+                SecureFile.WriteAllText(_configPath, json);
             }
             catch { }
         }

@@ -269,7 +269,7 @@ namespace SmartCubeMobile.MockData
             var path = Path.Combine(DataDir, "property.json");
             if (File.Exists(path))
             {
-                try { _property = JsonSerializer.Deserialize<PropertyAddress>(File.ReadAllText(path)); }
+                try { _property = JsonSerializer.Deserialize<PropertyAddress>(SecureFile.ReadAllText(path)); }
                 catch { _property = new PropertyAddress(); }
             }
             return _property ??= new PropertyAddress();
@@ -279,7 +279,7 @@ namespace SmartCubeMobile.MockData
         {
             _property = property;
             var path = Path.Combine(DataDir, "property.json");
-            File.WriteAllText(path, JsonSerializer.Serialize(property));
+            SecureFile.WriteAllText(path, JsonSerializer.Serialize(property));
         }
 
         public static void SaveBills()
@@ -287,7 +287,7 @@ namespace SmartCubeMobile.MockData
             if (_bills == null) return;
             var path = Path.Combine(DataDir, "bills.json");
             var options = new JsonSerializerOptions { WriteIndented = true };
-            File.WriteAllText(path, JsonSerializer.Serialize(_bills, options));
+            SecureFile.WriteAllText(path, JsonSerializer.Serialize(_bills, options));
         }
 
         private static void LoadBills()
@@ -295,7 +295,7 @@ namespace SmartCubeMobile.MockData
             var path = Path.Combine(DataDir, "bills.json");
             if (File.Exists(path))
             {
-                try { _bills = JsonSerializer.Deserialize<List<MockUtilityBill>>(File.ReadAllText(path)) ?? new(); }
+                try { _bills = JsonSerializer.Deserialize<List<MockUtilityBill>>(SecureFile.ReadAllText(path)) ?? new(); }
                 catch { _bills = new(); }
             }
             else
@@ -313,7 +313,7 @@ namespace SmartCubeMobile.MockData
             var path = Path.Combine(DataDir, "mortgage.json");
             if (File.Exists(path))
             {
-                try { _mortgage = JsonSerializer.Deserialize<MortgageDetails>(File.ReadAllText(path)); }
+                try { _mortgage = JsonSerializer.Deserialize<MortgageDetails>(SecureFile.ReadAllText(path)); }
                 catch { _mortgage = null; }
             }
             return _mortgage;
@@ -327,7 +327,7 @@ namespace SmartCubeMobile.MockData
             try
             {
                 if (mortgage == null) { if (File.Exists(path)) File.Delete(path); }
-                else File.WriteAllText(path, JsonSerializer.Serialize(mortgage, new JsonSerializerOptions { WriteIndented = true }));
+                else SecureFile.WriteAllText(path, JsonSerializer.Serialize(mortgage, new JsonSerializerOptions { WriteIndented = true }));
             }
             catch { }
         }
@@ -348,7 +348,7 @@ namespace SmartCubeMobile.MockData
             if (!File.Exists(path)) return;
             try
             {
-                var saved = JsonSerializer.Deserialize<List<MockInvestment>>(File.ReadAllText(path));
+                var saved = JsonSerializer.Deserialize<List<MockInvestment>>(SecureFile.ReadAllText(path));
                 if (saved != null) _extraInvestments.AddRange(saved);
             }
             catch { }
@@ -358,7 +358,7 @@ namespace SmartCubeMobile.MockData
         {
             try
             {
-                File.WriteAllText(Path.Combine(DataDir, "investments.json"),
+                SecureFile.WriteAllText(Path.Combine(DataDir, "investments.json"),
                     JsonSerializer.Serialize(_extraInvestments, new JsonSerializerOptions { WriteIndented = true }));
             }
             catch { }
@@ -546,7 +546,7 @@ namespace SmartCubeMobile.MockData
             var path = Path.Combine(DataDir, "suppliers.json");
             if (File.Exists(path))
             {
-                try { _suppliers = JsonSerializer.Deserialize<List<MockSupplier>>(File.ReadAllText(path)) ?? new(); }
+                try { _suppliers = JsonSerializer.Deserialize<List<MockSupplier>>(SecureFile.ReadAllText(path)) ?? new(); }
                 catch { _suppliers = new(); }
             }
             else
@@ -602,7 +602,7 @@ namespace SmartCubeMobile.MockData
             try
             {
                 if (!Directory.Exists(DataDir)) Directory.CreateDirectory(DataDir);
-                File.WriteAllText(Path.Combine(DataDir, "suppliers.json"),
+                SecureFile.WriteAllText(Path.Combine(DataDir, "suppliers.json"),
                     JsonSerializer.Serialize(_suppliers, new JsonSerializerOptions { WriteIndented = true }));
             }
             catch { }
@@ -638,7 +638,7 @@ namespace SmartCubeMobile.MockData
             var path = Path.Combine(DataDir, "subscriptions.json");
             if (File.Exists(path))
             {
-                try { _subscriptions = JsonSerializer.Deserialize<List<Subscription>>(File.ReadAllText(path)) ?? new(); }
+                try { _subscriptions = JsonSerializer.Deserialize<List<Subscription>>(SecureFile.ReadAllText(path)) ?? new(); }
                 catch { _subscriptions = new(); }
             }
             else
@@ -720,7 +720,7 @@ namespace SmartCubeMobile.MockData
             if (_subscriptions == null) return;
             var path = Path.Combine(DataDir, "subscriptions.json");
             var options = new JsonSerializerOptions { WriteIndented = true };
-            File.WriteAllText(path, JsonSerializer.Serialize(_subscriptions, options));
+            SecureFile.WriteAllText(path, JsonSerializer.Serialize(_subscriptions, options));
         }
 
         public static void AddSubscription(Subscription sub)

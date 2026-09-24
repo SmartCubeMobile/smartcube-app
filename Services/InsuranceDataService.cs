@@ -63,7 +63,7 @@ namespace SmartCubeMobile.Services
             try
             {
                 if (!File.Exists(_filePath)) return;
-                var json = File.ReadAllText(_filePath);
+                var json = SecureFile.ReadAllText(_filePath);
                 var policies = JsonConvert.DeserializeObject<List<InsurancePolicy>>(json);
                 if (policies != null)
                     _policies.AddRange(policies);
@@ -78,7 +78,7 @@ namespace SmartCubeMobile.Services
                 var dir = Path.GetDirectoryName(_filePath);
                 if (!Directory.Exists(dir))
                     Directory.CreateDirectory(dir);
-                File.WriteAllText(_filePath, JsonConvert.SerializeObject(_policies, Formatting.Indented));
+                SecureFile.WriteAllText(_filePath, JsonConvert.SerializeObject(_policies, Formatting.Indented));
             }
             catch { }
         }

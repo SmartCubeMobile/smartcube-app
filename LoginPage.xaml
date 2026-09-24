@@ -78,6 +78,11 @@
 
                 <BoxView HeightRequest="1" Color="#1E2D4A" Margin="0,22,0,16" />
 
+                <Label Text="Forgot your password?" FontSize="13" TextColor="#60A5FA" HorizontalOptions="Center" Margin="0,0,0,10">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnForgotPasswordTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
                 <HorizontalStackLayout HorizontalOptions="Center" Spacing="4">
                     <Label Text="New to SmartCube?" FontSize="13" TextColor="#64748B" />
                     <Label Text="Create an account" FontSize="13" TextColor="#60A5FA" FontAttributes="Bold">

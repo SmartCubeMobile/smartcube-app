@@ -66,6 +66,12 @@ public partial class LoginPage : ContentPage
         ShowPasswordBtn.Text = PasswordEntry.IsPassword ? "Show" : "Hide";
     }
 
+    private async void OnForgotPasswordTapped(object sender, EventArgs e)
+    {
+        try { await Launcher.Default.OpenAsync(new Uri($"{SessionService.ServerBase}/site/forgot-password.html")); }
+        catch { }
+    }
+
     private async void OnCreateAccountTapped(object sender, EventArgs e)
     {
         try { await Launcher.Default.OpenAsync(new Uri($"{SessionService.ServerBase}/site/register.html")); }

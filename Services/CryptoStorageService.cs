@@ -34,7 +34,7 @@ namespace SmartCubeMobile.Services
             else
                 connections.Add(conn);
 
-            File.WriteAllText(_connectionsFile, JsonConvert.SerializeObject(connections, Formatting.Indented));
+            SecureFile.WriteAllText(_connectionsFile, JsonConvert.SerializeObject(connections, Formatting.Indented));
         }
 
         public static List<SavedConnection> LoadConnections()
@@ -42,7 +42,7 @@ namespace SmartCubeMobile.Services
             try
             {
                 if (File.Exists(_connectionsFile))
-                    return JsonConvert.DeserializeObject<List<SavedConnection>>(File.ReadAllText(_connectionsFile)) ?? new();
+                    return JsonConvert.DeserializeObject<List<SavedConnection>>(SecureFile.ReadAllText(_connectionsFile)) ?? new();
             }
             catch { }
             return new();
@@ -55,7 +55,7 @@ namespace SmartCubeMobile.Services
                 c.Type == conn.Type &&
                 ((c.Type == "wallet" && c.Symbol == conn.Symbol && c.Address == conn.Address) ||
                  (c.Type == "exchange" && c.ExchangeName == conn.ExchangeName && c.ApiKey == conn.ApiKey)));
-            File.WriteAllText(_connectionsFile, JsonConvert.SerializeObject(connections, Formatting.Indented));
+            SecureFile.WriteAllText(_connectionsFile, JsonConvert.SerializeObject(connections, Formatting.Indented));
         }
 
         public static void SaveHoldingsCache(List<MockCryptoHolding> holdings)
@@ -63,7 +63,7 @@ namespace SmartCubeMobile.Services
             try
             {
                 var json = JsonConvert.SerializeObject(holdings, Formatting.Indented);
-                File.WriteAllText(_cacheFile, json);
+                SecureFile.WriteAllText(_cacheFile, json);
             }
             catch { }
         }
@@ -73,7 +73,7 @@ namespace SmartCubeMobile.Services
             try
             {
                 if (File.Exists(_cacheFile))
-                    return JsonConvert.DeserializeObject<List<MockCryptoHolding>>(File.ReadAllText(_cacheFile)) ?? new();
+                    return JsonConvert.DeserializeObject<List<MockCryptoHolding>>(SecureFile.ReadAllText(_cacheFile)) ?? new();
             }
             catch { }
             return new();

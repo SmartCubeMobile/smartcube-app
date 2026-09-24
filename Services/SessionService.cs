@@ -82,7 +82,7 @@ namespace SmartCubeMobile.Services
                 try
                 {
                     if (!File.Exists(_deviceFile)) return null;
-                    return JObject.Parse(File.ReadAllText(_deviceFile))["token"]?.ToString();
+                    return JObject.Parse(SecureFile.ReadAllText(_deviceFile))["token"]?.ToString();
                 }
                 catch { return null; }
             }
@@ -198,7 +198,7 @@ namespace SmartCubeMobile.Services
             {
                 var dir = Path.GetDirectoryName(_deviceFile);
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                File.WriteAllText(_deviceFile, JsonConvert.SerializeObject(new { token, saved = DateTime.UtcNow }));
+                SecureFile.WriteAllText(_deviceFile, JsonConvert.SerializeObject(new { token, saved = DateTime.UtcNow }));
             }
             catch { }
         }
