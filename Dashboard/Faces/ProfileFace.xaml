@@ -32,11 +32,13 @@
                 <Grid ColumnDefinitions="*,Auto" Padding="0,0,0,4">
                     <Label x:Name="MaintTitle" Text="Vehicle Maintenance"
                            TextColor="{StaticResource TextPrimary}" FontSize="20"
-                           FontAttributes="Bold" VerticalOptions="Center" />
+                           FontAttributes="Bold" VerticalOptions="Center"
+                           ToolTipProperties.Text="Detailed maintenance info for this vehicle: MOT status, advisories, mileage history and your preferred garage." />
                     <Button Grid.Column="1" Text="Close"
                             BackgroundColor="#3B1A1A" TextColor="#EF4444"
                             FontSize="12" CornerRadius="8" Padding="14,4"
                             HeightRequest="30"
+                            ToolTipProperties.Text="Close vehicle maintenance and return to your vehicle list."
                             Clicked="OnCloseMaintenanceClicked" />
                 </Grid>
 
@@ -51,18 +53,21 @@
                         <Border x:Name="MotStatusCard" Style="{StaticResource CardFrame}" Padding="14">
                             <VerticalStackLayout Spacing="8">
                                 <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
-                                    <Label Text="MOT Status" Style="{StaticResource Heading2}" />
+                                    <Label Text="MOT Status" Style="{StaticResource Heading2}"
+                                           ToolTipProperties.Text="Shows your vehicle's MOT expiry date and how many days remain." />
                                     <Button Grid.Column="1" x:Name="SetMotReminderBtn" Text="Set Reminder"
                                             BackgroundColor="#3B2E1A" TextColor="#F59E0B"
                                             FontSize="10" FontAttributes="Bold"
                                             CornerRadius="6" Padding="10,2"
                                             HeightRequest="26"
+                                            ToolTipProperties.Text="Set a Windows reminder for three weeks before your MOT expires."
                                             Clicked="OnSetMotReminderClicked" />
                                     <Button Grid.Column="2" x:Name="RefreshMotBtn" Text="Refresh MOT"
                                             BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                                             FontSize="10" FontAttributes="Bold"
                                             CornerRadius="6" Padding="10,2"
                                             HeightRequest="26"
+                                            ToolTipProperties.Text="Fetch the latest MOT test date, result, expiry and advisories from the DVSA."
                                             Clicked="OnRefreshMotClicked" />
                                 </Grid>
                                 <Border x:Name="MotCountdownBadge"
@@ -98,7 +103,8 @@
                         <!-- Vehicle Diagram -->
                         <Border x:Name="DiagramCard" Style="{StaticResource CardFrame}" Padding="14" IsVisible="False">
                             <VerticalStackLayout Spacing="6">
-                                <Label Text="Advisory Locations" Style="{StaticResource Heading2}" />
+                                <Label Text="Advisory Locations" Style="{StaticResource Heading2}"
+                                       ToolTipProperties.Text="A diagram of your car highlighting where MOT advisories were found." />
                                 <Grid HorizontalOptions="Center" WidthRequest="180" HeightRequest="260" Margin="0,4">
                                     <!-- Car body outline -->
                                     <Border BackgroundColor="#0D1322" Stroke="#2A3A5C" StrokeThickness="2"
@@ -196,13 +202,15 @@
                         <!-- Find Part -->
                         <Border Style="{StaticResource CardFrame}" Padding="14">
                             <VerticalStackLayout Spacing="8">
-                                <Label Text="Find Part Number" Style="{StaticResource Heading2}" />
+                                <Label Text="Find Part Number" Style="{StaticResource Heading2}"
+                                       ToolTipProperties.Text="Search for an OEM part number for your vehicle by typing what you need." />
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="6">
                                     <Border BackgroundColor="#0D1322" Stroke="#2A3A5C" StrokeThickness="1"
                                             StrokeShape="{RoundRectangle CornerRadius=6}" Padding="0">
                                         <Entry x:Name="FindPartEntry" Placeholder="e.g. shock absorber, windscreen"
                                                PlaceholderColor="#4A5A7C" TextColor="#E2E8F0"
                                                BackgroundColor="Transparent" FontSize="12"
+                                               ToolTipProperties.Text="Type a part name, e.g. shock absorber or windscreen, then press Enter to search."
                                                Completed="OnFindPartSearch" />
                                     </Border>
                                     <Button Grid.Column="1" x:Name="FindPartBtn" Text="Search"
@@ -210,6 +218,7 @@
                                             FontSize="10" FontAttributes="Bold"
                                             CornerRadius="6" Padding="10,2"
                                             HeightRequest="26"
+                                            ToolTipProperties.Text="Search online for the part number matching your search text."
                                             Clicked="OnFindPartSearchClicked" />
                                 </Grid>
                                 <VerticalStackLayout x:Name="PartSearchResults" Spacing="4" />
@@ -227,12 +236,14 @@
                         <Border x:Name="AdvisoriesCard" Style="{StaticResource CardFrame}" Padding="14">
                             <VerticalStackLayout Spacing="8">
                                 <Grid ColumnDefinitions="*,Auto">
-                                    <Label Text="MOT Advisories" Style="{StaticResource Heading2}" />
+                                    <Label Text="MOT Advisories" Style="{StaticResource Heading2}"
+                                           ToolTipProperties.Text="Advisory items noted at your last MOT test." />
                                     <Button Grid.Column="1" x:Name="GetAllEstimatesBtn" Text="Get All Estimates"
                                             BackgroundColor="#3B2E1A" TextColor="#F59E0B"
                                             FontSize="10" FontAttributes="Bold"
                                             CornerRadius="6" Padding="10,2"
                                             HeightRequest="26" IsVisible="False"
+                                            ToolTipProperties.Text="Email your preferred garage asking for a repair estimate on all advisories."
                                             Clicked="OnGetAllEstimatesClicked" />
                                 </Grid>
                                 <VerticalStackLayout x:Name="AdvisoriesList" Spacing="5" />
@@ -246,7 +257,8 @@
                         <!-- Mileage -->
                         <Border x:Name="MileageCard" Style="{StaticResource CardFrame}" Padding="14">
                             <VerticalStackLayout Spacing="8">
-                                <Label Text="Mileage History" Style="{StaticResource Heading2}" />
+                                <Label Text="Mileage History" Style="{StaticResource Heading2}"
+                                       ToolTipProperties.Text="Your vehicle's recorded mileage over time, and a scroll-wheel odometer to log a new reading." />
                                 <!-- Odometer clock -->
                                 <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                     <Border x:Name="OdometerContainer" BackgroundColor="#0D1322" Stroke="#2A3A5C" StrokeThickness="1"
@@ -262,6 +274,7 @@
                                             FontSize="11" FontAttributes="Bold"
                                             CornerRadius="6" Padding="12,2"
                                             HeightRequest="30"
+                                            ToolTipProperties.Text="Save the mileage shown on the odometer above as a new reading."
                                             Clicked="OnSetMileageClicked" />
                                 </Grid>
                                 <Label x:Name="OdometerHint" Text="Scroll over digits to adjust"
@@ -278,12 +291,14 @@
                         <Border x:Name="GarageCard" Style="{StaticResource CardFrame}" Padding="14">
                             <VerticalStackLayout Spacing="8">
                                 <Grid ColumnDefinitions="*,Auto">
-                                    <Label Text="Preferred Garage" Style="{StaticResource Heading2}" />
+                                    <Label Text="Preferred Garage" Style="{StaticResource Heading2}"
+                                           ToolTipProperties.Text="The MOT/service garage you use most, with contact details for requesting estimates." />
                                     <Button Grid.Column="1" x:Name="AddGarageBtn" Text="+ Add Garage"
                                             BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                                             FontSize="10" FontAttributes="Bold"
                                             CornerRadius="6" Padding="10,2"
                                             HeightRequest="26"
+                                            ToolTipProperties.Text="Add a garage by postcode, name, address and phone number."
                                             Clicked="OnAddGarageClicked" />
                                 </Grid>
                                 <VerticalStackLayout x:Name="GarageList" Spacing="5" />
@@ -314,7 +329,8 @@
                 <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Padding="0,0,0,4">
                     <Label x:Name="PropMaintTitle" Text="Property Maintenance"
                            TextColor="{StaticResource TextPrimary}" FontSize="20"
-                           FontAttributes="Bold" VerticalOptions="Center" />
+                           FontAttributes="Bold" VerticalOptions="Center"
+                           ToolTipProperties.Text="Detailed maintenance info for this property: details, financials, maintenance log and contractors." />
                     <ActivityIndicator Grid.Column="1" x:Name="PropRefreshSpinner"
                                        IsRunning="False" IsVisible="False"
                                        Color="#60A5FA" HeightRequest="20" WidthRequest="20"
@@ -324,11 +340,13 @@
                             FontSize="10" FontAttributes="Bold"
                             CornerRadius="6" Padding="10,2"
                             HeightRequest="26"
+                            ToolTipProperties.Text="Look up the latest estimated value, EPC rating and building details for this property online."
                             Clicked="OnRefreshPropDetailsClicked" />
                     <Button Grid.Column="3" Text="Close"
                             BackgroundColor="#3B1A1A" TextColor="#EF4444"
                             FontSize="12" CornerRadius="8" Padding="14,4"
                             HeightRequest="30"
+                            ToolTipProperties.Text="Close property maintenance and return to your property list."
                             Clicked="OnClosePropMaintClicked" />
                 </Grid>
 
@@ -341,7 +359,8 @@
                         <!-- Property Details -->
                         <Border Style="{StaticResource CardFrame}" Padding="14">
                             <VerticalStackLayout Spacing="8">
-                                <Label Text="Property Details" Style="{StaticResource Heading2}" />
+                                <Label Text="Property Details" Style="{StaticResource Heading2}"
+                                       ToolTipProperties.Text="Address, postcode, property type, bedrooms, tenure and whether this is your primary home." />
                                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="8">
                                     <Label Grid.Row="0" Grid.Column="0" Text="Address"
                                            TextColor="{StaticResource TextMuted}" FontSize="11" />
@@ -374,7 +393,8 @@
                         <!-- Financials -->
                         <Border Style="{StaticResource CardFrame}" Padding="14">
                             <VerticalStackLayout Spacing="8">
-                                <Label Text="Financials" Style="{StaticResource Heading2}" />
+                                <Label Text="Financials" Style="{StaticResource Heading2}"
+                                       ToolTipProperties.Text="Estimated value, last sale price, purchase details and council tax band for this property." />
                                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="8">
                                     <Label Grid.Row="0" Grid.Column="0" Text="Estimated Value"
                                            TextColor="{StaticResource TextMuted}" FontSize="11" />
@@ -414,7 +434,8 @@
                         <!-- Building Details (from EPC) -->
                         <Border x:Name="BuildingDetailsCard" Style="{StaticResource CardFrame}" Padding="14" IsVisible="False">
                             <VerticalStackLayout Spacing="8">
-                                <Label Text="Building Details" Style="{StaticResource Heading2}" />
+                                <Label Text="Building Details" Style="{StaticResource Heading2}"
+                                       ToolTipProperties.Text="Floor area, walls, roof, heating, windows and hot water type, taken from the EPC certificate." />
                                 <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="4" ColumnSpacing="8">
                                     <Label Grid.Row="0" Grid.Column="0" Text="Floor Area"
                                            TextColor="{StaticResource TextMuted}" FontSize="11" />
@@ -455,12 +476,14 @@
                         <Border Style="{StaticResource CardFrame}" Padding="14">
                             <VerticalStackLayout Spacing="8">
                                 <Grid ColumnDefinitions="*,Auto">
-                                    <Label Text="Maintenance Log" Style="{StaticResource Heading2}" />
+                                    <Label Text="Maintenance Log" Style="{StaticResource Heading2}"
+                                           ToolTipProperties.Text="A record of work done on this property, with cost and date." />
                                     <Button Grid.Column="1" x:Name="AddPropMaintBtn" Text="+ Add Entry"
                                             BackgroundColor="#0A3D2E" TextColor="#34D399"
                                             FontSize="10" FontAttributes="Bold"
                                             CornerRadius="6" Padding="10,2"
                                             HeightRequest="26"
+                                            ToolTipProperties.Text="Log a piece of maintenance work done on this property, with category, description and cost."
                                             Clicked="OnAddPropMaintEntryClicked" />
                                 </Grid>
                                 <VerticalStackLayout x:Name="PropMaintLogList" Spacing="5" />
@@ -475,12 +498,14 @@
                         <Border Style="{StaticResource CardFrame}" Padding="14">
                             <VerticalStackLayout Spacing="8">
                                 <Grid ColumnDefinitions="*,Auto">
-                                    <Label Text="Contractors" Style="{StaticResource Heading2}" />
+                                    <Label Text="Contractors" Style="{StaticResource Heading2}"
+                                           ToolTipProperties.Text="Tradespeople you've used for this property, with phone and email for quick contact." />
                                     <Button Grid.Column="1" x:Name="AddContractorBtn" Text="+ Add"
                                             BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                                             FontSize="10" FontAttributes="Bold"
                                             CornerRadius="6" Padding="10,2"
                                             HeightRequest="26"
+                                            ToolTipProperties.Text="Add a tradesperson's trade, name, phone and email to this property."
                                             Clicked="OnAddContractorClicked" />
                                 </Grid>
                                 <VerticalStackLayout x:Name="ContractorList" Spacing="5" />
@@ -522,24 +547,33 @@
             <!-- User Info Card -->
             <Border x:Name="UserCard" Style="{StaticResource CardFrame}" Padding="20">
                 <VerticalStackLayout Spacing="12">
-                    <HorizontalStackLayout Spacing="16">
-                        <Border BackgroundColor="{StaticResource Primary}"
-                                StrokeShape="RoundRectangle 24"
-                                Stroke="Transparent"
-                                WidthRequest="48" HeightRequest="48">
-                            <Label x:Name="AvatarInitials" Text="" TextColor="White"
-                                   FontSize="18" FontAttributes="Bold"
-                                   HorizontalOptions="Center"
-                                   VerticalOptions="Center" />
-                        </Border>
-                        <VerticalStackLayout Spacing="2" VerticalOptions="Center">
-                            <Label x:Name="ProfileName" Text=""
-                                   TextColor="{StaticResource TextPrimary}"
-                                   FontSize="18" FontAttributes="Bold" />
-                            <Label x:Name="ProfileEmail" Text=""
-                                   Style="{StaticResource SubHeading}" />
-                        </VerticalStackLayout>
-                    </HorizontalStackLayout>
+                    <Grid ColumnDefinitions="*,Auto">
+                        <HorizontalStackLayout Spacing="16">
+                            <Border BackgroundColor="{StaticResource Primary}"
+                                    StrokeShape="RoundRectangle 24"
+                                    Stroke="Transparent"
+                                    WidthRequest="48" HeightRequest="48">
+                                <Label x:Name="AvatarInitials" Text="" TextColor="White"
+                                       FontSize="18" FontAttributes="Bold"
+                                       HorizontalOptions="Center"
+                                       VerticalOptions="Center" />
+                            </Border>
+                            <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                                <Label x:Name="ProfileName" Text=""
+                                       TextColor="{StaticResource TextPrimary}"
+                                       FontSize="18" FontAttributes="Bold" />
+                                <Label x:Name="ProfileEmail" Text=""
+                                       Style="{StaticResource SubHeading}" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                        <Button Grid.Column="1" Text="?"
+                                ToolTipProperties.Text="What this section does"
+                                FontSize="12" FontAttributes="Bold"
+                                WidthRequest="26" HeightRequest="26" Padding="0"
+                                CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                                VerticalOptions="Center"
+                                Clicked="OnHelpClicked" />
+                    </Grid>
 
                     <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
 
@@ -564,26 +598,31 @@
             <Border x:Name="PersonalCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="10">
                     <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto" ColumnSpacing="6">
-                        <Label Text="Personal Details" Style="{StaticResource Heading2}" />
+                        <Label Text="Personal Details" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Your personal, driving licence and passport details, taken from documents you upload or entered manually." />
                         <Button Grid.Column="1" x:Name="UploadLicenceBtn" Text="Licence"
                                 BackgroundColor="#1A2E1A" TextColor="#22C55E"
                                 FontSize="11" CornerRadius="6" Padding="8,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Upload a photo of your driving licence; SmartCube reads your name, DOB and licence details automatically."
                                 Clicked="OnUploadLicenceClicked" />
                         <Button Grid.Column="2" x:Name="UploadPayslipBtn" Text="Payslip"
                                 BackgroundColor="#2E1A2E" TextColor="#C084FC"
                                 FontSize="11" CornerRadius="6" Padding="8,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Upload a payslip photo; SmartCube reads your NI number, tax code and income automatically."
                                 Clicked="OnUploadPayslipClicked" />
                         <Button Grid.Column="3" x:Name="UploadPassportBtn" Text="Passport"
                                 BackgroundColor="#1A2E2E" TextColor="#2DD4BF"
                                 FontSize="11" CornerRadius="6" Padding="8,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Upload a passport photo; SmartCube reads your passport number, nationality and expiry automatically."
                                 Clicked="OnUploadPassportClicked" />
                         <Button Grid.Column="4" x:Name="EditPersonalBtn" Text="Edit"
                                 BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                                 FontSize="11" CornerRadius="6" Padding="8,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Edit your personal details by typing them in, one field at a time."
                                 Clicked="OnEditPersonalClicked" />
                     </Grid>
                     <Grid ColumnDefinitions="Auto,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto"
@@ -655,12 +694,14 @@
             <Border x:Name="PropertiesCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="10">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Properties" Style="{StaticResource Heading2}" />
+                        <Label Text="Properties" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Properties you've added, with address, EPC rating and estimated value." />
                         <Button Grid.Column="1" x:Name="AddPropertyBtn" Text="+ Add"
                                 BackgroundColor="#0A3D2E" TextColor="#34D399"
                                 FontSize="11" FontAttributes="Bold"
                                 CornerRadius="8" Padding="10,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Add a property by postcode; SmartCube looks up matching addresses for you to choose from."
                                 Clicked="OnAddPropertyClicked" />
                     </Grid>
                     <VerticalStackLayout x:Name="PropertiesList" Spacing="8" />
@@ -675,12 +716,14 @@
             <Border x:Name="VehiclesCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="10">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Vehicles" Style="{StaticResource Heading2}" />
+                        <Label Text="Vehicles" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Vehicles you've added, with make, model, MOT and tax status." />
                         <Button Grid.Column="1" x:Name="AddVehicleBtn" Text="+ Add by Reg"
                                 BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                                 FontSize="11" FontAttributes="Bold"
                                 CornerRadius="8" Padding="10,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Add a vehicle by registration number; SmartCube looks up its make, model and MOT details."
                                 Clicked="OnAddVehicleClicked" />
                     </Grid>
                     <VerticalStackLayout x:Name="VehiclesList" Spacing="8" />
@@ -703,18 +746,21 @@
             <Border x:Name="SessionCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="8">
                     <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
-                        <Label Text="Session" Style="{StaticResource Heading2}" />
+                        <Label Text="Session" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Your sign-in status, two-factor authentication and this device's login history." />
                         <Button Grid.Column="1" x:Name="ChangePasswordBtn" Text="Change Password"
                                 BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                                 FontSize="11" FontAttributes="Bold"
                                 CornerRadius="8" Padding="10,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Change the password for your SmartCube account."
                                 Clicked="OnChangePasswordClicked" />
                         <Button Grid.Column="2" x:Name="SignOutBtn" Text="Sign Out"
                                 BackgroundColor="#3B1A1A" TextColor="#EF4444"
                                 FontSize="11" FontAttributes="Bold"
                                 CornerRadius="8" Padding="10,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Sign out and forget this device; you'll need your password next time."
                                 Clicked="OnSignOutClicked" />
                     </Grid>
                     <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="6" ColumnSpacing="8">
@@ -736,6 +782,7 @@
                                 FontSize="11" FontAttributes="Bold"
                                 CornerRadius="8" Padding="10,2" HeightRequest="26"
                                 VerticalOptions="Center" IsEnabled="False"
+                                ToolTipProperties.Text="Set up or manage two-factor authentication (authenticator app codes) for extra account security."
                                 Clicked="OnTwoFactorClicked" />
                     </Grid>
                 </VerticalStackLayout>
@@ -745,12 +792,14 @@
             <Border x:Name="SmartScanCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="8">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Smart Scan" Style="{StaticResource Heading2}" />
+                        <Label Text="Smart Scan" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Your Smart Scan licence lets the app read insurance policies and other documents automatically." />
                         <Button Grid.Column="1" x:Name="SmartScanKeyBtn" Text="Enter Key"
                                 BackgroundColor="#0A3D2E" TextColor="#34D399"
                                 FontSize="11" FontAttributes="Bold"
                                 CornerRadius="8" Padding="10,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Enter or change your Smart Scan licence key."
                                 Clicked="OnSmartScanKeyClicked" />
                     </Grid>
                     <Label Text="Reads insurance policies and other documents automatically when you drop them in."
@@ -767,12 +816,14 @@
             <Border x:Name="CreditScoreCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="10">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Credit Score" Style="{StaticResource Heading2}" />
+                        <Label Text="Credit Score" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Your most recently recorded credit score, rating and history." />
                         <Button Grid.Column="1" x:Name="UpdateScoreBtn" Text="Update Score"
                                 BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                                 FontSize="11" FontAttributes="Bold"
                                 CornerRadius="8" Padding="10,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Record a new credit score and which provider it came from."
                                 Clicked="OnUpdateScoreClicked" />
                     </Grid>
 
@@ -835,16 +886,19 @@
                                 BackgroundColor="#0A3D2E" TextColor="#34D399"
                                 FontSize="10" FontAttributes="Bold"
                                 CornerRadius="6" HeightRequest="30"
+                                ToolTipProperties.Text="Open ClearScore in your browser to check your credit score for free."
                                 Clicked="OnCheckClearScoreClicked" />
                         <Button Grid.Column="1" x:Name="CheckCreditKarmaBtn" Text="Credit Karma"
                                 BackgroundColor="#2E1A2E" TextColor="#C084FC"
                                 FontSize="10" FontAttributes="Bold"
                                 CornerRadius="6" HeightRequest="30"
+                                ToolTipProperties.Text="Open Credit Karma in your browser to check your credit score for free."
                                 Clicked="OnCheckCreditKarmaClicked" />
                         <Button Grid.Column="2" x:Name="CheckMseBtn" Text="MSE Club"
                                 BackgroundColor="#1A2E3B" TextColor="#38BDF8"
                                 FontSize="10" FontAttributes="Bold"
                                 CornerRadius="6" HeightRequest="30"
+                                ToolTipProperties.Text="Open MoneySavingExpert's Credit Club in your browser to check your credit score for free."
                                 Clicked="OnCheckMseClicked" />
                     </Grid>
                 </VerticalStackLayout>
@@ -853,7 +907,8 @@
             <!-- Email Bill Scanner -->
             <Border x:Name="EmailCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="10">
-                    <Label Text="Email Bill Scanner" Style="{StaticResource Heading2}" />
+                    <Label Text="Email Bill Scanner" Style="{StaticResource Heading2}"
+                           ToolTipProperties.Text="Connects to your email inbox to find and import energy and water bills automatically." />
                     <Label Text="Connect your email to automatically find and import bills from your energy and water suppliers."
                            TextColor="{StaticResource TextMuted}" FontSize="12" />
 
@@ -873,6 +928,7 @@
                                    PlaceholderColor="{StaticResource TextMuted}"
                                    BackgroundColor="{StaticResource CardBgLight}"
                                    FontSize="12" Keyboard="Email"
+                                   ToolTipProperties.Text="Enter the email address you want SmartCube to scan for bills."
                                    TextChanged="OnEmailAddressChanged" />
                             <Label Grid.Row="1" Text="App Password" TextColor="{StaticResource TextMuted}"
                                    FontSize="12" VerticalOptions="Center" />
@@ -881,7 +937,8 @@
                                    TextColor="{StaticResource TextPrimary}"
                                    PlaceholderColor="{StaticResource TextMuted}"
                                    BackgroundColor="{StaticResource CardBgLight}"
-                                   FontSize="12" IsPassword="True" />
+                                   FontSize="12" IsPassword="True"
+                                   ToolTipProperties.Text="Enter an app password for this account — not your normal email password." />
                             <Label Grid.Row="2" Text="IMAP Server" TextColor="{StaticResource TextMuted}"
                                    FontSize="12" VerticalOptions="Center" />
                             <Entry Grid.Row="2" Grid.Column="1" x:Name="EmailImapEntry"
@@ -889,7 +946,8 @@
                                    TextColor="{StaticResource TextPrimary}"
                                    PlaceholderColor="{StaticResource TextMuted}"
                                    BackgroundColor="{StaticResource CardBgLight}"
-                                   FontSize="12" />
+                                   FontSize="12"
+                                   ToolTipProperties.Text="The IMAP server for your email provider; this is usually filled in automatically." />
                         </Grid>
                         <Label Text="Use an App Password, not your normal password. Gmail: Google Account → Security → App Passwords"
                                TextColor="{StaticResource TextMuted}" FontSize="10" />
@@ -903,17 +961,20 @@
                                 FontSize="13" FontAttributes="Bold"
                                 CornerRadius="8" HeightRequest="36"
                                 Padding="16,0"
+                                ToolTipProperties.Text="Connect to your email account using the details above."
                                 Clicked="OnConnectEmailClicked" />
                         <Button x:Name="ScanEmailBtn" Text="&#x1F50D; Scan for Bills"
                                 BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                                 FontSize="13" FontAttributes="Bold"
                                 CornerRadius="8" HeightRequest="36"
                                 Padding="16,0" IsVisible="False"
+                                ToolTipProperties.Text="Scan your inbox for bill PDFs and add any new ones to your bill history."
                                 Clicked="OnScanEmailClicked" />
                         <Button x:Name="DisconnectEmailBtn" Text="Disconnect"
                                 BackgroundColor="#3B1A1A" TextColor="#EF4444"
                                 FontSize="11" CornerRadius="8" HeightRequest="36"
                                 Padding="12,0" IsVisible="False"
+                                ToolTipProperties.Text="Remove this email connection from SmartCube."
                                 Clicked="OnDisconnectEmailClicked" />
                     </HorizontalStackLayout>
                 </VerticalStackLayout>
@@ -922,7 +983,8 @@
             <!-- Connect Bank -->
             <Border x:Name="ConnectBankCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="12">
-                    <Label Text="Open Banking" Style="{StaticResource Heading2}" />
+                    <Label Text="Open Banking" Style="{StaticResource Heading2}"
+                           ToolTipProperties.Text="Connect your real bank accounts to see live balances and transactions." />
                     <Label Text="Connect your real bank accounts via TrueLayer to see live balances and transactions."
                            TextColor="{StaticResource TextMuted}" FontSize="12" />
                     <HorizontalStackLayout Spacing="8">
@@ -934,6 +996,7 @@
                             FontSize="14" FontAttributes="Bold"
                             CornerRadius="10" HeightRequest="44"
                             HorizontalOptions="Fill"
+                            ToolTipProperties.Text="Connect or manage your bank accounts via TrueLayer Open Banking."
                             Clicked="OnConnectBankClicked" />
                 </VerticalStackLayout>
             </Border>
@@ -941,13 +1004,15 @@
             <!-- Reports -->
             <Border x:Name="ReportsCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="12">
-                    <Label Text="Reports" Style="{StaticResource Heading2}" />
+                    <Label Text="Reports" Style="{StaticResource Heading2}"
+                           ToolTipProperties.Text="A full report across your banking, utilities, crypto and investments." />
                     <Label Text="Full portfolio report across all sectors — banking, utility, crypto, and investments."
                            TextColor="{StaticResource TextMuted}" FontSize="12" />
                     <Button x:Name="ViewReportBtn" Text="&#x1F4CA; View Full Report"
                             FontSize="14" FontAttributes="Bold"
                             CornerRadius="10" HeightRequest="44"
                             HorizontalOptions="Fill"
+                            ToolTipProperties.Text="Open the full portfolio report covering all sectors."
                             Clicked="OnViewReportClicked" />
                 </VerticalStackLayout>
             </Border>
@@ -956,12 +1021,14 @@
             <Border x:Name="DocumentsCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="10">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Documents" Style="{StaticResource Heading2}" />
+                        <Label Text="Documents" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Documents you've uploaded, such as licence, passport and payslip photos." />
                         <Button Grid.Column="1" x:Name="AddDocumentBtn" Text="+ Upload"
                                 BackgroundColor="#0A3D2E" TextColor="#34D399"
                                 FontSize="11" FontAttributes="Bold"
                                 CornerRadius="8" Padding="10,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Upload a document from your computer and choose a category for it."
                                 Clicked="OnAddDocumentClicked" />
                     </Grid>
                     <VerticalStackLayout x:Name="DocumentsList" Spacing="6" />
@@ -976,11 +1043,13 @@
             <Border x:Name="MortgageCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="10">
                     <Grid ColumnDefinitions="*,Auto">
-                        <Label Text="Mortgage Tracker" Style="{StaticResource Heading2}" />
+                        <Label Text="Mortgage Tracker" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Your mortgage lender, balance, rate and fixed-rate end date, with alerts before your rate changes." />
                         <Button Grid.Column="1" x:Name="EditMortgageBtn" Text="Edit"
                                 BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                                 FontSize="11" CornerRadius="6" Padding="10,2"
                                 HeightRequest="26"
+                                ToolTipProperties.Text="Enter or update your mortgage lender, balance, payment, rate and fixed-rate end date."
                                 Clicked="OnEditMortgageClicked" />
                     </Grid>
 
@@ -1062,7 +1131,8 @@
             <!-- Cube Faces -->
             <Border x:Name="CubeFacesCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="8">
-                    <Label Text="Cube Faces" Style="{StaticResource Heading2}" />
+                    <Label Text="Cube Faces" Style="{StaticResource Heading2}"
+                           ToolTipProperties.Text="The pages available on your SmartCube dashboard, in the order they appear." />
                     <VerticalStackLayout x:Name="CubeFacesContainer" Spacing="6" />
                 </VerticalStackLayout>
             </Border>

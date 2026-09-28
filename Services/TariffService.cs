@@ -34,6 +34,7 @@ namespace SmartCubeMobile.Services
         public bool Ok { get; set; }
         public bool Available { get; set; }
         public string Error { get; set; }
+        public string FuelType { get; set; } = "dual";
         public int RegionId { get; set; }
         public string RegionName { get; set; }
         public string RegionSource { get; set; }
@@ -139,11 +140,25 @@ namespace SmartCubeMobile.Services
             return Math.Round(units * 365m / Math.Max(days, 30), 0);
         }
 
-        public static async Task<TariffResult> GetTariffs(string postcode, decimal? elecKwh, decimal? gasKwh)
+        // True when the user has any sign of gas: a gas bill or a gas supplier record.
+        public static bool UserHasGas()
+        {
+            try
+            {
+                if (MockData.MockDataService.GetUtilityBills().Any(b => string.Equals(b.FuelType, "Gas", StringComparison.OrdinalIgnoreCase) && b.Amount > 0)) return true;
+                if (MockData.MockDataService.GetSuppliers().Any(s => string.Equals(s.Type, "Gas", StringComparison.OrdinalIgnoreCase))) return true;
+            }
+            catch { }
+            return false;
+        }
+
+        // fuel: "dual" (gas + electricity, default), "elec" (electricity-only) or "gas" (gas-only tariffs)
+        public static async Task<TariffResult> GetTariffs(string postcode, decimal? elecKwh, decimal? gasKwh, string fuel = "dual")
         {
             var url = $"{SessionService.ServerBase}/api/tariffs?postcode={Uri.EscapeDataString(postcode)}";
-            if (elecKwh > 0) url += $"&elecKwh={elecKwh}";
-            if (gasKwh > 0) url += $"&gasKwh={gasKwh}";
+            if (elecKwh > 0 && fuel != "gas") url += $"&elecKwh={elecKwh}";
+            if (gasKwh > 0 && fuel != "elec") url += $"&gasKwh={gasKwh}";
+            if (fuel is "elec" or "gas") url += $"&fuel={fuel}";
 
             try
             {
@@ -155,6 +170,7 @@ namespace SmartCubeMobile.Services
                     Ok = j["ok"]?.Value<bool>() ?? false,
                     Available = j["available"]?.Value<bool>() ?? false,
                     Error = j["error"]?.ToString(),
+                    FuelType = j["fuelType"]?.ToString() ?? "dual",
                     RegionId = j["regionId"]?.Value<int>() ?? 0,
                     RegionName = j["regionName"]?.ToString(),
                     RegionSource = j["regionSource"]?.ToString(),

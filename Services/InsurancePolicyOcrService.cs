@@ -1,3 +1,4 @@
+using System.Text;
 using System.Text.RegularExpressions;
 using Newtonsoft.Json.Linq;
 #if WINDOWS
@@ -41,7 +42,10 @@ namespace SmartCubeMobile.Services
 
         private static string ServerBase => SessionService.ServerBase;
 
-        public static async Task<(InsurancePolicyOcrData Data, string RawText, string Error)> ExtractFromImage(string filePath, string categoryHint)
+        public enum ScanMode { SmartScan, Basic, Simulated }
+
+        // Basic skips the server (no licence needed); Simulated reads a hand-written response.json instead of calling it.
+        public static async Task<(InsurancePolicyOcrData Data, string RawText, string Error)> ExtractFromImage(string filePath, string categoryHint, ScanMode mode = ScanMode.SmartScan)
         {
 #if WINDOWS
             string rawText;
@@ -77,6 +81,17 @@ namespace SmartCubeMobile.Services
             }
 
             InsurancePolicyOcrData data;
+            if (mode == ScanMode.Basic)
+            {
+                data = ParseInsuranceTextFallback(rawText, categoryHint);
+                data.Warning = "Basic read (Smart Scan not used). Check the figures before saving.";
+                return (data, rawText, null);
+            }
+            if (mode == ScanMode.Simulated)
+            {
+                var (simData, simError) = ParseViaSimulation(rawText, categoryHint);
+                return (simData, rawText, simError);
+            }
             try
             {
                 data = await ParseViaServer(rawText, categoryHint);
@@ -170,6 +185,48 @@ namespace SmartCubeMobile.Services
             }
 
             var parsed = result["data"] as JObject ?? throw new Exception("Server returned no data");
+            return FromJson(parsed, categoryHint);
+        }
+
+        // ---- Simulated Smart Scan (testing without server credits) ----
+        // The app writes the OCR text to SimulationDir\last_ocr.txt; a person (or Claude Code) writes
+        // SimulationDir\response.json in the same shape the server returns, tagged with the text hash.
+        public static readonly string SimulationDir = @"D:\SmartCubeMobile\Data\SmartScan";
+
+        private static (InsurancePolicyOcrData Data, string Error) ParseViaSimulation(string ocrText, string categoryHint)
+        {
+            Directory.CreateDirectory(SimulationDir);
+            var hash = Convert.ToHexString(System.Security.Cryptography.SHA256.HashData(Encoding.UTF8.GetBytes(ocrText)))[..16];
+            File.WriteAllText(Path.Combine(SimulationDir, "last_ocr.txt"), ocrText, Encoding.UTF8);
+            File.WriteAllText(Path.Combine(SimulationDir, "request.json"),
+                new JObject { ["sourceHash"] = hash, ["category"] = categoryHint, ["savedAt"] = DateTime.Now.ToString("s") }.ToString(),
+                Encoding.UTF8);
+
+            var responsePath = Path.Combine(SimulationDir, "response.json");
+            if (File.Exists(responsePath))
+            {
+                try
+                {
+                    var json = JObject.Parse(File.ReadAllText(responsePath, Encoding.UTF8));
+                    if (string.Equals(json["sourceHash"]?.ToString(), hash, StringComparison.OrdinalIgnoreCase))
+                    {
+                        var data = FromJson((json["data"] as JObject) ?? json, categoryHint);
+                        data.Warning = "Simulated Smart Scan (response.json), not the live service.";
+                        return (data, null);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    return (null, $"response.json could not be read: {ex.Message}");
+                }
+            }
+
+            return (null, $"Simulated Smart Scan: the document text has been saved to\n{SimulationDir}\\last_ocr.txt (hash {hash}).\n\n" +
+                          "Ask Claude Code to write response.json for it, then drop the document again and choose Simulated.");
+        }
+
+        private static InsurancePolicyOcrData FromJson(JObject parsed, string categoryHint)
+        {
             return new InsurancePolicyOcrData
             {
                 Category = categoryHint,

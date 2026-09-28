@@ -115,6 +115,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     }
                 }
             };
+            ToolTipProperties.SetText(totalCard, "Shows your combined balance across all accounts; tap to see all transactions.");
             totalCard.GestureRecognizers.Add(new TapGestureRecognizer
             {
                 Command = new Command(() => SelectAccount(null, totalCard))
@@ -148,6 +149,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     }
                 };
                 var acctName = account.AccountName;
+                ToolTipProperties.SetText(card, "Shows this account's balance; tap to filter transactions to just this account.");
                 card.GestureRecognizers.Add(new TapGestureRecognizer
                 {
                     Command = new Command(() => SelectAccount(acctName, card))
@@ -177,6 +179,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     }
                 }
             };
+            ToolTipProperties.SetText(addCard, "Connect a new bank account through TrueLayer; SmartCube never sees your bank password.");
             addCard.GestureRecognizers.Add(new TapGestureRecognizer
             {
                 Command = new Command(OnAddAccount)
@@ -223,6 +226,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     }
                 }
             };
+            ToolTipProperties.SetText(totalCard, "Shows your combined balance across all accounts; tap to see all transactions.");
             totalCard.GestureRecognizers.Add(new TapGestureRecognizer
             {
                 Command = new Command(() => SelectAccount(null, totalCard))
@@ -256,6 +260,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     }
                 };
                 var acctName = account.AccountName;
+                ToolTipProperties.SetText(card, "Shows this account's balance; tap to filter transactions to just this account.");
                 card.GestureRecognizers.Add(new TapGestureRecognizer
                 {
                     Command = new Command(() => SelectAccount(acctName, card))
@@ -285,6 +290,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     }
                 }
             };
+            ToolTipProperties.SetText(addCard, "Connect a new bank account through TrueLayer; SmartCube never sees your bank password.");
             addCard.GestureRecognizers.Add(new TapGestureRecognizer
             {
                 Command = new Command(OnAddAccount)
@@ -372,6 +378,13 @@ namespace SmartCubeMobile.Dashboard.Faces
             await LoadLiveData();
             RefreshBtn.Text = "⟳";
             RefreshBtn.IsEnabled = true;
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (page != null)
+                await page.DisplayAlert("Banking", "This section shows your connected bank accounts and recent transactions. Tap an account card to filter the list below to just that account. Use Add Account to connect a new bank through TrueLayer — SmartCube never sees your bank password. All your account and transaction data is stored locally on this PC.", "OK");
         }
 
         private void RefreshData()

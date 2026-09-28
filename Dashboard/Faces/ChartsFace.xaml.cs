@@ -169,6 +169,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     Stroke = Colors.Transparent,
                     Padding = new Thickness(10, 7),
                 };
+                ToolTipProperties.SetText(row, "Tap to see which merchants make up your spending in this category.");
 
                 var grid = new Grid
                 {
@@ -427,6 +428,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                         }
                     }
                 };
+                ToolTipProperties.SetText(row, "Tap to see this merchant's spending broken down by category.");
 
                 var category = m.Category;
                 row.GestureRecognizers.Add(new TapGestureRecognizer
@@ -442,6 +444,12 @@ namespace SmartCubeMobile.Dashboard.Faces
         {
             SearchEntry.Text = "";
             SearchResultsCard.IsVisible = false;
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (page != null) await page.DisplayAlert("Charts", "This section combines your bank, crypto and spending data into charts: net worth over time, spending by category (tap a category or search a merchant to drill in), account and holding breakdowns, a suggested budget, and savings ideas. Use the Account picker to filter everything to one account. All figures are calculated from data stored locally on this PC.", "OK");
         }
 
         private void LoadNetWorthTrend(List<MockChartPoint> netWorth)

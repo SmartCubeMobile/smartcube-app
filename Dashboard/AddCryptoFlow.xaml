@@ -12,11 +12,12 @@
                 Stroke="{StaticResource BorderColor}"
                 StrokeThickness="0,0,0,1"
                 Padding="24,14">
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                 <Button x:Name="BackButton" Text="← Back"
                         BackgroundColor="Transparent"
                         TextColor="{StaticResource TextSecondary}"
                         FontSize="13" Padding="8,4"
+                        ToolTipProperties.Text="Go back a step, or leave this screen if you haven't started."
                         Clicked="OnBackClicked" />
                 <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
                     <Label x:Name="PageTitle" Text="Add Crypto"
@@ -30,6 +31,10 @@
                 <Label Grid.Column="2" x:Name="StepIndicator" Text="Step 1 of 3"
                        TextColor="{StaticResource TextMuted}" FontSize="12"
                        VerticalOptions="Center" Margin="0,0,8,0" />
+                <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does"
+                        FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26"
+                        Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                        VerticalOptions="Center" Clicked="OnHelpClicked" />
             </Grid>
         </Border>
 
@@ -40,7 +45,8 @@
                 <VerticalStackLayout Spacing="16" HorizontalOptions="Center" WidthRequest="500">
 
                     <!-- Wallet Address -->
-                    <Border x:Name="WalletOption" Style="{StaticResource CardFrame}" Padding="20">
+                    <Border x:Name="WalletOption" Style="{StaticResource CardFrame}" Padding="20"
+                            ToolTipProperties.Text="Add a crypto wallet by its public address so SmartCube can read its balance.">
                         <HorizontalStackLayout Spacing="16">
                             <Label Text="🔑" FontSize="32" VerticalOptions="Center" />
                             <VerticalStackLayout Spacing="4" VerticalOptions="Center">
@@ -55,7 +61,8 @@
                     </Border>
 
                     <!-- Exchange Account -->
-                    <Border x:Name="ExchangeOption" Style="{StaticResource CardFrame}" Padding="20">
+                    <Border x:Name="ExchangeOption" Style="{StaticResource CardFrame}" Padding="20"
+                            ToolTipProperties.Text="Link an exchange account using an API key so SmartCube can read your holdings.">
                         <HorizontalStackLayout Spacing="16">
                             <Label Text="🏛" FontSize="32" VerticalOptions="Center" />
                             <VerticalStackLayout Spacing="4" VerticalOptions="Center">
@@ -102,6 +109,7 @@
                                         <Entry x:Name="Field1Entry" Placeholder="Enter here"
                                                TextColor="{StaticResource TextPrimary}"
                                                BackgroundColor="Transparent"
+                                               ToolTipProperties.Text="Enter the wallet address or exchange API key requested above."
                                                FontSize="14" HeightRequest="44" />
                                     </Border>
                                 </VerticalStackLayout>
@@ -114,6 +122,7 @@
                                         <Entry x:Name="Field2Entry" Placeholder="Enter here"
                                                TextColor="{StaticResource TextPrimary}"
                                                BackgroundColor="Transparent" IsPassword="True"
+                                               ToolTipProperties.Text="Enter the exchange's secret or private key requested above; hidden as you type."
                                                FontSize="14" HeightRequest="44" />
                                     </Border>
                                 </VerticalStackLayout>
@@ -127,6 +136,7 @@
                                                 Placeholder="Paste your private key here"
                                                 TextColor="{StaticResource TextPrimary}"
                                                 BackgroundColor="Transparent"
+                                                ToolTipProperties.Text="Paste your Coinbase API private key (PEM) here; used only to read your holdings."
                                                 FontSize="11" HeightRequest="120"
                                                 FontFamily="Consolas"
                                                 AutoSize="TextChanges" />
@@ -141,6 +151,7 @@
                                         <Entry x:Name="Field3Entry" Placeholder="Optional label"
                                                TextColor="{StaticResource TextPrimary}"
                                                BackgroundColor="Transparent"
+                                               ToolTipProperties.Text="Optional name to help you tell this wallet or exchange account apart from others."
                                                FontSize="14" HeightRequest="44" />
                                     </Border>
                                 </VerticalStackLayout>
@@ -149,6 +160,7 @@
                                        HorizontalOptions="Center" />
                                 <Button x:Name="ConnectBtn" Text="Connect"
                                         FontSize="15" CornerRadius="12" HeightRequest="48"
+                                        ToolTipProperties.Text="Look up your balance or holdings and add them to SmartCube; keys are stored only on this PC."
                                         Clicked="OnConnectClicked" />
                             </VerticalStackLayout>
                         </VerticalStackLayout>
@@ -177,7 +189,9 @@
                                FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" />
                         <VerticalStackLayout x:Name="FoundAssetsList" Spacing="8" />
                         <Button Text="Add to SmartCube" FontSize="15" CornerRadius="12"
-                                HeightRequest="48" Clicked="OnAddClicked" />
+                                HeightRequest="48"
+                                ToolTipProperties.Text="Close this screen and return to the dashboard now these assets have been added."
+                                Clicked="OnAddClicked" />
                     </VerticalStackLayout>
                 </VerticalStackLayout>
             </ScrollView>

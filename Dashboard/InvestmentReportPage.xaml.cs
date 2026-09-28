@@ -409,5 +409,12 @@ namespace SmartCubeMobile.Dashboard
         {
             await Navigation.PopAsync();
         }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Portfolio Report",
+                "This page is a detailed, printable-style report on your investment portfolio: overall value and performance, every holding, sector and platform breakdowns, top and bottom performers, and estimated dividend income. It is read-only and calculated from the investments you've already set up in SmartCube, using data stored locally on this PC.",
+                "OK");
+        }
     }
 }

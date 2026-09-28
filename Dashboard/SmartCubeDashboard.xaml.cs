@@ -6,7 +6,7 @@ namespace SmartCubeMobile
     public partial class SmartCubeDashboard : ContentPage
     {
         private readonly Button[] navButtons;
-        private readonly string[] faceNames = { "Banking", "Utility", "Crypto", "Exchange", "Investments", "Charts", "Subscriptions", "Insurance", "News", "Profile" };
+        private readonly string[] faceNames = { "Banking", "Utility", "Crypto", "Exchange", "Investments", "Charts", "Subscriptions", "Insurance", "News", "Profile", "Help & support" };
         private readonly string[] faceSubtitles = {
             "Accounts and transactions",
             "Energy bills and usage",
@@ -17,8 +17,13 @@ namespace SmartCubeMobile
             "Manage your recurring payments",
             "Car, house and life policies",
             "Market and finance news",
-            "Settings and preferences"
+            "Settings and preferences",
+            "Contact us, see replies and join live chat"
         };
+
+        private SupportFace supportFace;
+        private IDispatcherTimer supportTimer;
+        private int? pendingSupportTicket;
 
         private BankingFace bankingFace;
         private UtilityFace utilityFace;
@@ -42,7 +47,8 @@ namespace SmartCubeMobile
             UserLabel.Text = SessionService.DisplayName;
             UserInitials.Text = SessionService.InitialsFor(SessionService.DisplayName);
 
-            navButtons = new[] { NavBanking, NavUtility, NavCrypto, NavExchange, NavInvestments, NavCharts, NavSubscriptions, NavInsurance, NavNews, NavProfile };
+            navButtons = new[] { NavBanking, NavUtility, NavCrypto, NavExchange, NavInvestments, NavCharts, NavSubscriptions, NavInsurance, NavNews, NavProfile, NavSupport };
+            NavSupport.Clicked += (s, e) => SwitchFace(10);
 
             NavBanking.Clicked += (s, e) => SwitchFace(0);
             NavUtility.Clicked += (s, e) => SwitchFace(1);
@@ -65,9 +71,11 @@ namespace SmartCubeMobile
             insuranceFace = new InsuranceFace();
             newsFace = new NewsFace();
             profileFace = new ProfileFace();
+            supportFace = new SupportFace();
 
             SwitchFace(9);
             StartClock();
+            StartSupportWatch();
             _ = SmartDataService.EnsureTokensFresh();
         }
 
@@ -122,6 +130,11 @@ namespace SmartCubeMobile
 
             if (index == 0)
                 _ = bankingFace.ReloadAsync();
+            if (index == 10)
+            {
+                var open = pendingSupportTicket; pendingSupportTicket = null;
+                _ = supportFace.RefreshAsync(open);
+            }
 
             if (face is IAnimatedFace animatedFace)
                 _ = animatedFace.PlayEntryAnimation();
@@ -141,8 +154,40 @@ namespace SmartCubeMobile
             7 => insuranceFace,
             8 => newsFace,
             9 => profileFace,
+            10 => supportFace,
             _ => bankingFace
         };
+
+        // Checks for replies or live-chat invitations from support every two minutes (and shortly after
+        // start-up), and offers to open them once per new event.
+        private void StartSupportWatch()
+        {
+            supportTimer = Dispatcher.CreateTimer();
+            supportTimer.Interval = TimeSpan.FromMinutes(2);
+            supportTimer.Tick += async (s, e) => await CheckSupport();
+            supportTimer.Start();
+            Dispatcher.DispatchDelayed(TimeSpan.FromSeconds(8), async () => await CheckSupport());
+        }
+
+        private bool checkingSupport;
+        private async Task CheckSupport()
+        {
+            if (checkingSupport || SessionService.Current == null) return;
+            checkingSupport = true;
+            try
+            {
+                var (ok, _, tickets, _) = await SupportService.GetMyTickets();
+                NavSupport.Text = ok && tickets.Any(SupportService.HasNews) ? "\U0001F4AC•" : "\U0001F4AC";
+                if (!ok || activeFace == 10) return;
+                var t = tickets.FirstOrDefault(SupportService.ShouldNotify);
+                if (t == null) return;
+                var what = t.ChatOffered ? "has invited you to a live chat about" : "has replied to";
+                var go = await DisplayAlert("SmartCube support", $"Support {what} {t.Reference}: {t.Subject}", t.ChatOffered ? "Open" : "View", "Later");
+                if (go) { pendingSupportTicket = t.Id; SwitchFace(10); }
+            }
+            catch { }
+            finally { checkingSupport = false; }
+        }
 
         private void StartClock()
         {

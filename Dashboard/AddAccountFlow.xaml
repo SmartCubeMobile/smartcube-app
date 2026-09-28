@@ -12,11 +12,12 @@
                 Stroke="{StaticResource BorderColor}"
                 StrokeThickness="0,0,0,1"
                 Padding="24,14">
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                 <Button x:Name="BackButton" Text="← Back"
                         BackgroundColor="Transparent"
                         TextColor="{StaticResource TextSecondary}"
                         FontSize="13" Padding="8,4"
+                        ToolTipProperties.Text="Go back a step, or leave this screen if you haven't picked a bank yet."
                         Clicked="OnBackClicked" />
                 <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
                     <Label x:Name="StepTitle" Text="Add Bank Account"
@@ -30,6 +31,10 @@
                 <Label Grid.Column="2" x:Name="StepIndicator" Text="Step 1 of 3"
                        TextColor="{StaticResource TextMuted}" FontSize="12"
                        VerticalOptions="Center" Margin="0,0,8,0" />
+                <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does"
+                        FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26"
+                        Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                        VerticalOptions="Center" Clicked="OnHelpClicked" />
             </Grid>
         </Border>
 
@@ -72,6 +77,7 @@
                                            Placeholder="Enter here"
                                            TextColor="{StaticResource TextPrimary}"
                                            BackgroundColor="Transparent"
+                                           ToolTipProperties.Text="Type the login detail shown above (varies by bank, e.g. your customer number, username or email)."
                                            FontSize="15" HeightRequest="44" />
                                 </Border>
                             </VerticalStackLayout>
@@ -87,6 +93,7 @@
                                            Placeholder="Enter here"
                                            TextColor="{StaticResource TextPrimary}"
                                            BackgroundColor="Transparent"
+                                           ToolTipProperties.Text="Type the second login detail shown above (varies by bank, e.g. password or date of birth)."
                                            FontSize="15" HeightRequest="44" />
                                 </Border>
                             </VerticalStackLayout>
@@ -103,6 +110,7 @@
                                            TextColor="{StaticResource TextPrimary}"
                                            BackgroundColor="Transparent"
                                            IsPassword="True"
+                                           ToolTipProperties.Text="Type the passcode, PIN or security code shown above; hidden as you type."
                                            FontSize="15" HeightRequest="44" />
                                 </Border>
                             </VerticalStackLayout>
@@ -114,6 +122,7 @@
                             <Button x:Name="ConnectButton" Text="Connect"
                                     FontSize="15" CornerRadius="12"
                                     HeightRequest="48"
+                                    ToolTipProperties.Text="Submit these details to look up your accounts at this bank; everything is stored only on this PC."
                                     Clicked="OnConnectClicked" />
                         </VerticalStackLayout>
                     </Border>
@@ -164,6 +173,7 @@
                                 Text="Add to SmartCube"
                                 FontSize="15" CornerRadius="12"
                                 HeightRequest="48"
+                                ToolTipProperties.Text="Close this screen and return to the dashboard now these accounts have been added."
                                 Clicked="OnAddToCubeClicked" />
                     </VerticalStackLayout>
                 </VerticalStackLayout>

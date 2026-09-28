@@ -1274,6 +1274,48 @@ namespace SmartCubeMobile.Services
                 gasMeterEnd = gasParsed.MeterReadingEnd;
             }
 
+            // A "dual fuel" account often gets single-fuel bills (e.g. EDF bills electricity on the 13th and
+            // gas on the 14th). Only keep a fuel that actually has charges on this bill; otherwise the
+            // other fuel would be invented with £0 and figures copied from the wrong section.
+            var hasElec = elecAmount > 0.005m;
+            var hasGas = gasAmount > 0.005m;
+            if (hasElec != hasGas)
+            {
+                var single = new MockUtilityBill
+                {
+                    BillDate = parsed.BillDate,
+                    Supplier = parsed.Supplier,
+                    FuelType = hasElec ? "Electricity" : "Gas",
+                    Amount = parsed.Amount,
+                    UnitsUsed = hasElec ? elecUsage : gasUsage,
+                    UoM = "kWh",
+                    Period = parsed.Period,
+                    Address = parsed.Address,
+                    UnitRatePence = hasElec ? elecRate : gasRate,
+                    StandingChargePence = hasElec ? elecStanding : gasStanding,
+                    VatRate = parsed.VatRate > 0 ? parsed.VatRate : 5m,
+                    IsEstimated = parsed.IsEstimated,
+                    PeriodStart = parsed.PeriodStart,
+                    PeriodEnd = parsed.PeriodEnd,
+                    PaymentMethod = parsed.PaymentMethod ?? "Direct Debit",
+                    IsFromPdf = true,
+                    HasSolar = hasElec && parsed.HasSolar,
+                    ExportKwh = hasElec ? parsed.ExportKwh : 0,
+                    ExportRatePence = hasElec ? parsed.ExportRatePence : 0,
+                    ExportPayment = hasElec ? parsed.ExportPayment : 0,
+                    GenerationKwh = hasElec ? parsed.GenerationKwh : 0,
+                    ExportTariffType = hasElec ? parsed.ExportTariffType : null,
+                    IsDeemedExport = hasElec && parsed.IsDeemedExport,
+                    MeterReadingStart = hasElec ? elecMeterStart : gasMeterStart,
+                    MeterReadingEnd = hasElec ? elecMeterEnd : gasMeterEnd,
+                };
+                // Fall back to the whole-bill figures if the fuel section didn't yield its own.
+                if (single.UnitsUsed <= 0) single.UnitsUsed = parsed.UnitsUsed;
+                if (single.UnitRatePence <= 0) single.UnitRatePence = parsed.UnitRatePence;
+                if (single.StandingChargePence <= 0) single.StandingChargePence = parsed.StandingChargePence;
+                return new List<MockUtilityBill> { single };
+            }
+
             return new List<MockUtilityBill>
             {
                 new MockUtilityBill

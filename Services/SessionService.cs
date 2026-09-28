@@ -220,6 +220,10 @@ namespace SmartCubeMobile.Services
             if (changed) UserProfileDataService.SaveProfile();
         }
 
+        // Shared, signed-in calls to the SmartCube server (same cookies as the login).
+        public static Task<(bool Ok, string Error, JObject Json)> ApiGet(string path) => Get(path);
+        public static Task<(bool Ok, string Error, JObject Json)> ApiPost(string path, object body) => Post(path, body);
+
         private static async Task<(bool Ok, string Error, JObject Json)> Post(string path, object body)
         {
             try

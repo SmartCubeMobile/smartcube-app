@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.Faces.SupportFace"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid ColumnDefinitions="*,*" Padding="16" ColumnSpacing="12">
+
+        <!-- Left: new ticket -->
+        <ScrollView Grid.Column="0">
+            <VerticalStackLayout Spacing="12">
+
+                <Border x:Name="ChatBanner" Style="{StaticResource CardFrame}" Padding="14" IsVisible="False"
+                        BackgroundColor="#0A3D2E" Stroke="#10B981">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="10">
+                        <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                            <Label Text="Support has invited you to a live chat" FontAttributes="Bold" FontSize="14" TextColor="#D1FAE5" />
+                            <Label x:Name="ChatBannerLabel" Text="" FontSize="12" TextColor="#A7F3D0" LineBreakMode="WordWrap" />
+                        </VerticalStackLayout>
+                        <Button Grid.Column="1" x:Name="ChatBannerBtn" Text="Join chat" BackgroundColor="#10B981" TextColor="White"
+                                FontSize="13" FontAttributes="Bold" CornerRadius="10" Padding="16,6" VerticalOptions="Center"
+                                Clicked="OnBannerJoinClicked"
+                                ToolTipProperties.Text="Open the live chat with SmartCube support inside the app." />
+                    </Grid>
+                </Border>
+
+                <Border Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Contact support" Style="{StaticResource Heading2}"
+                                   ToolTipProperties.Text="Send a message to the SmartCube support team from your account." />
+                            <Button Grid.Column="1" Text="?" ToolTipProperties.Text="What this section does"
+                                    FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0"
+                                    CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                                    VerticalOptions="Center" Clicked="OnHelpClicked" />
+                        </Grid>
+                        <Label x:Name="SignedInLabel" Text="" FontSize="12" TextColor="{StaticResource TextMuted}" />
+
+                        <Label Text="What is the problem with?" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        <Border BackgroundColor="{StaticResource CardBgLight}" Stroke="{StaticResource BorderColor}" StrokeShape="RoundRectangle 8" Padding="8,0">
+                            <Picker x:Name="AreaPicker" Title="Choose an area" TextColor="{StaticResource TextPrimary}"
+                                    TitleColor="{StaticResource TextMuted}" BackgroundColor="Transparent" FontSize="13"
+                                    ToolTipProperties.Text="Pick the part of SmartCube the problem is in, so it reaches the right place." />
+                        </Border>
+
+                        <Label Text="Subject" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        <Border BackgroundColor="{StaticResource CardBgLight}" Stroke="{StaticResource BorderColor}" StrokeShape="RoundRectangle 8" Padding="8,0">
+                            <Entry x:Name="SubjectEntry" Placeholder="e.g. My EDF bills are not importing" MaxLength="200"
+                                   TextColor="{StaticResource TextPrimary}" PlaceholderColor="{StaticResource TextMuted}"
+                                   BackgroundColor="Transparent" FontSize="13"
+                                   ToolTipProperties.Text="A short summary of the problem." />
+                        </Border>
+
+                        <Label Text="What happened?" FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                        <Border BackgroundColor="{StaticResource CardBgLight}" Stroke="{StaticResource BorderColor}" StrokeShape="RoundRectangle 8" Padding="8,4">
+                            <Editor x:Name="MessageEditor" HeightRequest="150" MaxLength="8000" AutoSize="Disabled"
+                                    Placeholder="What were you doing, what did you expect, and what happened instead? Include any error message."
+                                    TextColor="{StaticResource TextPrimary}" PlaceholderColor="{StaticResource TextMuted}"
+                                    BackgroundColor="Transparent" FontSize="13"
+                                    ToolTipProperties.Text="Describe the problem. Error messages and the steps you took help us fix it faster." />
+                        </Border>
+
+                        <Button x:Name="SendBtn" Text="Send to support" BackgroundColor="{StaticResource Primary}" TextColor="White"
+                                FontAttributes="Bold" CornerRadius="10" HeightRequest="42" Clicked="OnSendClicked"
+                                ToolTipProperties.Text="Send this ticket. We'll email a copy and reply to you here and by email." />
+                        <Label x:Name="SendStatus" Text="" FontSize="12" TextColor="{StaticResource TextSecondary}" LineBreakMode="WordWrap" IsVisible="False" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Live chat" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="How live chat with SmartCube support works." />
+                        <Label FontSize="12" TextColor="{StaticResource TextSecondary}" LineBreakMode="WordWrap"
+                               Text="When someone from support picks up your ticket, they may invite you to a live chat. You'll see a Join chat button here and in the email we send. Everything said in the chat is saved on your ticket." />
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Right: my tickets + selected ticket -->
+        <ScrollView Grid.Column="1">
+            <VerticalStackLayout Spacing="12">
+                <Border Style="{StaticResource CardFrame}" Padding="16">
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label Text="Your tickets" Style="{StaticResource Heading2}"
+                                   ToolTipProperties.Text="Every support request from your account, newest activity first." />
+                            <Button Grid.Column="1" x:Name="RefreshBtn" Text="Refresh" BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                    FontSize="11" FontAttributes="Bold" CornerRadius="8" Padding="10,2" HeightRequest="26"
+                                    Clicked="OnRefreshClicked" ToolTipProperties.Text="Check for new replies from support." />
+                        </Grid>
+                        <Label x:Name="TicketsStatus" Text="Loading…" FontSize="12" TextColor="{StaticResource TextMuted}" LineBreakMode="WordWrap" />
+                        <VerticalStackLayout x:Name="TicketList" Spacing="6" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border x:Name="DetailCard" Style="{StaticResource CardFrame}" Padding="16" IsVisible="False">
+                    <VerticalStackLayout Spacing="8">
+                        <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                            <VerticalStackLayout Spacing="2">
+                                <Label x:Name="DetailTitle" Text="" FontSize="15" FontAttributes="Bold" TextColor="{StaticResource TextPrimary}" LineBreakMode="WordWrap" />
+                                <Label x:Name="DetailMeta" Text="" FontSize="11" TextColor="{StaticResource TextMuted}" />
+                            </VerticalStackLayout>
+                            <Button Grid.Column="1" x:Name="JoinChatBtn" Text="Join live chat" IsVisible="False"
+                                    BackgroundColor="#10B981" TextColor="White" FontSize="12" FontAttributes="Bold"
+                                    CornerRadius="8" Padding="12,4" HeightRequest="32" VerticalOptions="Start"
+                                    Clicked="OnJoinChatClicked"
+                                    ToolTipProperties.Text="Support has offered a live chat about this ticket. Open it inside the app." />
+                        </Grid>
+                        <VerticalStackLayout x:Name="Thread" Spacing="8" />
+                        <Border x:Name="ReplyBox" BackgroundColor="{StaticResource CardBgLight}" Stroke="{StaticResource BorderColor}" StrokeShape="RoundRectangle 8" Padding="8,4">
+                            <Editor x:Name="ReplyEditor" HeightRequest="90" MaxLength="8000" AutoSize="Disabled" Placeholder="Write a reply to support…"
+                                    TextColor="{StaticResource TextPrimary}" PlaceholderColor="{StaticResource TextMuted}" BackgroundColor="Transparent" FontSize="13"
+                                    ToolTipProperties.Text="Add more detail or answer a question from support. It's added to this ticket." />
+                        </Border>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <Label x:Name="ReplyStatus" Text="" FontSize="12" TextColor="{StaticResource TextSecondary}" VerticalOptions="Center" LineBreakMode="WordWrap" />
+                            <Button Grid.Column="1" x:Name="ReplyBtn" Text="Send reply" BackgroundColor="{StaticResource Primary}" TextColor="White"
+                                    FontSize="12" FontAttributes="Bold" CornerRadius="8" Padding="14,4" HeightRequest="32"
+                                    Clicked="OnReplyClicked" ToolTipProperties.Text="Send your reply to support on this ticket." />
+                        </Grid>
+                    </VerticalStackLayout>
+                </Border>
+            </VerticalStackLayout>
+        </ScrollView>
+    </Grid>
+</ContentView>

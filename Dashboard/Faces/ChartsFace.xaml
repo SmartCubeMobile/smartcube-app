@@ -8,7 +8,7 @@
     <VerticalStackLayout Padding="16" Spacing="12">
 
         <!-- Account Selector + Search -->
-        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+        <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="12">
             <Border Grid.Column="0" Style="{StaticResource CardFrame}" Padding="12,8">
                 <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
                     <Label Text="Account:" TextColor="{StaticResource TextSecondary}"
@@ -16,6 +16,7 @@
                     <Picker x:Name="AccountPicker" Grid.Column="1"
                             TextColor="{StaticResource TextPrimary}"
                             FontSize="13"
+                            ToolTipProperties.Text="Filter every chart below to one account, or choose All Accounts to see everything combined."
                             SelectedIndexChanged="OnAccountChanged" />
                 </Grid>
             </Border>
@@ -28,9 +29,11 @@
                            TextColor="{StaticResource TextPrimary}"
                            FontSize="13"
                            BackgroundColor="Transparent"
+                           ToolTipProperties.Text="Type part of a merchant name to see how much you've spent with them."
                            TextChanged="OnSearchTextChanged" />
                 </Grid>
             </Border>
+            <Button Grid.Column="2" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
         </Grid>
 
         <!-- Top: Summary KPIs -->
@@ -38,7 +41,7 @@
 
             <Border Style="{StaticResource CardFrame}" Padding="16" WidthRequest="200">
                 <VerticalStackLayout Spacing="4">
-                    <Label Text="Net Worth" Style="{StaticResource SubHeading}" />
+                    <Label Text="Net Worth" Style="{StaticResource SubHeading}" ToolTipProperties.Text="Your combined bank and crypto balance for the selected account(s)." />
                     <Label x:Name="NetWorthLabel" Text=""
                            TextColor="{StaticResource Success}"
                            FontSize="22" FontAttributes="Bold" />
@@ -49,7 +52,7 @@
 
             <Border Style="{StaticResource CardFrame}" Padding="16" WidthRequest="200">
                 <VerticalStackLayout Spacing="4">
-                    <Label Text="Monthly Spend" Style="{StaticResource SubHeading}" />
+                    <Label Text="Monthly Spend" Style="{StaticResource SubHeading}" ToolTipProperties.Text="What you've spent this month, compared with last month." />
                     <Label x:Name="MonthlySpendLabel" Text=""
                            TextColor="{StaticResource Warning}"
                            FontSize="22" FontAttributes="Bold" />
@@ -60,7 +63,7 @@
 
             <Border Style="{StaticResource CardFrame}" Padding="16" WidthRequest="200">
                 <VerticalStackLayout Spacing="4">
-                    <Label Text="Bank Accounts" Style="{StaticResource SubHeading}" />
+                    <Label Text="Bank Accounts" Style="{StaticResource SubHeading}" ToolTipProperties.Text="Your total balance across connected bank accounts, and how many accounts are included." />
                     <Label x:Name="BankTotalLabel" Text=""
                            TextColor="{StaticResource Primary}"
                            FontSize="22" FontAttributes="Bold" />
@@ -71,7 +74,7 @@
 
             <Border Style="{StaticResource CardFrame}" Padding="16" WidthRequest="200">
                 <VerticalStackLayout Spacing="4">
-                    <Label Text="Crypto Holdings" Style="{StaticResource SubHeading}" />
+                    <Label Text="Crypto Holdings" Style="{StaticResource SubHeading}" ToolTipProperties.Text="The current GBP value of your crypto and stock holdings, and how many assets you hold." />
                     <Label x:Name="CryptoTotalLabel" Text=""
                            TextColor="{StaticResource Secondary}"
                            FontSize="22" FontAttributes="Bold" />
@@ -88,9 +91,11 @@
             <Grid RowDefinitions="Auto,*">
                 <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
                     <Label x:Name="SearchResultsTitle" Text="Search Results"
-                           Style="{StaticResource Heading2}" />
+                           Style="{StaticResource Heading2}"
+                           ToolTipProperties.Text="Merchants matching your search, with how much you've spent at each." />
                     <Button Grid.Column="1" Text="Clear" BackgroundColor="Transparent"
                             TextColor="{StaticResource Primary}" FontSize="12" Padding="8,2"
+                            ToolTipProperties.Text="Clear the search box and hide these results."
                             Clicked="OnClearSearch" />
                 </Grid>
                 <ScrollView Grid.Row="1" HeightRequest="300">
@@ -107,11 +112,13 @@
                 <Grid RowDefinitions="Auto,Auto,*">
                     <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,4">
                         <Label x:Name="SpendingTitle" Text="Spending by Category"
-                               Style="{StaticResource Heading2}" />
+                               Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Your spending broken down by category; tap a category to see the merchants behind it." />
                         <Button x:Name="SpendingBackBtn" Grid.Column="1" Text="← Back"
                                 BackgroundColor="Transparent"
                                 TextColor="{StaticResource Primary}" FontSize="12"
                                 Padding="8,2" IsVisible="False"
+                                ToolTipProperties.Text="Go back to the full spending-by-category list."
                                 Clicked="OnSpendingBack" />
                     </Grid>
                     <Label Grid.Row="1" x:Name="SpendingHint"
@@ -128,7 +135,8 @@
             <Border x:Name="NetWorthCard" Grid.Column="1" Style="{StaticResource CardFrame}" Padding="16">
                 <Grid RowDefinitions="Auto,*">
                     <Label Grid.Row="0" Text="Net Worth (12 Months)"
-                           Style="{StaticResource Heading2}" Margin="0,0,0,12" />
+                           Style="{StaticResource Heading2}" Margin="0,0,0,12"
+                           ToolTipProperties.Text="Your combined bank and crypto balance over the last 12 months." />
                     <ScrollView Grid.Row="1">
                     <CollectionView x:Name="NetWorthList" SelectionMode="None">
                         <CollectionView.ItemTemplate>
@@ -206,7 +214,8 @@
             <Border x:Name="BudgetCard" Grid.Column="0" Style="{StaticResource CardFrame}" Padding="16">
                 <Grid RowDefinitions="Auto,Auto,*">
                     <Label Grid.Row="0" Text="Suggested Monthly Budget"
-                           Style="{StaticResource Heading2}" Margin="0,0,0,4" />
+                           Style="{StaticResource Heading2}" Margin="0,0,0,4"
+                           ToolTipProperties.Text="A suggested monthly budget per category, based on your average spending." />
                     <Label Grid.Row="1" x:Name="BudgetSubtitle" Text="Based on 12-month average spending"
                            TextColor="{StaticResource TextMuted}" FontSize="11" Margin="0,0,0,10" />
                     <ScrollView Grid.Row="2">
@@ -219,7 +228,8 @@
             <Border x:Name="InvestCard" Grid.Column="1" Style="{StaticResource CardFrame}" Padding="16">
                 <Grid RowDefinitions="Auto,Auto,*">
                     <Label Grid.Row="0" Text="Savings Opportunities"
-                           Style="{StaticResource Heading2}" Margin="0,0,0,4" />
+                           Style="{StaticResource Heading2}" Margin="0,0,0,4"
+                           ToolTipProperties.Text="Ideas for cutting spending and where to put spare money, based on your transactions." />
                     <Label Grid.Row="1" x:Name="SavingsSubtitle" Text=""
                            TextColor="{StaticResource Success}" FontSize="12"
                            FontAttributes="Bold" Margin="0,0,0,10" />

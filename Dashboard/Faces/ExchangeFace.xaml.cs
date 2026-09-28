@@ -220,6 +220,13 @@ namespace SmartCubeMobile.Dashboard.Faces
             }
         }
 
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (page != null)
+                await page.DisplayAlert("Exchange", "This section converts between currencies and cryptocurrencies using live exchange rates. Enter an amount and pick your From and To currencies, or tap the swap button to reverse them. Tracked Rates vs GBP lists live rates against the pound; use Add Currency to track more. Rates come from the European Central Bank and CoinGecko and are cached locally on this PC.", "OK");
+        }
+
         public async Task PlayEntryAnimation()
         {
             AnimationHelper.PrepareForEntry(ConverterCard, SourceCard);

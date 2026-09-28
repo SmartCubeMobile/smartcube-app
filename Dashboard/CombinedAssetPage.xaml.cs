@@ -204,6 +204,12 @@ namespace SmartCubeMobile.Dashboard
                     }
                 };
 
+                ToolTipProperties.SetText(btn, filter == "All"
+                    ? "Show every transaction below, with no type filter applied."
+                    : filter == "No Fees"
+                        ? "Hide tiny dust or fee transactions from the list below."
+                        : $"Show only {filter} transactions in the list below.");
+
                 var f = filter;
                 btn.GestureRecognizers.Add(new TapGestureRecognizer
                 {
@@ -221,6 +227,7 @@ namespace SmartCubeMobile.Dashboard
                 Padding = new Thickness(12, 6),
                 Content = new Label { Text = "Export PDF", TextColor = Color.FromArgb("#60A5FA"), FontSize = 12, FontAttributes = FontAttributes.Bold }
             };
+            ToolTipProperties.SetText(pdfBtn, "Export the transactions currently shown to a PDF report file.");
             pdfBtn.GestureRecognizers.Add(new TapGestureRecognizer { Command = new Command(async () => await ExportPdf()) });
             FilterBar.Children.Add(pdfBtn);
         }
@@ -398,6 +405,7 @@ namespace SmartCubeMobile.Dashboard
                 {
                     var addr = fromInfo.FullAddress;
                     fromCell.TextDecorations = TextDecorations.Underline;
+                    ToolTipProperties.SetText(fromCell, "Tap to link this address to one of your wallets or exchanges, or give it a custom label.");
                     fromCell.GestureRecognizers.Add(new TapGestureRecognizer
                     {
                         Command = new Command(async () => await TransactionHelper.ClaimAddress(addr, this))
@@ -407,6 +415,7 @@ namespace SmartCubeMobile.Dashboard
                 {
                     var addr = toInfo.FullAddress;
                     toCell.TextDecorations = TextDecorations.Underline;
+                    ToolTipProperties.SetText(toCell, "Tap to link this address to one of your wallets or exchanges, or give it a custom label.");
                     toCell.GestureRecognizers.Add(new TapGestureRecognizer
                     {
                         Command = new Command(async () => await TransactionHelper.ClaimAddress(addr, this))
@@ -504,6 +513,13 @@ namespace SmartCubeMobile.Dashboard
         private async void OnBackClicked(object sender, EventArgs e)
         {
             await Navigation.PopAsync();
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Combined Asset",
+                "This page combines your holdings of one coin across every wallet and exchange you have connected. It shows the total value, price, profit/loss and a breakdown of where it is held. The transaction list below can be filtered by type and exported to a PDF report. All figures are calculated from data stored locally on this PC.",
+                "OK");
         }
     }
 }

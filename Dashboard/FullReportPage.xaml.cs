@@ -401,5 +401,12 @@ namespace SmartCubeMobile.Dashboard
         {
             await Navigation.PopAsync();
         }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Full Report",
+                "This page is a single, printable-style report covering your whole financial picture: net worth, banking, utilities, crypto and investments. Everything here is calculated from the accounts, bills, wallets and holdings you have already set up in SmartCube. There are no buttons to change data on this page, it is read-only. All figures come from data stored locally on this PC.",
+                "OK");
+        }
     }
 }

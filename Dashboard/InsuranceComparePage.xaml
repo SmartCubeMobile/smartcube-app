@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.InsuranceComparePage"
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid RowDefinitions="Auto,Auto,*" Padding="0">
+
+        <!-- Header -->
+        <Border BackgroundColor="{StaticResource NavBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="0,0,0,1"
+                Padding="24,14">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" ColumnSpacing="8">
+                <Button Text="← Back" BackgroundColor="Transparent"
+                        TextColor="{StaticResource TextSecondary}"
+                        FontSize="13" Padding="8,4"
+                        ToolTipProperties.Text="Go back to your insurance policies."
+                        Clicked="OnBackClicked" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
+                    <Label x:Name="PageTitle" Text="Compare Insurance"
+                           FontSize="20" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           HorizontalOptions="Center" />
+                    <Label x:Name="PageSubtitle" Text=""
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+                <Button Grid.Column="2" x:Name="AutoFillBtn" Text="Auto-fill"
+                        BackgroundColor="#0A3D2E" TextColor="#34D399"
+                        FontSize="12" FontAttributes="Bold"
+                        CornerRadius="8" Padding="12,4" HeightRequest="32"
+                        ToolTipProperties.Text="Fill the fields on this page that SmartCube knows: registration, postcode, name, email, date of birth, cover start date."
+                        Clicked="OnAutoFillClicked" />
+                <Button Grid.Column="3" Text="?"
+                        ToolTipProperties.Text="What this page does"
+                        FontSize="12" FontAttributes="Bold"
+                        WidthRequest="26" HeightRequest="26" Padding="0"
+                        CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                        VerticalOptions="Center"
+                        Clicked="OnHelpClicked" />
+            </Grid>
+        </Border>
+
+        <!-- Your policy details + comparison site choices -->
+        <Border Grid.Row="1" BackgroundColor="{StaticResource CardBgLight}" Padding="16,10">
+            <Grid ColumnDefinitions="*,Auto" ColumnSpacing="16">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Your current policy (click a value to copy it)" FontSize="10" TextColor="{StaticResource TextMuted}" />
+                    <HorizontalStackLayout x:Name="DetailChips" Spacing="6" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="4">
+                    <Label Text="Get quotes from" FontSize="10" TextColor="{StaticResource TextMuted}" HorizontalOptions="End" />
+                    <HorizontalStackLayout x:Name="SiteButtons" Spacing="6" />
+                </VerticalStackLayout>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" RowDefinitions="Auto,*">
+            <Border BackgroundColor="{StaticResource CardBgLight}" Padding="12,6" Margin="0">
+                <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="6">
+                    <Button Grid.Column="0" Text="◀" FontSize="12" Padding="0"
+                            WidthRequest="30" HeightRequest="26" CornerRadius="6"
+                            BackgroundColor="#1E2D4A" TextColor="#CBD5E1"
+                            ToolTipProperties.Text="Back a page"
+                            Clicked="OnBrowserBackClicked" />
+                    <Button Grid.Column="1" Text="▶" FontSize="12" Padding="0"
+                            WidthRequest="30" HeightRequest="26" CornerRadius="6"
+                            BackgroundColor="#1E2D4A" TextColor="#CBD5E1"
+                            ToolTipProperties.Text="Forward a page"
+                            Clicked="OnBrowserForwardClicked" />
+                    <Label x:Name="UrlLabel" Grid.Column="2" Text="" TextColor="{StaticResource TextMuted}"
+                           FontSize="11" VerticalOptions="Center" LineBreakMode="MiddleTruncation" />
+                    <ActivityIndicator x:Name="LoadingIndicator" Grid.Column="3"
+                                       IsRunning="False" Color="{StaticResource Primary}"
+                                       HeightRequest="20" WidthRequest="20" />
+                </Grid>
+            </Border>
+            <WebView x:Name="CompareWebView" Grid.Row="1"
+                     Navigating="OnWebViewNavigating"
+                     Navigated="OnWebViewNavigated" />
+        </Grid>
+    </Grid>
+</ContentPage>

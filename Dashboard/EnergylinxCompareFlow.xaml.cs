@@ -780,6 +780,7 @@ namespace SmartCubeMobile.Dashboard
                     grid.Children.Add(costCol);
                     card.Content = grid;
 
+                    ToolTipProperties.SetText(card, $"{t.SupplierName}{(string.IsNullOrEmpty(t.TariffName) ? "" : " — " + t.TariffName)}.");
                     card.GestureRecognizers.Add(new TapGestureRecognizer
                     {
                         Command = new Command(async () =>
@@ -839,6 +840,13 @@ namespace SmartCubeMobile.Dashboard
         private async void OnBackClicked(object sender, EventArgs e)
         {
             await Navigation.PopAsync();
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Compare Tariffs",
+                "This page loads Energylinx's own tariff comparison website and tries to fill in your postcode and usage automatically. Complete the comparison as normal, then tap Scrape Results to read the tariffs it shows into a list you can browse without leaving SmartCube. No data is sent anywhere except to Energylinx's own site; results shown here are read from that page, not stored online.",
+                "OK");
         }
 
         private class ScrapedTariff

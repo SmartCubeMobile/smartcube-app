@@ -13,20 +13,30 @@
                 <!-- Suppliers & Tariffs -->
                 <Border x:Name="SupplierCard" Style="{StaticResource CardFrame}" Padding="16">
                     <VerticalStackLayout Spacing="10">
-                        <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-                            <Label Text="Suppliers &amp; Tariffs" Style="{StaticResource Heading2}" />
+                        <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
+                            <Label Text="Suppliers &amp; Tariffs" Style="{StaticResource Heading2}"
+                                   ToolTipProperties.Text="Your energy, water and broadband suppliers, tariffs and monthly cost." />
                             <Button Grid.Column="1" Text="Compare"
                                     BackgroundColor="#164E3A" TextColor="#22C55E"
                                     FontSize="12" FontAttributes="Bold"
                                     CornerRadius="8" Padding="10,4"
                                     HeightRequest="30"
+                                    ToolTipProperties.Text="Compare energy tariffs available for your postcode."
                                     Clicked="OnCompareTariffsClicked" />
                             <Button Grid.Column="2" Text="+ Add"
                                     BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                                     FontSize="12" FontAttributes="Bold"
                                     CornerRadius="8" Padding="10,4"
                                     HeightRequest="30"
+                                    ToolTipProperties.Text="Add a new energy, water or broadband supplier by logging in or entering details."
                                     Clicked="OnAddSupplierClicked" />
+                            <Button Grid.Column="3" Text="?"
+                                    ToolTipProperties.Text="What this section does"
+                                    FontSize="12" FontAttributes="Bold"
+                                    WidthRequest="26" HeightRequest="26" Padding="0"
+                                    CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                                    VerticalOptions="Center"
+                                    Clicked="OnHelpClicked" />
                         </Grid>
                         <VerticalStackLayout x:Name="SupplierList" Spacing="8" />
                     </VerticalStackLayout>
@@ -35,7 +45,8 @@
                 <!-- Meter Readings -->
                 <Border x:Name="ReadingsCard" Style="{StaticResource CardFrame}" Padding="16">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Latest Readings" Style="{StaticResource Heading2}" />
+                        <Label Text="Latest Readings" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Your most recent electricity, gas and water meter readings and usage." />
                         <Grid ColumnDefinitions="*,Auto,Auto" RowDefinitions="Auto,Auto,Auto,Auto"
                               RowSpacing="8" ColumnSpacing="12">
                             <Label Grid.Row="0" Text="Meter" TextColor="{StaticResource TextMuted}" FontSize="11" />
@@ -88,7 +99,8 @@
                 <!-- Latest Bills -->
                 <Border x:Name="CostsCard" Style="{StaticResource CardFrame}" Padding="16">
                     <VerticalStackLayout Spacing="10">
-                        <Label x:Name="CostsHeading" Text="Latest Bills" Style="{StaticResource Heading2}" />
+                        <Label x:Name="CostsHeading" Text="Latest Bills" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="The most recent bill amount for each utility, and your total cost." />
                         <Grid ColumnDefinitions="*,Auto" RowDefinitions="Auto,Auto,Auto,Auto,1,Auto" RowSpacing="8">
                             <Label Grid.Row="0" Text="Electricity" TextColor="{StaticResource TextSecondary}" />
                             <Label Grid.Row="0" Grid.Column="1" x:Name="ElecCost" Text=""
@@ -118,7 +130,8 @@
                         <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="8">
                             <Label Text="🛡️" FontSize="18" VerticalOptions="Center" />
                             <VerticalStackLayout Grid.Column="1" Spacing="0">
-                                <Label Text="Bill Audit" Style="{StaticResource Heading2}" />
+                                <Label Text="Bill Audit" Style="{StaticResource Heading2}"
+                                       ToolTipProperties.Text="Checks your uploaded PDF bills for pricing errors and possible savings." />
                                 <Label x:Name="AuditSubtitle" Text=""
                                        TextColor="{StaticResource TextMuted}" FontSize="10" />
                             </VerticalStackLayout>
@@ -128,12 +141,14 @@
                                         FontSize="11" FontAttributes="Bold"
                                         CornerRadius="8" Padding="10,4"
                                         HeightRequest="28" IsVisible="False"
+                                        ToolTipProperties.Text="Save a PDF report of the audit findings to your PC."
                                         Clicked="OnDownloadReportClicked" />
                                 <Button x:Name="RunAuditBtn" Text="Run Audit"
                                         BackgroundColor="#3B1A1A" TextColor="#EF4444"
                                         FontSize="11" FontAttributes="Bold"
                                         CornerRadius="8" Padding="10,4"
                                         HeightRequest="28"
+                                        ToolTipProperties.Text="Check your uploaded bills for errors and potential savings."
                                         Clicked="OnRunAuditClicked" />
                             </HorizontalStackLayout>
                         </Grid>
@@ -188,7 +203,8 @@
                     StrokeDashArray="8,5"
                     StrokeShape="RoundRectangle 12"
                     Padding="24,20"
-                    MinimumHeightRequest="100">
+                    MinimumHeightRequest="100"
+                    ToolTipProperties.Text="Drop your PDF bills here; SmartCube reads the amounts and dates for you.">
                 <Border.GestureRecognizers>
                     <DropGestureRecognizer AllowDrop="True"
                                           DragOver="OnDragOver"
@@ -218,17 +234,20 @@
                 <VerticalStackLayout Spacing="8">
                     <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
                         <Label x:Name="ParsedResultsTitle" Text="Parsed Bills"
-                               Style="{StaticResource Heading2}" />
+                               Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Bills SmartCube has just read from the PDFs you dropped, ready to add to your history." />
                         <Button Grid.Column="1" x:Name="AddAllBillsBtn" Text="Add All to History"
                                 BackgroundColor="#164E3A" TextColor="#22C55E"
                                 FontSize="12" FontAttributes="Bold"
                                 CornerRadius="8" Padding="12,4"
                                 HeightRequest="30"
+                                ToolTipProperties.Text="Save all the parsed bills below to your bill history."
                                 Clicked="OnAddAllParsedBills" />
                         <Button Grid.Column="2" Text="Clear"
                                 BackgroundColor="Transparent" TextColor="#EF4444"
                                 FontSize="12" Padding="8,4"
                                 HeightRequest="30"
+                                ToolTipProperties.Text="Discard the parsed bills without adding them to your history."
                                 Clicked="OnClearParsedBills" />
                     </Grid>
                     <ScrollView HeightRequest="220">
@@ -240,7 +259,8 @@
             <!-- Bills History -->
             <Border x:Name="BillsCard" Grid.Row="2" Style="{StaticResource CardFrame}" Padding="16">
                 <Grid RowDefinitions="Auto,Auto,*">
-                    <Label Grid.Row="0" Text="Bill History" Style="{StaticResource Heading2}" Margin="0,0,0,8" />
+                    <Label Grid.Row="0" Text="Bill History" Style="{StaticResource Heading2}" Margin="0,0,0,8"
+                           ToolTipProperties.Text="All your uploaded utility bills. Select a row to remove it." />
                     <Border Grid.Row="1" BackgroundColor="{StaticResource CardBgLight}"
                             StrokeShape="RoundRectangle 6" Stroke="Transparent"
                             Padding="12,8" Margin="0,0,0,6">

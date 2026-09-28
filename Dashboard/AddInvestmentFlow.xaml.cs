@@ -178,5 +178,12 @@ namespace SmartCubeMobile.Dashboard
             Step1.Opacity = 0;
             await Step1.FadeTo(1, 250, Easing.CubicOut);
         }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Add Investment",
+                "This screen adds a share, ETF or investment trust you already own to your portfolio. Fill in the symbol, name and sector, then the purchase date, shares, price and fee, and tap Review to check the summary. 'Add to Portfolio' saves it and returns you to the dashboard. Everything is stored locally on this PC, not in the cloud.",
+                "OK");
+        }
     }
 }

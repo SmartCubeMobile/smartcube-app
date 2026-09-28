@@ -553,6 +553,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     WidthRequest = 32,
                     VerticalOptions = LayoutOptions.Center,
                 };
+                ToolTipProperties.SetText(refreshBtnLocal, "Refresh balances and transactions for this wallet or exchange.");
                 var capturedSourceName = sourceName;
                 var capturedBtn = refreshBtnLocal;
                 refreshBtnLocal.Clicked += async (s, e) =>
@@ -572,6 +573,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     WidthRequest = 26,
                     VerticalOptions = LayoutOptions.Center,
                 };
+                ToolTipProperties.SetText(removeBtnLocal, "Remove this wallet or exchange and all of its crypto assets from SmartCube.");
                 var capturedRemoveName = sourceName;
                 removeBtnLocal.Clicked += async (s, e) => await RemoveSourceAsync(capturedRemoveName);
 
@@ -641,6 +643,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                         HeightRequest = 24,
                         Margin = new Thickness(0, 4, 0, 0),
                     };
+                    ToolTipProperties.SetText(addAssetBtn, "Add another crypto asset to this wallet.");
                     var capturedSource = sourceName;
                     addAssetBtn.Clicked += async (s, e) =>
                     {
@@ -712,6 +715,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     Content = wrapper,
                 };
 
+                ToolTipProperties.SetText(card, "Tap to see full details for this wallet or exchange, including its assets and transactions.");
                 var capturedAssets = assets;
                 var capturedName = sourceName;
                 card.GestureRecognizers.Add(new TapGestureRecognizer
@@ -760,6 +764,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     }
                 }
             };
+            ToolTipProperties.SetText(addCard, "Add a wallet or exchange so your crypto balances appear here.");
             addCard.GestureRecognizers.Add(new TapGestureRecognizer { Command = new Command(OnAddCrypto) });
             HoldingCards.Children.Add(addCard);
         }
@@ -862,6 +867,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     }
                 };
 
+                ToolTipProperties.SetText(row, "Tap to see this coin's combined balance and transaction history across every source.");
                 var capturedHoldings = asset.Holdings;
                 var capturedSymbol = asset.Symbol;
                 row.GestureRecognizers.Add(new TapGestureRecognizer
@@ -970,6 +976,11 @@ namespace SmartCubeMobile.Dashboard.Faces
                         HorizontalOptions = LayoutOptions.Center,
                     }
                 };
+                ToolTipProperties.SetText(btn, filter == "All"
+                    ? "Show every transaction type in the list below."
+                    : filter == "No Fees"
+                        ? "Hide small dust and fee transactions from the list below."
+                        : $"Show only {filter} transactions in the list below.");
                 var f = filter;
                 btn.GestureRecognizers.Add(new TapGestureRecognizer
                 {
@@ -1078,6 +1089,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                 {
                     var addr = fromInfo.FullAddress;
                     fromCell.TextDecorations = TextDecorations.Underline;
+                    ToolTipProperties.SetText(fromCell, "Tap to label this address as one of your own wallets or exchanges.");
                     fromCell.GestureRecognizers.Add(new TapGestureRecognizer
                     {
                         Command = new Command(async () => await TransactionHelper.ClaimAddress(addr, Navigation.NavigationStack.LastOrDefault() ?? Application.Current.Windows[0].Page))
@@ -1087,6 +1099,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                 {
                     var addr = toInfo.FullAddress;
                     toCell.TextDecorations = TextDecorations.Underline;
+                    ToolTipProperties.SetText(toCell, "Tap to label this address as one of your own wallets or exchanges.");
                     toCell.GestureRecognizers.Add(new TapGestureRecognizer
                     {
                         Command = new Command(async () => await TransactionHelper.ClaimAddress(addr, Navigation.NavigationStack.LastOrDefault() ?? Application.Current.Windows[0].Page))
@@ -1263,6 +1276,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     WidthRequest = 28,
                     VerticalOptions = LayoutOptions.Center,
                 };
+                ToolTipProperties.SetText(removeBtn, "Delete this price alert.");
                 var capturedAlert = alert;
                 removeBtn.Clicked += (s, e) =>
                 {
@@ -1549,6 +1563,13 @@ namespace SmartCubeMobile.Dashboard.Faces
                 MainThread.BeginInvokeOnMainThread(RefreshData);
             };
             await Navigation.PushAsync(flow);
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (page != null)
+                await page.DisplayAlert("Crypto", "This section tracks your crypto wallets and exchange accounts. Tap Add Wallet to connect a new wallet or exchange, and tap a card to see its full details. Top Assets and Transaction History summarise your holdings and activity across every connected source, and Price Alerts lets you know when a coin crosses a target price. All balances and transactions are fetched live and stored locally on this PC.", "OK");
         }
 
         private void RefreshData()

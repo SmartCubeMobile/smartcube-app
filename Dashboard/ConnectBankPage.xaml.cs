@@ -128,6 +128,7 @@ namespace SmartCubeMobile.Dashboard
                         HeightRequest = 26,
                         VerticalOptions = LayoutOptions.Center,
                     };
+                    ToolTipProperties.SetText(disconnectBtn, $"Disconnect {provider} and remove its accounts and transactions from SmartCube.");
                     disconnectBtn.Clicked += async (s, ev) =>
                     {
                         var confirm = await DisplayAlert("Remove Connection",
@@ -299,6 +300,13 @@ namespace SmartCubeMobile.Dashboard
         {
             _listenerCts?.Cancel();
             await Navigation.PopAsync();
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Bank Connections",
+                "This screen links your UK bank accounts using TrueLayer, so SmartCube never sees your bank password. Tap 'Link Bank Account' to authorise access in your browser; the authorisation code returns automatically, or you can paste it in yourself. Once connected, your accounts and transactions appear in Banking. Use 'Remove' to disconnect a bank and delete its accounts and transactions from this PC.",
+                "OK");
         }
     }
 }

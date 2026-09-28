@@ -17,8 +17,8 @@
             <!-- Holdings table -->
             <Border Grid.Row="1" x:Name="HoldingsCard" Style="{StaticResource CardFrame}" Padding="16">
                 <Grid RowDefinitions="Auto,*">
-                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10" Margin="0,0,0,12">
-                        <Label Text="Holdings" Style="{StaticResource Heading2}" />
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10" Margin="0,0,0,12">
+                        <Label Text="Holdings" Style="{StaticResource Heading2}" ToolTipProperties.Text="Your investment holdings — shares, ETFs, trusts and funds — with current value and gain or loss." />
                         <Label Grid.Column="1" x:Name="HoldingsCount"
                                Style="{StaticResource SubHeading}" VerticalOptions="Center" />
                         <Button Grid.Column="2" x:Name="AddInvestmentBtn"
@@ -30,7 +30,9 @@
                                 BorderColor="{StaticResource GlowBorder}"
                                 BorderWidth="1"
                                 VerticalOptions="Center"
+                                ToolTipProperties.Text="Add a new investment holding so its value and gain are tracked here."
                                 Clicked="OnAddInvestmentClicked" />
+                        <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
                     </Grid>
                     <CollectionView Grid.Row="1" x:Name="HoldingsList">
                         <CollectionView.ItemTemplate>
@@ -88,7 +90,7 @@
                 <!-- Allocation by sector -->
                 <Border x:Name="SectorCard" Style="{StaticResource CardFrame}" Padding="16">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="Sector Allocation" Style="{StaticResource Heading2}" />
+                        <Label Text="Sector Allocation" Style="{StaticResource Heading2}" ToolTipProperties.Text="How your portfolio value is split across market sectors." />
                         <VerticalStackLayout x:Name="SectorList" Spacing="6" />
                     </VerticalStackLayout>
                 </Border>
@@ -96,7 +98,7 @@
                 <!-- Top dividends -->
                 <Border x:Name="DividendCard" Style="{StaticResource CardFrame}" Padding="16">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="Dividend Yields" Style="{StaticResource Heading2}" />
+                        <Label Text="Dividend Yields" Style="{StaticResource Heading2}" ToolTipProperties.Text="Your five highest-yielding holdings, by annual dividend yield." />
                         <VerticalStackLayout x:Name="DividendList" Spacing="6" />
                     </VerticalStackLayout>
                 </Border>
@@ -104,7 +106,7 @@
                 <!-- Platform -->
                 <Border x:Name="PlatformCard" Style="{StaticResource CardFrame}" Padding="16">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Platform" Style="{StaticResource Heading2}" />
+                        <Label Text="Platform" Style="{StaticResource Heading2}" ToolTipProperties.Text="The investment platform your holdings are held with." />
                         <HorizontalStackLayout Spacing="8">
                             <Label Text="🏦" FontSize="18" VerticalOptions="Center" />
                             <Label x:Name="PlatformLabel" TextColor="{StaticResource TextSecondary}"

@@ -9,9 +9,10 @@
         <!-- Header -->
         <Border Grid.Row="0" BackgroundColor="{StaticResource NavBg}" Padding="20,16"
                 StrokeThickness="0">
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                 <Button Grid.Column="0" Text="← Back" BackgroundColor="Transparent"
                         TextColor="{StaticResource Accent}" FontSize="14"
+                        ToolTipProperties.Text="Go back to the previous screen."
                         Clicked="OnBackClicked" Padding="0" />
                 <VerticalStackLayout Grid.Column="1" HorizontalOptions="Center" Spacing="2">
                     <Label x:Name="HeaderTitle" TextColor="{StaticResource TextPrimary}"
@@ -23,7 +24,9 @@
                         BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                         FontSize="16" CornerRadius="8" Padding="6,0"
                         HeightRequest="32" WidthRequest="36"
+                        ToolTipProperties.Text="Re-fetch the latest price for this coin and refresh the figures on this page."
                         Clicked="OnRefreshClicked" />
+                <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
             </Grid>
         </Border>
 
@@ -59,7 +62,7 @@
                 <!-- P&L Chart -->
                 <Border Style="{StaticResource CardFrame}" Padding="16">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="P&amp;L Over Time" Style="{StaticResource Heading2}" />
+                        <Label Text="P&amp;L Over Time" Style="{StaticResource Heading2}" ToolTipProperties.Text="How the combined profit or loss on this coin has changed over time." />
                         <GraphicsView x:Name="PnlChart" HeightRequest="180" />
                     </VerticalStackLayout>
                 </Border>
@@ -67,7 +70,7 @@
                 <!-- Sources Breakdown -->
                 <Border Style="{StaticResource CardFrame}" Padding="16">
                     <VerticalStackLayout Spacing="8">
-                        <Label Text="Held Across" Style="{StaticResource Heading2}" />
+                        <Label Text="Held Across" Style="{StaticResource Heading2}" ToolTipProperties.Text="Every wallet or exchange holding this coin, and how much is held in each." />
                         <VerticalStackLayout x:Name="SourcesList" Spacing="6" />
                     </VerticalStackLayout>
                 </Border>
@@ -76,7 +79,7 @@
                 <Border Style="{StaticResource CardFrame}" Padding="16">
                     <VerticalStackLayout Spacing="8">
                         <Grid ColumnDefinitions="*,Auto">
-                            <Label Text="Transaction Summary" Style="{StaticResource Heading2}" />
+                            <Label Text="Transaction Summary" Style="{StaticResource Heading2}" ToolTipProperties.Text="Totals for coins received, sent and the net change across all sources." />
                             <Label Grid.Column="1" x:Name="TxCountLabel" TextColor="{StaticResource TextMuted}" FontSize="12"
                                    VerticalOptions="Center" />
                         </Grid>
@@ -96,7 +99,7 @@
                 <!-- Transaction History -->
                 <Border Style="{StaticResource CardFrame}" Padding="16">
                     <VerticalStackLayout Spacing="10">
-                        <Label Text="All Transactions" Style="{StaticResource Heading2}" />
+                        <Label Text="All Transactions" Style="{StaticResource Heading2}" ToolTipProperties.Text="Every transaction for this coin across all sources; use the buttons above to filter or export as PDF." />
                         <HorizontalStackLayout x:Name="FilterBar" Spacing="8" />
                         <ScrollView Orientation="Horizontal">
                             <VerticalStackLayout x:Name="TransactionsList" Spacing="4"

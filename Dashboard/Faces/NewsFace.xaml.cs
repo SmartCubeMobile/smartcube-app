@@ -175,6 +175,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                         TextColor = Color.FromArgb("#60A5FA"),
                         FontSize = 10,
                     };
+                    ToolTipProperties.SetText(link, "Open this article in your web browser.");
                     var tapGesture = new TapGestureRecognizer();
                     var url = item.Url;
                     tapGesture.Tapped += async (s, ev) =>
@@ -204,6 +205,12 @@ namespace SmartCubeMobile.Dashboard.Faces
             FinanceNewsService.ClearCache();
             await LoadNewsAsync();
             RefreshNewsBtn.IsEnabled = true;
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (page != null) await page.DisplayAlert("News", "This section shows recent financial news headlines covering markets, crypto and the wider economy, pulled from external news sources. Tap the refresh icon to fetch the latest headlines, or tap \"Read full article\" on any story to open it in your browser. Headlines are fetched live and are not stored on this PC beyond a short cache.", "OK");
         }
 
         private static string FormatTimeAgo(DateTime published)

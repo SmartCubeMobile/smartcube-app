@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.SupportChatPage"
+             Shell.NavBarIsVisible="False"
+             NavigationPage.HasNavigationBar="False"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid RowDefinitions="Auto,*">
+        <Border BackgroundColor="{StaticResource CardBg}" Stroke="{StaticResource BorderColor}"
+                StrokeThickness="0,0,0,1" Padding="20,12">
+            <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                <Button Text="← Back" BackgroundColor="Transparent" TextColor="{StaticResource TextSecondary}"
+                        FontSize="13" Padding="8,4" Clicked="OnBackClicked"
+                        ToolTipProperties.Text="Leave the chat and go back to your support tickets. Everything said is saved on the ticket." />
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label x:Name="TitleLabel" Text="Live chat with support" FontSize="18" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}" />
+                    <Label x:Name="SubtitleLabel" Text="" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                </VerticalStackLayout>
+                <ActivityIndicator Grid.Column="2" x:Name="Busy" IsRunning="True" Color="{StaticResource Primary}"
+                                   WidthRequest="20" HeightRequest="20" VerticalOptions="Center" />
+            </Grid>
+        </Border>
+        <WebView x:Name="ChatView" Grid.Row="1" Navigated="OnNavigated" />
+    </Grid>
+</ContentPage>

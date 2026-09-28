@@ -157,6 +157,8 @@ namespace SmartCubeMobile.Dashboard
             grid.Children.Add(info);
             card.Content = grid;
 
+            ToolTipProperties.SetText(card, $"Select {name} to continue with this network or exchange.");
+
             var k = key;
             var c = card;
             card.GestureRecognizers.Add(new TapGestureRecognizer
@@ -614,6 +616,13 @@ namespace SmartCubeMobile.Dashboard
                 return;
             }
             await Navigation.PopAsync();
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Add Crypto",
+                "This screen adds a crypto wallet or exchange account so its balances appear on your dashboard. Choose 'Wallet Address' to look up a public blockchain address, or 'Exchange Account' to link an exchange using an API key. SmartCube fetches live prices and balances, then lets you review them before adding. Your addresses and keys are stored locally on this PC.",
+                "OK");
         }
 
         private record NetworkInfo(string Name, string Symbol, string Icon, string Colour);

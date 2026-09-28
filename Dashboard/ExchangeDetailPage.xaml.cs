@@ -92,6 +92,7 @@ namespace SmartCubeMobile.Dashboard
                     VerticalOptions = LayoutOptions.Start,
                     HorizontalOptions = LayoutOptions.End,
                 };
+                ToolTipProperties.SetText(refreshBtn, $"Re-fetch the latest price and balance for {h.Symbol}.");
                 var capturedForRefresh = h;
                 var capturedRefreshBtn = refreshBtn;
                 refreshBtn.Clicked += async (s, e) => await RefreshAssetAsync(capturedForRefresh, capturedRefreshBtn);
@@ -109,6 +110,7 @@ namespace SmartCubeMobile.Dashboard
                     VerticalOptions = LayoutOptions.Start,
                     HorizontalOptions = LayoutOptions.End,
                 };
+                ToolTipProperties.SetText(removeBtn, $"Remove {h.Symbol} from {_sourceName}. Asks for confirmation first.");
                 var capturedForRemove = h;
                 removeBtn.Clicked += async (s, e) => await RemoveAssetAsync(capturedForRemove);
 
@@ -153,6 +155,7 @@ namespace SmartCubeMobile.Dashboard
                     }
                 };
 
+                ToolTipProperties.SetText(card, $"Open the detail page for {h.Symbol} on {_sourceName}.");
                 var captured = h;
                 card.GestureRecognizers.Add(new TapGestureRecognizer
                 {
@@ -342,6 +345,12 @@ namespace SmartCubeMobile.Dashboard
                     }
                 };
 
+                ToolTipProperties.SetText(btn, filter == "All"
+                    ? "Show every transaction below, with no type filter applied."
+                    : filter == "No Fees"
+                        ? "Hide tiny dust or fee transactions from the list below."
+                        : $"Show only {filter} transactions in the list below.");
+
                 var f = filter;
                 btn.GestureRecognizers.Add(new TapGestureRecognizer
                 {
@@ -359,6 +368,7 @@ namespace SmartCubeMobile.Dashboard
                 Padding = new Thickness(12, 6),
                 Content = new Label { Text = "Export PDF", TextColor = Color.FromArgb("#60A5FA"), FontSize = 12, FontAttributes = FontAttributes.Bold }
             };
+            ToolTipProperties.SetText(pdfBtn, "Export the transactions currently shown to a PDF report file.");
             pdfBtn.GestureRecognizers.Add(new TapGestureRecognizer { Command = new Command(async () => await ExportPdf()) });
             FilterBar.Children.Add(pdfBtn);
         }
@@ -505,6 +515,7 @@ namespace SmartCubeMobile.Dashboard
                 {
                     var addr = fromInfo.FullAddress;
                     fromCell.TextDecorations = TextDecorations.Underline;
+                    ToolTipProperties.SetText(fromCell, "Tap to link this address to one of your wallets or exchanges, or give it a custom label.");
                     fromCell.GestureRecognizers.Add(new TapGestureRecognizer
                     {
                         Command = new Command(async () => await TransactionHelper.ClaimAddress(addr, this))
@@ -514,6 +525,7 @@ namespace SmartCubeMobile.Dashboard
                 {
                     var addr = toInfo.FullAddress;
                     toCell.TextDecorations = TextDecorations.Underline;
+                    ToolTipProperties.SetText(toCell, "Tap to link this address to one of your wallets or exchanges, or give it a custom label.");
                     toCell.GestureRecognizers.Add(new TapGestureRecognizer
                     {
                         Command = new Command(async () => await TransactionHelper.ClaimAddress(addr, this))
@@ -581,6 +593,13 @@ namespace SmartCubeMobile.Dashboard
         private async void OnBackClicked(object sender, EventArgs e)
         {
             await Navigation.PopAsync();
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Exchange / Wallet Detail",
+                "This page shows every asset held on this exchange or wallet, its total value and profit/loss, and the full transaction history. Tap an asset card to see its own detail page, use the small refresh button to re-fetch its price and balance, or the ✕ button to remove it. Transactions can be filtered by type and exported to a PDF report. All data is stored locally on this PC.",
+                "OK");
         }
     }
 }

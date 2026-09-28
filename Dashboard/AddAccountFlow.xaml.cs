@@ -65,6 +65,8 @@ namespace SmartCubeMobile.Dashboard
                     }
                 };
 
+                ToolTipProperties.SetText(card, $"Select {bank.Name} to enter your login details and fetch your accounts.");
+
                 var b = bank;
                 card.GestureRecognizers.Add(new TapGestureRecognizer
                 {
@@ -299,6 +301,13 @@ namespace SmartCubeMobile.Dashboard
             }
 
             await Navigation.PopAsync();
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Add Bank Account",
+                "This screen walks you through connecting a UK bank account. Pick your bank from the list, then enter the login details it asks for. SmartCube looks up your accounts and recent transactions and adds them to your dashboard. Your details and data are stored locally on this PC, not in the cloud.",
+                "OK");
         }
 
         private static List<MockAccount> GenerateMockAccounts(BankInfo bank)

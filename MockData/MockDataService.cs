@@ -297,6 +297,11 @@ namespace SmartCubeMobile.MockData
             {
                 try { _bills = JsonSerializer.Deserialize<List<MockUtilityBill>>(SecureFile.ReadAllText(path)) ?? new(); }
                 catch { _bills = new(); }
+
+                // Clean-up: earlier versions invented a £0 second fuel for single-fuel energy bills.
+                var removed = _bills.RemoveAll(b => b.IsFromPdf && b.Amount <= 0
+                    && (b.FuelType == "Electricity" || b.FuelType == "Gas"));
+                if (removed > 0) SaveBills();
             }
             else
             {
@@ -753,6 +758,48 @@ namespace SmartCubeMobile.MockData
             GetSuppliers();
             _suppliers.Add(supplier);
             SaveSuppliers();
+        }
+
+        public static bool RemoveSupplier(MockSupplier supplier)
+        {
+            var suppliers = GetSuppliers();
+            var existing = suppliers.FirstOrDefault(s => ReferenceEquals(s, supplier))
+                        ?? suppliers.FirstOrDefault(s => s.Name == supplier.Name && s.Type == supplier.Type);
+            if (existing == null) return false;
+            suppliers.Remove(existing);
+            SaveSuppliers();
+
+            // Take the supplier's bills out of the history as well.
+            var bills = GetUtilityBills();
+            var removed = bills.RemoveAll(b => BillBelongsTo(b, existing, suppliers));
+            if (removed > 0) SaveBills();
+            return true;
+        }
+
+        public static int CountBillsFor(MockSupplier supplier)
+        {
+            var suppliers = GetSuppliers();
+            return GetUtilityBills().Count(b => BillBelongsTo(b, supplier, suppliers.Where(s => !ReferenceEquals(s, supplier)).ToList()));
+        }
+
+        // A bill belongs to the supplier by name; if another entry with the same name remains
+        // (e.g. separate electricity and gas records), only bills of this entry's type are counted.
+        private static bool BillBelongsTo(MockUtilityBill bill, MockSupplier supplier, List<MockSupplier> remaining)
+        {
+            if (!SupplierNamesMatch(bill.Supplier, supplier.Name)) return false;
+            var sameNameRemains = remaining.Any(s => SupplierNamesMatch(s.Name, supplier.Name));
+            return !sameNameRemains || string.Equals(bill.FuelType, supplier.Type, StringComparison.OrdinalIgnoreCase);
+        }
+
+        // "EDF" and "EDF Energy" are the same supplier: bills carry the name printed on the PDF,
+        // supplier records carry the name from the connect list.
+        public static bool SupplierNamesMatch(string a, string b)
+        {
+            static string Key(string s) => System.Text.RegularExpressions.Regex.Replace(
+                (s ?? "").ToLowerInvariant(), @"\b(energy|power|gas|electric(?:ity)?|ltd|limited|plc|uk)\b|[^a-z0-9]", "");
+            var ka = Key(a); var kb = Key(b);
+            if (ka.Length == 0 || kb.Length == 0) return false;
+            return ka == kb || ka.StartsWith(kb) || kb.StartsWith(ka);
         }
 
         public static void UpdateSupplier(string type, string newName, string newTariff, string newDetail, decimal newCost)

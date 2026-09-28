@@ -12,7 +12,8 @@
 
                 <Border x:Name="ConverterCard" Style="{StaticResource CardFrame}" Padding="20">
                     <VerticalStackLayout Spacing="14">
-                        <Label Text="Currency Converter" Style="{StaticResource Heading2}" />
+                        <Label Text="Currency Converter" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Convert between currencies and cryptocurrencies using live exchange rates." />
 
                         <!-- From -->
                         <VerticalStackLayout Spacing="6">
@@ -25,7 +26,8 @@
                                            TextColor="{StaticResource TextPrimary}"
                                            BackgroundColor="Transparent"
                                            Keyboard="Numeric" FontSize="16" HeightRequest="44"
-                                           TextChanged="OnAmountChanged" />
+                                           TextChanged="OnAmountChanged"
+                                           ToolTipProperties.Text="Enter the amount you want to convert." />
                                 </Border>
                                 <Border Grid.Column="1" BackgroundColor="{StaticResource CardBgLight}"
                                         Stroke="{StaticResource BorderColor}"
@@ -33,7 +35,8 @@
                                     <Picker x:Name="FromCurrency"
                                             TextColor="{StaticResource TextPrimary}"
                                             BackgroundColor="Transparent" FontSize="14"
-                                            SelectedIndexChanged="OnCurrencyChanged" />
+                                            SelectedIndexChanged="OnCurrencyChanged"
+                                            ToolTipProperties.Text="Choose the currency you're converting from." />
                                 </Border>
                             </Grid>
                         </VerticalStackLayout>
@@ -43,7 +46,8 @@
                                 TextColor="{StaticResource Primary}" FontSize="22"
                                 HeightRequest="36" Padding="0"
                                 HorizontalOptions="Center"
-                                Clicked="OnSwapClicked" />
+                                Clicked="OnSwapClicked"
+                                ToolTipProperties.Text="Swap the From and To currencies." />
 
                         <!-- To -->
                         <VerticalStackLayout Spacing="6">
@@ -56,7 +60,8 @@
                                            TextColor="{StaticResource Accent}"
                                            BackgroundColor="Transparent"
                                            IsReadOnly="True"
-                                           FontSize="16" HeightRequest="44" />
+                                           FontSize="16" HeightRequest="44"
+                                           ToolTipProperties.Text="Shows the converted amount in your chosen currency." />
                                 </Border>
                                 <Border Grid.Column="1" BackgroundColor="{StaticResource CardBgLight}"
                                         Stroke="{StaticResource BorderColor}"
@@ -64,7 +69,8 @@
                                     <Picker x:Name="ToCurrency"
                                             TextColor="{StaticResource TextPrimary}"
                                             BackgroundColor="Transparent" FontSize="14"
-                                            SelectedIndexChanged="OnCurrencyChanged" />
+                                            SelectedIndexChanged="OnCurrencyChanged"
+                                            ToolTipProperties.Text="Choose the currency you're converting to." />
                                 </Border>
                             </Grid>
                         </VerticalStackLayout>
@@ -101,10 +107,12 @@
         <!-- Right: Tracked Rates -->
         <Border x:Name="RatesCard" Grid.Column="1" Style="{StaticResource CardFrame}" Padding="16">
             <Grid RowDefinitions="Auto,*,Auto">
-                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
-                    <Label Text="Tracked Rates vs GBP" Style="{StaticResource Heading2}" />
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,12">
+                    <Label Text="Tracked Rates vs GBP" Style="{StaticResource Heading2}"
+                           ToolTipProperties.Text="Shows live exchange rates against the pound for the currencies you're tracking." />
                     <Label Grid.Column="1" Text="Fiat &amp; Crypto"
                            Style="{StaticResource SubHeading}" VerticalOptions="Center" />
+                    <Button Grid.Column="2" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
                 </Grid>
                 <CollectionView Grid.Row="1" x:Name="RatesList" SelectionMode="None">
                     <CollectionView.ItemTemplate>
@@ -155,7 +163,8 @@
                         StrokeThickness="2"
                         StrokeDashArray="6,4"
                         StrokeShape="RoundRectangle 10"
-                        Padding="12,10" Margin="0,8,0,0">
+                        Padding="12,10" Margin="0,8,0,0"
+                        ToolTipProperties.Text="Add a new currency or cryptocurrency to the tracked rates list.">
                     <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
                         <Label Text="+" TextColor="{StaticResource Primary}" FontSize="18"
                                VerticalOptions="Center" />

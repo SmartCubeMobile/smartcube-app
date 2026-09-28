@@ -7,8 +7,9 @@
 
         <Border x:Name="NewsCard" Style="{StaticResource CardFrame}" Padding="16" Opacity="0">
             <VerticalStackLayout Spacing="8">
-                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="10">
-                    <Label Text="Latest Market News" Style="{StaticResource Heading2}" />
+                <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="10">
+                    <Label Text="Latest Market News" Style="{StaticResource Heading2}"
+                           ToolTipProperties.Text="Recent financial news headlines covering markets, crypto and the economy." />
                     <ActivityIndicator x:Name="NewsSpinner" Grid.Column="1"
                                        IsRunning="True" IsVisible="True"
                                        Color="#60A5FA" HeightRequest="18" WidthRequest="18"
@@ -21,7 +22,9 @@
                             Padding="4"
                             HeightRequest="32" WidthRequest="32"
                             VerticalOptions="Center"
+                            ToolTipProperties.Text="Fetch the latest headlines now."
                             Clicked="OnRefreshNewsClicked" />
+                    <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
                 </Grid>
                 <VerticalStackLayout x:Name="NewsList" Spacing="0" />
             </VerticalStackLayout>

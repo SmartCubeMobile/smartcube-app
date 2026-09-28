@@ -11,10 +11,11 @@
         <Border Grid.Row="0" BackgroundColor="{StaticResource NavBg}"
                 Stroke="{StaticResource BorderColor}" StrokeThickness="0,0,0,1"
                 Padding="20,14">
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                 <Button x:Name="BackButton" Text="←" BackgroundColor="Transparent"
                         TextColor="{StaticResource TextSecondary}" FontSize="20"
                         Padding="0" WidthRequest="40" HeightRequest="40"
+                        ToolTipProperties.Text="Go back to the previous screen."
                         Clicked="OnBackClicked" />
                 <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                     <Label Text="Portfolio Report" FontSize="22" FontAttributes="Bold"
@@ -23,6 +24,7 @@
                            TextColor="{StaticResource TextSecondary}" />
                 </VerticalStackLayout>
                 <Label Grid.Column="2" Text="📊" FontSize="22" VerticalOptions="Center" />
+                <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
             </Grid>
         </Border>
 
@@ -33,7 +35,7 @@
                 <!-- Portfolio Summary -->
                 <Border x:Name="SummaryCard" Style="{StaticResource CardFrame}" Padding="20">
                     <VerticalStackLayout Spacing="14">
-                        <Label Text="Portfolio Summary" Style="{StaticResource Heading2}" />
+                        <Label Text="Portfolio Summary" Style="{StaticResource Heading2}" ToolTipProperties.Text="Overall value, cost, profit or loss, holdings count, yield and estimated income across your whole portfolio." />
                         <Grid x:Name="SummaryGrid" ColumnDefinitions="*,*,*" RowDefinitions="Auto,Auto" RowSpacing="16" ColumnSpacing="16" />
                     </VerticalStackLayout>
                 </Border>
@@ -41,7 +43,7 @@
                 <!-- Performance KPIs -->
                 <Border x:Name="PerformanceCard" Style="{StaticResource CardFrame}" Padding="20">
                     <VerticalStackLayout Spacing="14">
-                        <Label Text="Performance" Style="{StaticResource Heading2}" />
+                        <Label Text="Performance" Style="{StaticResource Heading2}" ToolTipProperties.Text="Today's change in value, average daily movement, and how many holdings are up or down." />
                         <Grid x:Name="PerformanceGrid" ColumnDefinitions="*,*,*,*" ColumnSpacing="12" />
                     </VerticalStackLayout>
                 </Border>
@@ -49,7 +51,7 @@
                 <!-- Holdings Breakdown -->
                 <Border x:Name="HoldingsCard" Style="{StaticResource CardFrame}" Padding="20">
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="Holdings Breakdown" Style="{StaticResource Heading2}" />
+                        <Label Text="Holdings Breakdown" Style="{StaticResource Heading2}" ToolTipProperties.Text="Every investment you hold, with shares, value, profit or loss and its weight in your portfolio." />
                         <!-- Column headers -->
                         <Border BackgroundColor="{StaticResource NavBg}" StrokeShape="RoundRectangle 6"
                                 Stroke="Transparent" Padding="12,8">
@@ -70,14 +72,14 @@
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
                     <Border x:Name="SectorCard" Style="{StaticResource CardFrame}" Padding="20">
                         <VerticalStackLayout Spacing="12">
-                            <Label Text="Sector Allocation" Style="{StaticResource Heading2}" />
+                            <Label Text="Sector Allocation" Style="{StaticResource Heading2}" ToolTipProperties.Text="How your portfolio value is spread across different market sectors." />
                             <VerticalStackLayout x:Name="SectorTable" Spacing="6" />
                         </VerticalStackLayout>
                     </Border>
 
                     <Border Grid.Column="1" x:Name="TypeCard" Style="{StaticResource CardFrame}" Padding="20">
                         <VerticalStackLayout Spacing="12">
-                            <Label Text="Asset Type Breakdown" Style="{StaticResource Heading2}" />
+                            <Label Text="Asset Type Breakdown" Style="{StaticResource Heading2}" ToolTipProperties.Text="How your portfolio value is split between shares, ETFs and investment trusts." />
                             <VerticalStackLayout x:Name="TypeTable" Spacing="6" />
                         </VerticalStackLayout>
                     </Border>
@@ -87,14 +89,14 @@
                 <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
                     <Border x:Name="TopCard" Style="{StaticResource CardFrame}" Padding="20">
                         <VerticalStackLayout Spacing="12">
-                            <Label Text="Top Performers" Style="{StaticResource Heading2}" />
+                            <Label Text="Top Performers" Style="{StaticResource Heading2}" ToolTipProperties.Text="Your 5 best-performing holdings by percentage gain." />
                             <VerticalStackLayout x:Name="TopList" Spacing="6" />
                         </VerticalStackLayout>
                     </Border>
 
                     <Border Grid.Column="1" x:Name="BottomCard" Style="{StaticResource CardFrame}" Padding="20">
                         <VerticalStackLayout Spacing="12">
-                            <Label Text="Bottom Performers" Style="{StaticResource Heading2}" />
+                            <Label Text="Bottom Performers" Style="{StaticResource Heading2}" ToolTipProperties.Text="Your worst-performing holdings by percentage loss." />
                             <VerticalStackLayout x:Name="BottomList" Spacing="6" />
                         </VerticalStackLayout>
                     </Border>
@@ -103,7 +105,7 @@
                 <!-- Dividend Income -->
                 <Border x:Name="DividendCard" Style="{StaticResource CardFrame}" Padding="20">
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="Dividend Income (Est. Annual)" Style="{StaticResource Heading2}" />
+                        <Label Text="Dividend Income (Est. Annual)" Style="{StaticResource Heading2}" ToolTipProperties.Text="Estimated yearly dividend income from each holding that pays a dividend." />
                         <Grid x:Name="DividendSummary" ColumnDefinitions="*,*,*" ColumnSpacing="16" Margin="0,0,0,8" />
                         <VerticalStackLayout x:Name="DividendTable" Spacing="4" />
                     </VerticalStackLayout>
@@ -112,7 +114,7 @@
                 <!-- Platform Summary -->
                 <Border x:Name="PlatformCard" Style="{StaticResource CardFrame}" Padding="20">
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="Platform Summary" Style="{StaticResource Heading2}" />
+                        <Label Text="Platform Summary" Style="{StaticResource Heading2}" ToolTipProperties.Text="How your investments are spread across the different platforms you hold them on." />
                         <VerticalStackLayout x:Name="PlatformTable" Spacing="6" />
                     </VerticalStackLayout>
                 </Border>
@@ -120,7 +122,7 @@
                 <!-- Risk Metrics -->
                 <Border x:Name="RiskCard" Style="{StaticResource CardFrame}" Padding="20">
                     <VerticalStackLayout Spacing="12">
-                        <Label Text="Risk &amp; Diversification" Style="{StaticResource Heading2}" />
+                        <Label Text="Risk &amp; Diversification" Style="{StaticResource Heading2}" ToolTipProperties.Text="How spread out your portfolio is: number of sectors and asset types, and your largest single position." />
                         <Grid x:Name="RiskGrid" ColumnDefinitions="*,*,*" ColumnSpacing="16" />
                     </VerticalStackLayout>
                 </Border>

@@ -39,6 +39,21 @@ namespace SmartCubeMobile.Services
             return findings;
         }
 
+        // The cap table holds national averages. Regional caps sit a few percent either side of them
+        // (unit rates roughly ±8%, standing charges up to ±20% for the outlying regions), so anything
+        // inside these bands is treated as "within the cap" rather than an overcharge.
+        private const decimal UnitRateTolerance = 0.08m;
+        private const decimal StandingChargeTolerance = 0.20m;
+        private const decimal MinimumReportableSaving = 1.00m;
+
+        private static AuditSeverity SeverityForSaving(decimal saving, bool capIsEstimated)
+        {
+            if (capIsEstimated) return AuditSeverity.Warning;
+            if (saving >= 50m) return AuditSeverity.Critical;
+            if (saving >= 10m) return AuditSeverity.Alert;
+            return AuditSeverity.Warning;
+        }
+
         private static List<AuditFinding> CheckPriceCapCompliance(List<MockUtilityBill> bills)
         {
             var findings = new List<AuditFinding>();
@@ -49,36 +64,47 @@ namespace SmartCubeMobile.Services
                     continue;
                 if (bill.FuelType != "Electricity" && bill.FuelType != "Gas")
                     continue;
+                if (bill.Amount <= 0) continue;   // nothing was charged, nothing to audit
 
                 var postcode = ExtractPostcode(bill.Address);
                 var region = OfgemRegionData.GetRegion(postcode);
                 if (region == null) continue;
-                var cap = OfgemRegionData.GetCap(region, bill.FuelType, bill.PaymentMethod ?? "Direct Debit", bill.BillDate);
 
+                // Compare against the cap that applied when the energy was USED, not when the bill was
+                // printed. A bill dated 13 July covers mid-June to mid-July and belongs to the previous cap.
+                var cap = OfgemRegionData.GetCapForPeriod(region, bill.FuelType, bill.PaymentMethod ?? "Direct Debit",
+                    bill.PeriodStart, bill.PeriodEnd, bill.BillDate);
                 if (cap == null) continue;
 
-                if (bill.UnitRatePence > 0 && bill.UnitRatePence > cap.UnitRatePence)
+                var estimatedNote = cap.IsEstimated
+                    ? " (no published cap for this period yet; compared with the latest known cap)" : "";
+
+                var unitLimit = cap.UnitRatePence * (1 + UnitRateTolerance);
+                if (bill.UnitRatePence > 0 && bill.UnitRatePence > unitLimit)
                 {
                     var overchargePerUnit = bill.UnitRatePence - cap.UnitRatePence;
                     var estSavings = bill.UnitsUsed > 0
                         ? Math.Round(bill.UnitsUsed * overchargePerUnit / 100m, 2)
                         : Math.Round(overchargePerUnit * 10m, 2);
 
-                    findings.Add(new AuditFinding
-                    {
-                        CheckType = "Price Cap",
-                        Severity = AuditSeverity.Critical,
-                        Title = "Unit rate exceeds Ofgem cap",
-                        Description = $"{bill.Supplier} charged {bill.UnitRatePence:F2}p/kWh for {bill.FuelType} " +
-                            $"but the Ofgem cap ({cap.CapPeriod}) is {cap.UnitRatePence:F2}p/kWh. " +
-                            $"Overcharge: {overchargePerUnit:F2}p/kWh.",
-                        PotentialSavings = estSavings,
-                        BillReference = $"{bill.Supplier} — {bill.Period}",
-                        Icon = "🚨",
-                    });
+                    if (estSavings >= MinimumReportableSaving)
+                        findings.Add(new AuditFinding
+                        {
+                            CheckType = "Price Cap",
+                            Severity = SeverityForSaving(estSavings, cap.IsEstimated),
+                            Title = "Unit rate above Ofgem cap",
+                            Description = $"{bill.Supplier} charged {bill.UnitRatePence:F2}p/kWh for {bill.FuelType} " +
+                                $"but the Ofgem cap for {cap.CapPeriod} averages {cap.UnitRatePence:F2}p/kWh nationally{estimatedNote}. " +
+                                $"That is {overchargePerUnit:F2}p/kWh above the average, more than regional variation explains. " +
+                                $"Check the {region} cap rate on ofgem.gov.uk before complaining.",
+                            PotentialSavings = estSavings,
+                            BillReference = $"{bill.Supplier} — {bill.Period}",
+                            Icon = "🚨",
+                        });
                 }
 
-                if (bill.StandingChargePence > 0 && bill.StandingChargePence > cap.StandingChargePence)
+                var standingLimit = cap.StandingChargePence * (1 + StandingChargeTolerance);
+                if (bill.StandingChargePence > 0 && bill.StandingChargePence > standingLimit)
                 {
                     var overPerDay = bill.StandingChargePence - cap.StandingChargePence;
                     var days = (bill.PeriodEnd.HasValue && bill.PeriodStart.HasValue)
@@ -86,18 +112,20 @@ namespace SmartCubeMobile.Services
                         : 30m;
                     var estSavings = Math.Round(overPerDay * days / 100m, 2);
 
-                    findings.Add(new AuditFinding
-                    {
-                        CheckType = "Price Cap",
-                        Severity = AuditSeverity.Critical,
-                        Title = "Standing charge exceeds Ofgem cap",
-                        Description = $"{bill.Supplier} charged {bill.StandingChargePence:F2}p/day for {bill.FuelType} " +
-                            $"standing charge but the Ofgem cap ({cap.CapPeriod}) is {cap.StandingChargePence:F2}p/day. " +
-                            $"Overcharge: {overPerDay:F2}p/day.",
-                        PotentialSavings = estSavings,
-                        BillReference = $"{bill.Supplier} — {bill.Period}",
-                        Icon = "🚨",
-                    });
+                    if (estSavings >= MinimumReportableSaving)
+                        findings.Add(new AuditFinding
+                        {
+                            CheckType = "Price Cap",
+                            Severity = SeverityForSaving(estSavings, cap.IsEstimated),
+                            Title = "Standing charge above Ofgem cap",
+                            Description = $"{bill.Supplier} charged {bill.StandingChargePence:F2}p/day for {bill.FuelType} " +
+                                $"standing charge but the Ofgem cap for {cap.CapPeriod} averages {cap.StandingChargePence:F2}p/day nationally{estimatedNote}. " +
+                                $"That is {overPerDay:F2}p/day above the average, more than regional variation explains. " +
+                                $"Check the {region} cap rate on ofgem.gov.uk before complaining.",
+                            PotentialSavings = estSavings,
+                            BillReference = $"{bill.Supplier} — {bill.Period}",
+                            Icon = "🚨",
+                        });
                 }
             }
 
@@ -435,6 +463,8 @@ namespace SmartCubeMobile.Services
         public decimal UnitRatePence { get; set; }
         public decimal StandingChargePence { get; set; }
         public string CapPeriod { get; set; }
+        // True when the period is later than the newest cap in the table and the latest known cap was used.
+        public bool IsEstimated { get; set; }
     }
 
     public static class OfgemRegionData
@@ -560,11 +590,15 @@ namespace SmartCubeMobile.Services
 
         public static OfgemCapRate GetCap(string region, string fuelType, string paymentMethod, DateTime billDate)
         {
+            var estimated = false;
             var quarter = QuarterlyCapRates.FirstOrDefault(q => billDate >= q.Start && billDate <= q.End);
             if (quarter == null)
             {
                 if (billDate > QuarterlyCapRates.Last().End)
+                {
                     quarter = QuarterlyCapRates.Last();
+                    estimated = true;
+                }
                 else
                     return null;
             }
@@ -575,6 +609,7 @@ namespace SmartCubeMobile.Services
                     UnitRatePence = quarter.ElecUnit,
                     StandingChargePence = quarter.ElecStanding,
                     CapPeriod = quarter.Label,
+                    IsEstimated = estimated,
                 };
 
             if (fuelType == "Gas")
@@ -583,9 +618,41 @@ namespace SmartCubeMobile.Services
                     UnitRatePence = quarter.GasUnit,
                     StandingChargePence = quarter.GasStanding,
                     CapPeriod = quarter.Label,
+                    IsEstimated = estimated,
                 };
 
             return null;
+        }
+
+        // Cap for the period the energy was used. If the period straddles two quarters the more
+        // generous cap applies, so a bill is only flagged when it beats both.
+        public static OfgemCapRate GetCapForPeriod(string region, string fuelType, string paymentMethod,
+            DateTime? periodStart, DateTime? periodEnd, DateTime billDate)
+        {
+            DateTime start, end;
+            if (periodStart.HasValue && periodEnd.HasValue && periodEnd > periodStart)
+            {
+                start = periodStart.Value; end = periodEnd.Value;
+            }
+            else
+            {
+                // No period on the bill: assume it covers the month before it was issued.
+                end = billDate.AddDays(-1); start = billDate.AddDays(-31);
+            }
+
+            var capStart = GetCap(region, fuelType, paymentMethod, start);
+            var capEnd = GetCap(region, fuelType, paymentMethod, end);
+            if (capStart == null) return capEnd;
+            if (capEnd == null) return capStart;
+            if (capStart.CapPeriod == capEnd.CapPeriod) return capEnd;
+
+            return new OfgemCapRate
+            {
+                UnitRatePence = Math.Max(capStart.UnitRatePence, capEnd.UnitRatePence),
+                StandingChargePence = Math.Max(capStart.StandingChargePence, capEnd.StandingChargePence),
+                CapPeriod = $"{capStart.CapPeriod} / {capEnd.CapPeriod}",
+                IsEstimated = capStart.IsEstimated || capEnd.IsEstimated,
+            };
         }
 
         private class QuarterlyCapEntry

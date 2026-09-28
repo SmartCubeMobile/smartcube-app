@@ -17,6 +17,27 @@ namespace SmartCubeMobile.Dashboard
 
         private bool _started;
         private string _supplierFilter;
+        private string _fuel = "dual";   // "dual", "elec" or "gas"
+
+        private void ApplyFuelHeader()
+        {
+            (FuelBtn.Text, var bg, var fg) = _fuel switch
+            {
+                "elec" => ("Electricity only", "#3B2A0A", "#FBBF24"),
+                "gas" => ("Gas only", "#0B2A3B", "#38BDF8"),
+                _ => ("Gas & electricity", "#0A3D2E", "#34D399"),
+            };
+            FuelBtn.BackgroundColor = Color.FromArgb(bg);
+            FuelBtn.TextColor = Color.FromArgb(fg);
+        }
+
+        // Cycles Gas & electricity -> Electricity only -> Gas only
+        private async void OnFuelClicked(object sender, EventArgs e)
+        {
+            _fuel = _fuel switch { "dual" => "elec", "elec" => "gas", _ => "dual" };
+            ApplyFuelHeader();
+            await Load();
+        }
 
         public TariffComparePage() : this(null) { }
 
@@ -55,6 +76,9 @@ namespace SmartCubeMobile.Dashboard
                 _usageSource = _elecKwh.HasValue || _gasKwh.HasValue ? "from your bills" : "typical household (no bills yet)";
                 _currentSpend = TariffService.EstimateAnnualSpend();
                 _spendSource = _currentSpend.HasValue ? "from your bills" : null;
+                // No gas anywhere in the user's data: compare electricity-only tariffs by default.
+                _fuel = _gasKwh > 0 || TariffService.UserHasGas() ? "dual" : "elec";
+                ApplyFuelHeader();
             }
             catch (Exception ex)
             {
@@ -151,7 +175,7 @@ namespace SmartCubeMobile.Dashboard
             var started = DateTime.UtcNow;
             try
             {
-                r = await TariffService.GetTariffs(_postcode, _elecKwh, _gasKwh);
+                r = await TariffService.GetTariffs(_postcode, _fuel == "gas" ? null : _elecKwh, _fuel == "elec" ? null : _gasKwh, _fuel);
                 var remaining = TimeSpan.FromMilliseconds(1200) - (DateTime.UtcNow - started);
                 if (remaining > TimeSpan.Zero) await Task.Delay(remaining);
             }
@@ -168,7 +192,12 @@ namespace SmartCubeMobile.Dashboard
 
             RegionLabel.Text = string.IsNullOrEmpty(r.RegionName) ? "—" : r.RegionName;
             RegionSourceLabel.Text = r.RegionSource == "energylinx" ? "confirmed for this postcode" : "based on postcode area";
-            SubtitleLabel.Text = $"Dual-fuel tariffs available in {r.RegionName}";
+            SubtitleLabel.Text = _fuel switch
+            {
+                "elec" => $"Electricity-only tariffs available in {r.RegionName}",
+                "gas" => $"Gas-only tariffs available in {r.RegionName}",
+                _ => $"Dual-fuel tariffs available in {r.RegionName}",
+            };
 
             if (!r.Available)
             {
@@ -362,7 +391,11 @@ namespace SmartCubeMobile.Dashboard
             info.Add(new Label { Text = string.Join("  ·  ", terms), TextColor = Color.FromArgb("#94A3B8"), FontSize = 11 });
             info.Add(new Label
             {
-                Text = $"Elec {t.ElecUnitRate:0.00}p/kWh + {t.ElecStandingCharge:0.00}p/day   Gas {t.GasUnitRate:0.00}p/kWh + {t.GasStandingCharge:0.00}p/day",
+                Text = _fuel == "gas" || t.ElecUnitRate <= 0
+                    ? $"Gas {t.GasUnitRate:0.00}p/kWh + {t.GasStandingCharge:0.00}p/day"
+                    : _fuel == "elec" || t.GasUnitRate <= 0
+                    ? $"Elec {t.ElecUnitRate:0.00}p/kWh + {t.ElecStandingCharge:0.00}p/day"
+                    : $"Elec {t.ElecUnitRate:0.00}p/kWh + {t.ElecStandingCharge:0.00}p/day   Gas {t.GasUnitRate:0.00}p/kWh + {t.GasStandingCharge:0.00}p/day",
                 TextColor = Color.FromArgb("#64748B"), FontSize = 10,
             });
             grid.Add(info, 0);
@@ -395,6 +428,7 @@ namespace SmartCubeMobile.Dashboard
                 FontSize = 11, FontAttributes = FontAttributes.Bold, CornerRadius = 8, Padding = new Thickness(12, 2), HeightRequest = 28,
                 VerticalOptions = LayoutOptions.Center, IsEnabled = !string.IsNullOrEmpty(t.SignupUrl),
             };
+            ToolTipProperties.SetText(btn, $"Open {t.SupplierName}'s website to sign up to this tariff.");
             btn.Clicked += async (s, e) => { try { await Launcher.Default.OpenAsync(new Uri(t.SignupUrl)); } catch { } };
             grid.Add(btn, 2);
 
@@ -446,5 +480,12 @@ namespace SmartCubeMobile.Dashboard
         }
 
         private async void OnBackClicked(object sender, EventArgs e) => await Navigation.PopAsync();
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Energy Tariffs",
+                "This page compares energy tariffs for your postcode. Change postcode or Change usage adjust the details used for the comparison, and View opens the supplier's website to sign up. Blue cards are your current supplier's tariffs, for a quick switch with no supplier change. Your bills and usage are read locally; tariff prices come from EnergyLinx via the SmartCube server.",
+                "OK");
+        }
     }
 }

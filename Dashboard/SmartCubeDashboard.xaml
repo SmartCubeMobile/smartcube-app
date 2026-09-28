@@ -90,6 +90,11 @@
                                 Style="{StaticResource NavButton}"
                                 ToolTipProperties.Text="Profile" />
 
+                        <Button x:Name="NavSupport"
+                                Text="&#x1F4AC;"
+                                Style="{StaticResource NavButton}"
+                                ToolTipProperties.Text="Help &amp; support: contact us, see replies and join live chat" />
+
                     </VerticalStackLayout>
                 </Grid>
                 </ScrollView>

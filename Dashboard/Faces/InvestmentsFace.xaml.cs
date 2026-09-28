@@ -217,6 +217,12 @@ namespace SmartCubeMobile.Dashboard.Faces
             }
         }
 
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (page != null) await page.DisplayAlert("Investments", "This section lists your shares, ETFs, trusts and funds, with their current value, cost and gain or loss. Tap + Add to record a new holding, or tap a holding in the list to see more detail. The panel on the right shows your sector allocation, top dividend yields and platform. All of this data is stored locally on this PC.", "OK");
+        }
+
         public async Task PlayEntryAnimation()
         {
             AnimationHelper.PrepareForEntry(HoldingsCard, SectorCard, DividendCard, PlatformCard);

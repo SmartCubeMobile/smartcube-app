@@ -44,11 +44,13 @@
                         <Entry x:Name="SetupCodeEntry" Placeholder="123 456" Keyboard="Numeric" MaxLength="7"
                                PlaceholderColor="#475569" TextColor="#F1F5F9" BackgroundColor="Transparent"
                                FontSize="18" CharacterSpacing="4" VerticalOptions="Center" ReturnType="Go"
-                               Completed="OnEnableClicked" />
+                               Completed="OnEnableClicked"
+                               ToolTipProperties.Text="Enter the 6-digit code your authenticator app shows for SmartCube." />
                     </Border>
                     <Button x:Name="EnableBtn" Text="Turn On Two-Factor" FontSize="15" FontAttributes="Bold"
                             BackgroundColor="#10B981" TextColor="White" CornerRadius="12" HeightRequest="48"
-                            Margin="0,16,0,0" Clicked="OnEnableClicked" />
+                            Margin="0,16,0,0" Clicked="OnEnableClicked"
+                            ToolTipProperties.Text="Turn on two-factor authentication using the code you entered." />
                 </VerticalStackLayout>
 
                 <!-- Recovery codes (shown once after enabling) -->
@@ -63,7 +65,8 @@
                     </Border>
                     <Button x:Name="CopyBtn" Text="Copy codes" FontSize="13" FontAttributes="Bold"
                             BackgroundColor="#1E3A5F" TextColor="#60A5FA" CornerRadius="10" HeightRequest="40"
-                            Margin="0,12,0,0" Clicked="OnCopyCodesClicked" />
+                            Margin="0,12,0,0" Clicked="OnCopyCodesClicked"
+                            ToolTipProperties.Text="Copy your recovery codes to the clipboard." />
                 </VerticalStackLayout>
 
                 <!-- Manage (already on) -->
@@ -74,15 +77,18 @@
                     <Border BackgroundColor="#0A0F1E" Stroke="#1E2D4A" StrokeThickness="1" Padding="12,0" HeightRequest="44">
                         <Border.StrokeShape><RoundRectangle CornerRadius="10" /></Border.StrokeShape>
                         <Entry x:Name="DisableCodeEntry" Placeholder="Code" PlaceholderColor="#475569" TextColor="#F1F5F9"
-                               BackgroundColor="Transparent" FontSize="16" CharacterSpacing="3" VerticalOptions="Center" />
+                               BackgroundColor="Transparent" FontSize="16" CharacterSpacing="3" VerticalOptions="Center"
+                               ToolTipProperties.Text="A current code from your authenticator app, or one of your recovery codes." />
                     </Border>
                     <Button x:Name="DisableBtn" Text="Turn Off Two-Factor" FontSize="14" FontAttributes="Bold"
                             BackgroundColor="#3B1A1A" TextColor="#EF4444" CornerRadius="12" HeightRequest="44"
-                            Margin="0,14,0,0" Clicked="OnDisableClicked" />
+                            Margin="0,14,0,0" Clicked="OnDisableClicked"
+                            ToolTipProperties.Text="Turn off two-factor authentication for your account." />
                 </VerticalStackLayout>
 
                 <Button x:Name="CloseBtn" Text="Close" FontSize="13" BackgroundColor="Transparent"
-                        TextColor="#94A3B8" HeightRequest="40" Margin="0,8,0,0" Clicked="OnCloseClicked" />
+                        TextColor="#94A3B8" HeightRequest="40" Margin="0,8,0,0" Clicked="OnCloseClicked"
+                        ToolTipProperties.Text="Close and go back." />
 
                 <Label x:Name="StatusLabel" Text="" FontSize="12" TextColor="#F87171"
                        HorizontalOptions="Center" HorizontalTextAlignment="Center"

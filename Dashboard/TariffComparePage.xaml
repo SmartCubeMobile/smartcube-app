@@ -7,19 +7,38 @@
 
     <Grid RowDefinitions="Auto,Auto,*" Padding="24,20" RowSpacing="14">
 
-        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto,Auto" ColumnSpacing="12">
+        <Grid Grid.Row="0" ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="12">
             <Button Grid.Column="0" Text="← Back" BackgroundColor="#131B2E" TextColor="#94A3B8"
-                    FontSize="12" CornerRadius="8" Padding="12,4" HeightRequest="32" Clicked="OnBackClicked" />
+                    FontSize="12" CornerRadius="8" Padding="12,4" HeightRequest="32"
+                    ToolTipProperties.Text="Go back to the previous screen."
+                    Clicked="OnBackClicked" />
             <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
                 <Label x:Name="TitleLabel" Text="Energy Tariffs" FontSize="22" FontAttributes="Bold" TextColor="#F1F5F9" />
                 <Label x:Name="SubtitleLabel" Text="" FontSize="12" TextColor="#64748B" />
             </VerticalStackLayout>
             <Button Grid.Column="2" x:Name="AllSuppliersBtn" Text="Show all suppliers" BackgroundColor="#164E3A" TextColor="#22C55E"
-                    FontSize="11" FontAttributes="Bold" CornerRadius="8" Padding="10,2" HeightRequest="28" IsVisible="False" Clicked="OnShowAllClicked" />
+                    FontSize="11" FontAttributes="Bold" CornerRadius="8" Padding="10,2" HeightRequest="28" IsVisible="False"
+                    ToolTipProperties.Text="Show tariffs from every supplier instead of just this one."
+                    Clicked="OnShowAllClicked" />
             <Button Grid.Column="3" x:Name="PostcodeBtn" Text="Change postcode" BackgroundColor="#1E3A5F" TextColor="#60A5FA"
-                    FontSize="11" FontAttributes="Bold" CornerRadius="8" Padding="10,2" HeightRequest="28" Clicked="OnChangePostcodeClicked" />
+                    FontSize="11" FontAttributes="Bold" CornerRadius="8" Padding="10,2" HeightRequest="28"
+                    ToolTipProperties.Text="Enter a different postcode to compare tariffs for another property."
+                    Clicked="OnChangePostcodeClicked" />
             <Button Grid.Column="4" x:Name="UsageBtn" Text="Change usage" BackgroundColor="#1E3A5F" TextColor="#60A5FA"
-                    FontSize="11" FontAttributes="Bold" CornerRadius="8" Padding="10,2" HeightRequest="28" Clicked="OnChangeUsageClicked" />
+                    FontSize="11" FontAttributes="Bold" CornerRadius="8" Padding="10,2" HeightRequest="28"
+                    ToolTipProperties.Text="Enter your yearly electricity and gas usage to get more accurate cost estimates."
+                    Clicked="OnChangeUsageClicked" />
+            <Button Grid.Column="5" x:Name="FuelBtn" Text="Gas &amp; electricity" BackgroundColor="#3B2A0A" TextColor="#FBBF24"
+                    FontSize="11" FontAttributes="Bold" CornerRadius="8" Padding="10,2" HeightRequest="28"
+                    ToolTipProperties.Text="Switch between dual-fuel tariffs and electricity-only tariffs."
+                    Clicked="OnFuelClicked" />
+            <Button Grid.Column="6" Text="?"
+                    ToolTipProperties.Text="What this section does"
+                    FontSize="12" FontAttributes="Bold"
+                    WidthRequest="26" HeightRequest="26" Padding="0"
+                    CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                    VerticalOptions="Center"
+                    Clicked="OnHelpClicked" />
         </Grid>
 
         <Border Grid.Row="1" BackgroundColor="#131B2E" Stroke="#1E2D4A" StrokeThickness="1" Padding="14,10"
@@ -59,7 +78,8 @@
                         StrokeShape="RoundRectangle 12" IsVisible="False">
                     <VerticalStackLayout Spacing="6">
                         <Grid ColumnDefinitions="*,Auto">
-                            <Label Text="Annual cost comparison" TextColor="#94A3B8" FontSize="12" FontAttributes="Bold" />
+                            <Label Text="Annual cost comparison" TextColor="#94A3B8" FontSize="12" FontAttributes="Bold"
+                                   ToolTipProperties.Text="Compares what you pay now against the cheapest and most expensive tariffs found." />
                             <Label Grid.Column="1" x:Name="ChartCaption" Text="" TextColor="#64748B" FontSize="11" />
                         </Grid>
                         <GraphicsView x:Name="ChartView" HeightRequest="132" />

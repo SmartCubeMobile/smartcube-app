@@ -205,6 +205,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     Padding = new Thickness(8, 2),
                     HeightRequest = 26,
                 };
+                ToolTipProperties.SetText(cancelBtn, "Mark this subscription as cancelled and see how to cancel it with the provider.");
                 cancelBtn.Clicked += (s, e) => OnCancelClicked(sub);
                 btnStack.Add(cancelBtn);
             }
@@ -219,6 +220,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                 Padding = new Thickness(8, 2),
                 HeightRequest = 26,
             };
+            ToolTipProperties.SetText(removeBtn, "Remove this subscription from your list entirely.");
             removeBtn.Clicked += (s, e) => OnRemoveClicked(sub);
             btnStack.Add(removeBtn);
 
@@ -298,6 +300,12 @@ namespace SmartCubeMobile.Dashboard.Faces
 
             MockDataService.AddSubscription(sub);
             LoadData();
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (page != null) await page.DisplayAlert("Subscriptions", "This section tracks your recurring subscriptions, whether added by hand or detected automatically from your transactions. It totals your spend per month and per year, and groups it by category on the right. Tap + Add to record a subscription, Cancel to mark one as cancelled and see how to cancel it with the provider, or Remove to delete it from the list. All of this data is stored locally on this PC.", "OK");
         }
 
         public async Task PlayEntryAnimation()

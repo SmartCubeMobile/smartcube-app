@@ -12,11 +12,18 @@
                 Stroke="{StaticResource BorderColor}"
                 StrokeThickness="0,0,0,1"
                 Padding="24,14">
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto,Auto,Auto" ColumnSpacing="8">
                 <Button Text="← Back" BackgroundColor="Transparent"
                         TextColor="{StaticResource TextSecondary}"
                         FontSize="13" Padding="8,4"
+                        ToolTipProperties.Text="Go back to the supplier list, or to the previous screen."
                         Clicked="OnBackClicked" />
+                <Button x:Name="LogBtn" Grid.Column="3" Text="Log"
+                        BackgroundColor="#0D1322" TextColor="#94A3B8"
+                        FontSize="12" CornerRadius="8" Padding="12,4"
+                        HeightRequest="32"
+                        ToolTipProperties.Text="Open the technical log of this login session, useful for troubleshooting."
+                        Clicked="OnLogClicked" />
                 <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
                     <Label x:Name="PageTitle" Text="Connect Supplier"
                            FontSize="20" FontAttributes="Bold"
@@ -31,7 +38,21 @@
                         FontSize="12" FontAttributes="Bold"
                         CornerRadius="8" Padding="12,4"
                         HeightRequest="32" IsVisible="False"
+                        ToolTipProperties.Text="Scan this page for bill amounts and dates and add them to your bill history."
                         Clicked="OnExtractClicked" />
+                <Button x:Name="ForgetLoginBtn" Grid.Column="4" Text="Forget login" IsVisible="False"
+                        BackgroundColor="#3B1A1A" TextColor="#EF4444"
+                        FontSize="12" CornerRadius="8" Padding="12,4"
+                        HeightRequest="32"
+                        ToolTipProperties.Text="Remove the saved username and password for this supplier from this PC."
+                        Clicked="OnForgetLoginClicked" />
+                <Button Grid.Column="5" Text="?"
+                        ToolTipProperties.Text="What this section does"
+                        FontSize="12" FontAttributes="Bold"
+                        WidthRequest="26" HeightRequest="26" Padding="0"
+                        CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                        VerticalOptions="Center"
+                        Clicked="OnHelpClicked" />
             </Grid>
         </Border>
 
@@ -42,37 +63,64 @@
                 <VerticalStackLayout Spacing="10" HorizontalOptions="Center" WidthRequest="520">
 
                     <Label Text="Energy" TextColor="{StaticResource TextSecondary}"
-                           FontSize="12" FontAttributes="Bold" Margin="0,0,0,4" />
+                           FontSize="12" FontAttributes="Bold" Margin="0,0,0,4"
+                           ToolTipProperties.Text="Electricity and gas suppliers." />
                     <VerticalStackLayout x:Name="EnergyList" Spacing="8" />
 
                     <Label Text="Water" TextColor="{StaticResource TextSecondary}"
-                           FontSize="12" FontAttributes="Bold" Margin="0,12,0,4" />
+                           FontSize="12" FontAttributes="Bold" Margin="0,12,0,4"
+                           ToolTipProperties.Text="Water suppliers." />
                     <VerticalStackLayout x:Name="WaterList" Spacing="8" />
 
                     <Label Text="Broadband &amp; Mobile" TextColor="{StaticResource TextSecondary}"
-                           FontSize="12" FontAttributes="Bold" Margin="0,12,0,4" />
+                           FontSize="12" FontAttributes="Bold" Margin="0,12,0,4"
+                           ToolTipProperties.Text="Broadband and mobile phone providers." />
                     <VerticalStackLayout x:Name="TelecomList" Spacing="8" />
 
                     <Label Text="Other" TextColor="{StaticResource TextSecondary}"
-                           FontSize="12" FontAttributes="Bold" Margin="0,12,0,4" />
+                           FontSize="12" FontAttributes="Bold" Margin="0,12,0,4"
+                           ToolTipProperties.Text="Council tax, TV licence and other household bills." />
                     <VerticalStackLayout x:Name="OtherList" Spacing="8" />
 
                 </VerticalStackLayout>
             </ScrollView>
 
             <!-- Step 2: WebView login -->
-            <Grid x:Name="Step2" IsVisible="False" RowDefinitions="Auto,*">
+            <Grid x:Name="Step2" IsVisible="False" RowDefinitions="Auto,Auto,*">
                 <Border BackgroundColor="{StaticResource CardBgLight}"
                         Padding="12,8" Margin="0">
-                    <Grid ColumnDefinitions="*,Auto">
-                        <Label x:Name="UrlLabel" Text="" TextColor="{StaticResource TextMuted}"
+                    <Grid ColumnDefinitions="Auto,Auto,*,Auto" ColumnSpacing="6">
+                        <Button Grid.Column="0" Text="◀" FontSize="12" Padding="0"
+                                WidthRequest="30" HeightRequest="26" CornerRadius="6"
+                                BackgroundColor="#1E2D4A" TextColor="#CBD5E1"
+                                ToolTipProperties.Text="Back a page"
+                                Clicked="OnBrowserBackClicked" />
+                        <Button Grid.Column="1" Text="▶" FontSize="12" Padding="0"
+                                WidthRequest="30" HeightRequest="26" CornerRadius="6"
+                                BackgroundColor="#1E2D4A" TextColor="#CBD5E1"
+                                ToolTipProperties.Text="Forward a page"
+                                Clicked="OnBrowserForwardClicked" />
+                        <Label x:Name="UrlLabel" Grid.Column="2" Text="" TextColor="{StaticResource TextMuted}"
                                FontSize="11" VerticalOptions="Center" LineBreakMode="MiddleTruncation" />
-                        <ActivityIndicator x:Name="LoadingIndicator" Grid.Column="1"
+                        <ActivityIndicator x:Name="LoadingIndicator" Grid.Column="3"
                                            IsRunning="False" Color="{StaticResource Primary}"
                                            HeightRequest="20" WidthRequest="20" />
                     </Grid>
                 </Border>
-                <WebView x:Name="SupplierWebView" Grid.Row="1"
+                <!-- Bill import status: appears while a bill is being read, then fades -->
+                <Border x:Name="BillStrip" Grid.Row="1" IsVisible="False"
+                        BackgroundColor="#0A3D2E" Stroke="#10B981" StrokeThickness="0,0,0,1"
+                        Padding="14,8">
+                    <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                        <ActivityIndicator x:Name="BillStripSpinner" IsRunning="True" Color="#34D399"
+                                           WidthRequest="18" HeightRequest="18" VerticalOptions="Center" />
+                        <Label x:Name="BillStripLabel" Grid.Column="1" Text="Reading bill…"
+                               TextColor="#D1FAE5" FontSize="13" FontAttributes="Bold"
+                               VerticalOptions="Center" LineBreakMode="TailTruncation" />
+                    </Grid>
+                </Border>
+
+                <WebView x:Name="SupplierWebView" Grid.Row="2"
                          Navigating="OnWebViewNavigating"
                          Navigated="OnWebViewNavigated" />
             </Grid>

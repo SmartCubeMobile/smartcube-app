@@ -20,6 +20,15 @@ namespace SmartCubeMobile.Dashboard.Faces
 #endif
         }
 
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (page != null)
+                await page.DisplayAlert("Utilities",
+                    "This section tracks your energy, water and broadband suppliers and bills. Use Compare to shop energy tariffs for your postcode, and + Add to add a supplier. Drop PDF bills into the box on the right and SmartCube reads the amounts, dates and usage automatically, or click Run Audit to check them for pricing errors and savings. All bill and supplier data is stored locally on this PC; tariff comparisons come from EnergyLinx via the SmartCube server.",
+                    "OK");
+        }
+
 #if WINDOWS
         private void RegisterNativeDrop()
         {
@@ -202,6 +211,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                             new ColumnDefinition(new GridLength(28)),
                             new ColumnDefinition(GridLength.Star),
                             new ColumnDefinition(GridLength.Auto),
+                            new ColumnDefinition(GridLength.Auto),
                         },
                         ColumnSpacing = 10,
                         Children =
@@ -213,6 +223,25 @@ namespace SmartCubeMobile.Dashboard.Faces
                     }
                 };
                 var supplier = s;
+                ToolTipProperties.SetText(card, isEnergy
+                    ? $"View tariffs for {s.Name}."
+                    : $"Switch supplier for {s.Name}.");
+
+                var removeBtn = new Button
+                {
+                    Text = "✕",
+                    FontSize = 12,
+                    TextColor = Color.FromArgb("#94A3B8"),
+                    BackgroundColor = Color.FromArgb("#0D1322"),
+                    CornerRadius = 8,
+                    Padding = new Thickness(0),
+                    WidthRequest = 28, HeightRequest = 28,
+                    VerticalOptions = LayoutOptions.Center,
+                };
+                ToolTipProperties.SetText(removeBtn, $"Remove {s.Name}");
+                removeBtn.Clicked += async (_, _) => await RemoveSupplier(supplier);
+                Grid.SetColumn(removeBtn, 3);
+                ((Grid)card.Content).Children.Add(removeBtn);
                 card.GestureRecognizers.Add(new TapGestureRecognizer
                 {
                     Command = new Command(async () =>
@@ -230,6 +259,23 @@ namespace SmartCubeMobile.Dashboard.Faces
 
             if (hints.Count > 0)
                 _ = AnnotateSupplierCards(hints);
+        }
+
+        private async Task RemoveSupplier(MockSupplier supplier)
+        {
+            var host = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (host == null) return;
+            var billCount = MockDataService.CountBillsFor(supplier);
+            var billsNote = billCount == 0
+                ? ""
+                : $"\n\n{billCount} bill{(billCount == 1 ? "" : "s")} from {supplier.Name} will be removed from your bill history too.";
+            var ok = await host.DisplayAlert("Remove supplier",
+                $"Remove {supplier.Name} ({supplier.Type}) from your suppliers?{billsNote}",
+                "Remove", "Cancel");
+            if (!ok) return;
+            MockDataService.RemoveSupplier(supplier);
+            RefreshData();
+            RunAudit();
         }
 
         private static bool IsEnergy(string type) =>
@@ -259,7 +305,8 @@ namespace SmartCubeMobile.Dashboard.Faces
                 if (string.IsNullOrEmpty(postcode)) return;
                 var (elec, gas) = TariffService.EstimateAnnualKwh();
                 var spend = TariffService.EstimateAnnualSpend();
-                var r = await TariffService.GetTariffs(postcode, elec, gas);
+                var fuel = gas > 0 || TariffService.UserHasGas() ? "dual" : "elec";
+                var r = await TariffService.GetTariffs(postcode, elec, gas, fuel);
                 if (!r.Ok || !r.Available) return;
 
                 var culture = new CultureInfo("en-GB");

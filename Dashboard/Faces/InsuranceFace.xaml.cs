@@ -14,6 +14,15 @@ namespace SmartCubeMobile.Dashboard.Faces
             SetupDropZones();
         }
 
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (page != null)
+                await page.DisplayAlert("Insurance",
+                    "This page tracks your car, house, life and pet insurance policies and what they cost. Use + Manual on any card to type in a policy's details yourself, or drop a policy PDF or photo onto the dashed box and Smart Scan reads the provider, premium and cover automatically. Find Payment on a policy searches your connected bank transactions for a matching payment, and Upcoming Renewals lists policies due soon. All policy data is stored locally on this PC.",
+                    "OK");
+        }
+
         private void SetupDropZones()
         {
             SetupDropZone(CarDropZone, "Car");
@@ -129,7 +138,23 @@ namespace SmartCubeMobile.Dashboard.Faces
         {
             var page = Application.Current.Windows[0].Page;
 
-            if (string.IsNullOrWhiteSpace(UserProfileDataService.GetProfile().SmartScanLicence))
+            // Let the user choose: Smart Scan (server, needs a licence) or the basic built-in reader.
+            const string smartOption = "Smart Scan (AI, uses your licence)";
+            const string basicOption = "Basic read (no licence, for testing)";
+            const string simOption = "Simulated Smart Scan (response.json, for testing)";
+            var choice = await page.DisplayActionSheet($"How should SmartCube read this {category.ToLower()} policy?",
+                "Cancel", null, smartOption, basicOption, simOption);
+            var mode = choice switch
+            {
+                smartOption => InsurancePolicyOcrService.ScanMode.SmartScan,
+                basicOption => InsurancePolicyOcrService.ScanMode.Basic,
+                simOption => InsurancePolicyOcrService.ScanMode.Simulated,
+                _ => (InsurancePolicyOcrService.ScanMode?)null,
+            };
+            if (mode == null) return;
+            var useSmartScan = mode == InsurancePolicyOcrService.ScanMode.SmartScan;
+
+            if (useSmartScan && string.IsNullOrWhiteSpace(UserProfileDataService.GetProfile().SmartScanLicence))
             {
                 if (!await EnsureSmartScanLicence()) return;
             }
@@ -140,19 +165,20 @@ namespace SmartCubeMobile.Dashboard.Faces
             {
                 try
                 {
-                    (data, rawText, error) = await InsurancePolicyOcrService.ExtractFromImage(filePath, category);
+                    (data, rawText, error) = await InsurancePolicyOcrService.ExtractFromImage(filePath, category, mode.Value);
                     break;
                 }
                 catch (SmartScanLicenceException ex)
                 {
-                    var retry = await EnsureSmartScanLicence($"{ex.Message}.\n\nEnter a valid Smart Scan licence key:");
-                    if (!retry) return;
+                    var retry = await EnsureSmartScanLicence($"{ex.Message}.\n\nEnter a valid Smart Scan licence key, or cancel to use the basic reader:");
+                    if (!retry) mode = InsurancePolicyOcrService.ScanMode.Basic;
                 }
             }
 
             if (error != null || data == null)
             {
-                await page.DisplayAlert("OCR Failed", error ?? "Could not read document", "OK");
+                var title = mode == InsurancePolicyOcrService.ScanMode.Simulated && rawText != null ? "Simulated Smart Scan" : "OCR Failed";
+                await page.DisplayAlert(title, error ?? "Could not read document", "OK");
                 return;
             }
 
@@ -481,6 +507,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                 HeightRequest = 26,
             };
             findPayBtn.Clicked += (s, e) => OnFindPaymentClicked(policy, costStack);
+            ToolTipProperties.SetText(findPayBtn, "Search your bank transactions for a payment that matches this policy.");
 
             var removeBtn = new Button
             {
@@ -493,7 +520,34 @@ namespace SmartCubeMobile.Dashboard.Faces
                 HeightRequest = 26,
             };
             removeBtn.Clicked += (s, e) => OnRemoveClicked(policy);
+            ToolTipProperties.SetText(removeBtn, "Remove this policy.");
 
+            var compareBtn = new Button
+            {
+                Text = "Compare",
+                BackgroundColor = Color.FromArgb("#1E3A5F"),
+                TextColor = Color.FromArgb("#60A5FA"),
+                FontSize = 10,
+                CornerRadius = 6,
+                Padding = new Thickness(8, 2),
+                HeightRequest = 26,
+            };
+            compareBtn.Clicked += async (s, e) =>
+            {
+                try
+                {
+                    var nav = Application.Current?.Windows.FirstOrDefault()?.Page?.Navigation;
+                    if (nav != null) await nav.PushAsync(new InsuranceComparePage(policy));
+                }
+                catch (Exception ex)
+                {
+                    var host = Application.Current?.Windows.FirstOrDefault()?.Page;
+                    if (host != null) await host.DisplayAlert("Compare", ex.Message, "OK");
+                }
+            };
+            ToolTipProperties.SetText(compareBtn, "Get quotes from UK comparison sites, with this policy's details ready to copy.");
+
+            btnStack.Add(compareBtn);
             btnStack.Add(findPayBtn);
             btnStack.Add(removeBtn);
 

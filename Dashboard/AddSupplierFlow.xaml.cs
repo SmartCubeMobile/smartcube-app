@@ -59,6 +59,7 @@ namespace SmartCubeMobile.Dashboard
             foreach (var (card, type) in cards)
             {
                 var t = type;
+                ToolTipProperties.SetText(card, $"Add a {type} supplier or bill.");
                 card.GestureRecognizers.Add(new TapGestureRecognizer
                 {
                     Command = new Command(async () =>
@@ -148,6 +149,13 @@ namespace SmartCubeMobile.Dashboard
                 return;
             }
             await Navigation.PopAsync();
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Add Supplier",
+                "Use this when a supplier can't be added by logging in. Pick what kind of bill it is, then enter the supplier name, tariff and the amount and month of a bill. Add Supplier saves it as a new supplier and adds that bill to your history, all stored locally on this PC.",
+                "OK");
         }
     }
 }

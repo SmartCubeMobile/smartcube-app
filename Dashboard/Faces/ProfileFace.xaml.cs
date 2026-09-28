@@ -58,6 +58,15 @@ namespace SmartCubeMobile.Dashboard.Faces
             }
         }
 
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (page != null)
+                await page.DisplayAlert("Profile & Household",
+                    "This page holds your personal details, properties, vehicles, session and account settings. Upload a licence, passport or payslip photo and SmartCube reads the details for you; add properties and vehicles by postcode or registration to look them up automatically. Use Session to change your password, sign out or set up two-factor authentication, and Smart Scan to enter the licence key that lets SmartCube read documents automatically. All of this data is stored locally on this PC.",
+                    "OK");
+        }
+
         private async void OnSmartScanKeyClicked(object sender, EventArgs e) => await PromptSmartScanKey();
 
         private async void OnChangePasswordClicked(object sender, EventArgs e)
@@ -561,6 +570,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     HeightRequest = 26,
                     VerticalOptions = LayoutOptions.Center,
                 };
+                ToolTipProperties.SetText(removeBtn, "Remove this property from your profile.");
                 var propId = prop.Id;
                 removeBtn.Clicked += async (s, ev) =>
                 {
@@ -584,6 +594,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     HeightRequest = 26,
                     VerticalOptions = LayoutOptions.Center,
                 };
+                ToolTipProperties.SetText(propMaintBtn, "Open maintenance details for this property: financials, maintenance log and contractors.");
                 var propRef = prop;
                 propMaintBtn.Clicked += (s, ev) => OnPropertyMaintenanceClicked(propRef);
 
@@ -742,6 +753,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                 };
                 var vehicleRef = v;
                 maintBtn.Clicked += (s, ev) => OnMaintenanceClicked(vehicleRef);
+                ToolTipProperties.SetText(maintBtn, "Open maintenance details for this vehicle: MOT status, advisories, mileage and garage.");
 
                 var removeBtn = new Button
                 {
@@ -754,6 +766,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     HeightRequest = 26,
                     VerticalOptions = LayoutOptions.Center,
                 };
+                ToolTipProperties.SetText(removeBtn, "Remove this vehicle from your profile.");
                 var vId = v.Id;
                 removeBtn.Clicked += async (s, ev) =>
                 {
@@ -959,6 +972,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     HeightRequest = 22,
                     VerticalOptions = LayoutOptions.Center,
                 };
+                ToolTipProperties.SetText(removeBtn, "Remove this maintenance entry.");
                 var entryId = entry.Id;
                 removeBtn.Clicked += async (s, ev) =>
                 {
@@ -1030,6 +1044,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     VerticalOptions = LayoutOptions.Center,
                     IsVisible = !string.IsNullOrEmpty(c.Phone),
                 };
+                ToolTipProperties.SetText(phoneBtn, "Call this contractor.");
                 var phone = c.Phone;
                 phoneBtn.Clicked += async (s, ev) =>
                 {
@@ -1048,6 +1063,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     HeightRequest = 22,
                     VerticalOptions = LayoutOptions.Center,
                 };
+                ToolTipProperties.SetText(removeBtn, "Remove this contractor.");
                 var cId = c.Id;
                 removeBtn.Clicked += async (s, ev) =>
                 {
@@ -1320,6 +1336,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     CommandParameter = adv,
                 };
                 estimateBtn.Clicked += OnGetEstimateClicked;
+                ToolTipProperties.SetText(estimateBtn, "Email your preferred garage asking for an estimate to fix this advisory.");
                 var getPartBtn = new Button
                 {
                     Text = _advisoryParts.ContainsKey(adv) ? _advisoryParts[adv] : "Get Part",
@@ -1331,6 +1348,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     CommandParameter = adv,
                 };
                 getPartBtn.Clicked += OnGetPartClicked;
+                ToolTipProperties.SetText(getPartBtn, "Search online for a part number matching this advisory.");
                 btnStack.Children.Add(estimateBtn);
                 btnStack.Children.Add(getPartBtn);
                 row.Content = new Grid
@@ -1433,6 +1451,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     CommandParameter = g.Id,
                 };
                 editBtn.Clicked += OnEditGarageClicked;
+                ToolTipProperties.SetText(editBtn, "Edit this garage's name, address, phone and contact details.");
                 var removeBtn = new Button
                 {
                     Text = "✕",
@@ -1445,6 +1464,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                     CommandParameter = g.Id,
                 };
                 removeBtn.Clicked += OnRemoveGarageClicked;
+                ToolTipProperties.SetText(removeBtn, "Remove this garage.");
                 var details = new VerticalStackLayout { Spacing = 2 };
                 details.Children.Add(new Label { Text = g.Name, TextColor = Color.FromArgb("#E2E8F0"), FontSize = 13, FontAttributes = FontAttributes.Bold });
                 details.Children.Add(new Label { Text = g.Address, TextColor = Color.FromArgb("#94A3B8"), FontSize = 11, LineBreakMode = LineBreakMode.WordWrap });
@@ -2519,8 +2539,8 @@ namespace SmartCubeMobile.Dashboard.Faces
                                     }
                                 }
                             }, 1),
-                            SetCol(CreateDocButton("Open", "#1E3A5F", "#60A5FA", doc.FilePath, OnOpenDocClicked), 2),
-                            SetCol(CreateDocButton("X", "#3B1A1A", "#EF4444", doc.Id, OnDeleteDocClicked), 3),
+                            SetCol(CreateDocButton("Open", "#1E3A5F", "#60A5FA", doc.FilePath, OnOpenDocClicked, "Open this document."), 2),
+                            SetCol(CreateDocButton("X", "#3B1A1A", "#EF4444", doc.Id, OnDeleteDocClicked, "Delete this document."), 3),
                         }
                     }
                 };
@@ -2535,7 +2555,7 @@ namespace SmartCubeMobile.Dashboard.Faces
             return view;
         }
 
-        private static Button CreateDocButton(string text, string bg, string fg, string tag, EventHandler handler)
+        private static Button CreateDocButton(string text, string bg, string fg, string tag, EventHandler handler, string tooltip = null)
         {
             var btn = new Button
             {
@@ -2549,6 +2569,8 @@ namespace SmartCubeMobile.Dashboard.Faces
                 ClassId = tag,
             };
             btn.Clicked += handler;
+            if (!string.IsNullOrEmpty(tooltip))
+                ToolTipProperties.SetText(btn, tooltip);
             return btn;
         }
 

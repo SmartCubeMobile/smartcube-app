@@ -62,6 +62,7 @@ namespace SmartCubeMobile.Dashboard
                     BackgroundColor = p == activePeriod ? Color.FromArgb("#3B82F6") : Color.FromArgb("#1C2744"),
                     TextColor = p == activePeriod ? Colors.White : Color.FromArgb("#94A3B8"),
                 };
+                ToolTipProperties.SetText(btn, $"Show the price chart for the last {p}.");
                 var period = p;
                 btn.Clicked += (s, e) =>
                 {
@@ -185,6 +186,13 @@ namespace SmartCubeMobile.Dashboard
         private async void OnBackClicked(object sender, EventArgs e)
         {
             await Navigation.PopAsync();
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Investment Detail",
+                "This page shows one investment in detail: its current price, market value, total cost and profit or loss. The chart shows how the price has moved over the period you pick, and the list below shows every purchase you've made of it. All figures are calculated from data stored locally on this PC.",
+                "OK");
         }
     }
 

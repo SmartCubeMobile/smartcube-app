@@ -12,10 +12,11 @@
                 Stroke="{StaticResource BorderColor}"
                 StrokeThickness="0,0,0,1"
                 Padding="24,14">
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                 <Button Text="← Back" BackgroundColor="Transparent"
                         TextColor="{StaticResource TextSecondary}"
                         FontSize="13" Padding="8,4"
+                        ToolTipProperties.Text="Go back to the previous step, or leave without adding a supplier."
                         Clicked="OnBackClicked" />
                 <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
                     <Label x:Name="PageTitle" Text="Add Supplier"
@@ -29,6 +30,13 @@
                 <Label Grid.Column="2" x:Name="StepIndicator" Text="Step 1 of 2"
                        TextColor="{StaticResource TextMuted}" FontSize="12"
                        VerticalOptions="Center" Margin="0,0,8,0" />
+                <Button Grid.Column="3" Text="?"
+                        ToolTipProperties.Text="What this section does"
+                        FontSize="12" FontAttributes="Bold"
+                        WidthRequest="26" HeightRequest="26" Padding="0"
+                        CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                        VerticalOptions="Center"
+                        Clicked="OnHelpClicked" />
             </Grid>
         </Border>
 
@@ -150,7 +158,8 @@
                                         StrokeShape="RoundRectangle 10" Padding="4,0">
                                     <Entry x:Name="SupplierNameEntry" Placeholder="e.g. British Gas, Octopus"
                                            TextColor="{StaticResource TextPrimary}"
-                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44" />
+                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44"
+                                           ToolTipProperties.Text="Type the name of your supplier or provider." />
                                 </Border>
                             </VerticalStackLayout>
 
@@ -162,7 +171,8 @@
                                         StrokeShape="RoundRectangle 10" Padding="4,0">
                                     <Entry x:Name="TariffNameEntry" Placeholder="e.g. Fixed Jan 2027"
                                            TextColor="{StaticResource TextPrimary}"
-                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44" />
+                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44"
+                                           ToolTipProperties.Text="Type the name of your tariff or plan." />
                                 </Border>
                             </VerticalStackLayout>
 
@@ -175,7 +185,8 @@
                                         StrokeShape="RoundRectangle 10" Padding="4,0">
                                     <Entry x:Name="TariffDetailEntry" Placeholder="e.g. 24.50p/kWh · 53.35p/day"
                                            TextColor="{StaticResource TextPrimary}"
-                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44" />
+                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44"
+                                           ToolTipProperties.Text="Type the unit rate or plan details shown on your bill." />
                                 </Border>
                             </VerticalStackLayout>
 
@@ -187,7 +198,8 @@
                                         StrokeShape="RoundRectangle 10" Padding="4,0">
                                     <Picker x:Name="BillMonthPicker"
                                             TextColor="{StaticResource TextPrimary}"
-                                            FontSize="14" HeightRequest="44" />
+                                            FontSize="14" HeightRequest="44"
+                                            ToolTipProperties.Text="Choose the month this bill is for." />
                                 </Border>
                             </VerticalStackLayout>
 
@@ -200,7 +212,8 @@
                                     <Entry x:Name="MonthlyCostEntry" Placeholder="e.g. 94.50"
                                            Keyboard="Numeric"
                                            TextColor="{StaticResource TextPrimary}"
-                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44" />
+                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44"
+                                           ToolTipProperties.Text="Type the amount of this bill, in pounds." />
                                 </Border>
                             </VerticalStackLayout>
 
@@ -212,7 +225,8 @@
                                         StrokeShape="RoundRectangle 10" Padding="4,0">
                                     <Entry x:Name="AccountRefEntry" Placeholder="e.g. BG-8841920"
                                            TextColor="{StaticResource TextPrimary}"
-                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44" />
+                                           BackgroundColor="Transparent" FontSize="14" HeightRequest="44"
+                                           ToolTipProperties.Text="Optionally type your account number with this supplier." />
                                 </Border>
                             </VerticalStackLayout>
 
@@ -220,6 +234,7 @@
                                     FontSize="15" FontAttributes="Bold"
                                     CornerRadius="12" HeightRequest="48"
                                     HorizontalOptions="Fill"
+                                    ToolTipProperties.Text="Save this supplier and its first bill to your history."
                                     Clicked="OnAddClicked" />
 
                         </VerticalStackLayout>

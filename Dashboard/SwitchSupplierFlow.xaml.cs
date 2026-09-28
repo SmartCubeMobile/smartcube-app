@@ -189,6 +189,7 @@ namespace SmartCubeMobile.Dashboard
                     HeightRequest = 34,
                     Padding = new Thickness(16, 0),
                 };
+                ToolTipProperties.SetText(switchBtn, $"Switch your {currentSupplier.Type.ToLower()} to {alt.Name} ({alt.Tariff}).");
                 var altRef = alt;
                 switchBtn.Clicked += async (s, e) => await OnSwitchClicked(altRef);
                 rightCol.Children.Add(switchBtn);
@@ -199,6 +200,7 @@ namespace SmartCubeMobile.Dashboard
                 grid.Children.Add(rightCol);
                 card.Content = grid;
 
+                ToolTipProperties.SetText(card, $"{alt.Name} — {alt.Tariff}, {alt.Comparison.ToLower()}.");
                 card.GestureRecognizers.Add(new TapGestureRecognizer
                 {
                     Command = new Command(async () =>
@@ -229,6 +231,13 @@ namespace SmartCubeMobile.Dashboard
         private async void OnBackClicked(object sender, EventArgs e)
         {
             await Navigation.PopAsync();
+        }
+
+        private async void OnHelpClicked(object sender, EventArgs e)
+        {
+            await DisplayAlert("Switch Supplier",
+                "This page compares your current supplier against alternative deals for the same service. Each card shows the tariff, price and how it compares to what you pay now; click Switch to confirm and update your supplier record. Prices shown here are example deals, not live quotes, and your supplier details are stored locally on this PC.",
+                "OK");
         }
 
         private record AlternativeSupplier(string Name, string Icon, string Tariff, string Detail, decimal MonthlyCost, string Comparison, bool Recommended);

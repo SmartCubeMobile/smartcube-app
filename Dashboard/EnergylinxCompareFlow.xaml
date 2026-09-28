@@ -12,10 +12,11 @@
                 Stroke="{StaticResource BorderColor}"
                 StrokeThickness="0,0,0,1"
                 Padding="24,14">
-            <Grid ColumnDefinitions="Auto,*,Auto">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
                 <Button Text="← Back" BackgroundColor="Transparent"
                         TextColor="{StaticResource TextSecondary}"
                         FontSize="13" Padding="8,4"
+                        ToolTipProperties.Text="Go back to the previous screen."
                         Clicked="OnBackClicked" />
                 <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
                     <Label x:Name="PageTitle" Text="Compare Tariffs"
@@ -31,7 +32,15 @@
                         FontSize="12" FontAttributes="Bold"
                         CornerRadius="8" Padding="12,4"
                         HeightRequest="32" IsVisible="False"
+                        ToolTipProperties.Text="Read the tariffs shown on this Energylinx page and list them below."
                         Clicked="OnScrapeClicked" />
+                <Button Grid.Column="3" Text="?"
+                        ToolTipProperties.Text="What this section does"
+                        FontSize="12" FontAttributes="Bold"
+                        WidthRequest="26" HeightRequest="26" Padding="0"
+                        CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                        VerticalOptions="Center"
+                        Clicked="OnHelpClicked" />
             </Grid>
         </Border>
 
@@ -61,11 +70,13 @@
                         <Label x:Name="ResultsTitle" Text="Available Tariffs"
                                TextColor="{StaticResource TextPrimary}"
                                FontSize="16" FontAttributes="Bold"
-                               VerticalOptions="Center" />
+                               VerticalOptions="Center"
+                               ToolTipProperties.Text="Tariffs found on the Energylinx comparison, cheapest first." />
                         <Button Grid.Column="1" Text="Back to Search"
                                 BackgroundColor="Transparent"
                                 TextColor="{StaticResource Primary}"
                                 FontSize="12" Padding="8,4"
+                                ToolTipProperties.Text="Close this results list and go back to the Energylinx comparison page."
                                 Clicked="OnBackToSearch" />
                     </Grid>
                 </Border>
