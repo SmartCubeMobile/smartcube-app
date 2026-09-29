@@ -131,6 +131,7 @@ namespace SmartCubeMobile.Services
             var (ok, error, json) = await Post("/api/account/device/register", new { deviceName = Environment.MachineName, pin });
             if (!ok || json?["token"] == null) return (false, error ?? "Could not remember this device.");
             SaveDeviceToken(json["token"].ToString(), hasPin: true);
+            TrySetDeviceSlot(json["deviceKey"]?.ToString());
             return (true, null);
         }
 
@@ -139,13 +140,43 @@ namespace SmartCubeMobile.Services
         {
             var token = DeviceToken;
             if (string.IsNullOrEmpty(token)) return (false, "This device isn't remembered.");
-            var (ok, error, _) = await Post("/api/account/device/pin", new { token, pin });
-            if (ok) SaveDeviceToken(token, hasPin: true);
+            var (ok, error, json) = await Post("/api/account/device/pin", new { token, pin });
+            if (ok)
+            {
+                SaveDeviceToken(token, hasPin: true);
+                TrySetDeviceSlot(json?["deviceKey"]?.ToString());
+            }
             return (ok, error);
         }
 
         // Stop remembering this PC locally (the saved token is deleted, so it can't be used again).
-        public static void ForgetThisDevice() => ClearDeviceToken();
+        public static void ForgetThisDevice()
+        {
+            ClearDeviceToken();
+            try { KeyVault.RemoveDeviceSlot(); } catch { }
+        }
+
+        // ---- Key vault (one lock, three keys) ----
+
+        private static void TrySetDeviceSlot(string deviceKey)
+        {
+            try { if (KeyVault.IsUnlocked && !string.IsNullOrEmpty(deviceKey)) KeyVault.SetDeviceSlot(deviceKey); }
+            catch { }
+        }
+
+        // After the vault is unlocked: make sure a remembered PC with a PIN also has its "this PC" slot.
+        public static async Task EnsureDeviceSlot()
+        {
+            try
+            {
+                if (!KeyVault.IsUnlocked || KeyVault.HasDeviceSlot) return;
+                var token = DeviceToken;
+                if (string.IsNullOrEmpty(token) || !DeviceHasPin) return;
+                var (ok, _, json) = await Post("/api/account/device/key", new { token });
+                if (ok) TrySetDeviceSlot(json?["deviceKey"]?.ToString());
+            }
+            catch { }
+        }
 
         public class DeviceLoginResult
         {
@@ -155,6 +186,7 @@ namespace SmartCubeMobile.Services
             public bool NeedsPin { get; set; }      // signed in, but this device has no PIN yet
             public bool Forgotten { get; set; }     // device no longer remembered: use the password
             public int AttemptsLeft { get; set; }
+            public string DeviceKey { get; set; }   // server half of the "this PC" vault slot (after a correct PIN)
         }
 
         // ---- Two-factor (authenticator app) ----
@@ -230,13 +262,21 @@ namespace SmartCubeMobile.Services
                 };
             }
             ApplySession(json);
-            return new DeviceLoginResult { Ok = true, NeedsPin = json["needsPin"]?.Value<bool>() ?? false };
+            return new DeviceLoginResult
+            {
+                Ok = true,
+                NeedsPin = json["needsPin"]?.Value<bool>() ?? false,
+                DeviceKey = json["deviceKey"]?.Type == JTokenType.String ? json["deviceKey"].ToString() : null,
+            };
         }
 
         public static async Task<(bool Ok, string Error)> ChangePassword(string currentPassword, string newPassword)
         {
             var (ok, error, _) = await Post("/api/account/change-password", new { currentPassword, newPassword });
             if (ok && Current != null) Current.MustChangePassword = false;
+            // Re-lock the data key with the new password so it keeps opening the data on this PC.
+            if (ok && KeyVault.IsUnlocked)
+                try { await Task.Run(() => KeyVault.SetPassword(Current?.Username, newPassword)); } catch { }
             return (ok, error);
         }
 
@@ -245,6 +285,8 @@ namespace SmartCubeMobile.Services
             var token = DeviceToken;
             try { await Post("/api/account/device/revoke", new { token }); } catch { }
             ClearDeviceToken();
+            try { KeyVault.RemoveDeviceSlot(); } catch { }
+            KeyVault.Lock();   // the data key leaves memory; the password (or recovery key) is needed again
             Current = null;
         }
 
@@ -263,6 +305,16 @@ namespace SmartCubeMobile.Services
                 MustChangePassword = json["mustChangePassword"]?.Value<bool>() ?? false,
                 TwoFactorEnabled = json["twoFactorEnabled"]?.Value<bool>() ?? false,
             };
+
+            SyncProfileFromSession();
+        }
+
+        // Copies the Smart Scan licence and name from the account into the local profile. Must not run
+        // while the data is locked: the profile would read as empty and could be saved over the real one.
+        public static void SyncProfileFromSession()
+        {
+            if (Current == null) return;
+            if (KeyVault.Exists && !KeyVault.IsUnlocked) return;
 
             var profile = UserProfileDataService.GetProfile();
             var changed = false;
@@ -316,7 +368,8 @@ namespace SmartCubeMobile.Services
             {
                 var dir = Path.GetDirectoryName(_deviceFile);
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                SecureFile.WriteAllText(_deviceFile, JsonConvert.SerializeObject(new { token, pin = hasPin, saved = DateTime.UtcNow }));
+                // Needed before sign-in, so it stays on the Windows lock rather than the vault key.
+                SecureFile.WriteAllTextDpapi(_deviceFile, JsonConvert.SerializeObject(new { token, pin = hasPin, saved = DateTime.UtcNow }));
             }
             catch { }
         }

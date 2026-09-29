@@ -157,7 +157,6 @@ namespace SmartCubeMobile.Dashboard.Faces
             TraceLabel.TextColor = profile.TraceEnabled ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
             RefreshTwoFactor();
             ChangePinBtn.IsVisible = !string.IsNullOrEmpty(SessionService.DeviceToken);
-
             LoadPersonalData();
             LoadProperties();
             LoadVehicles();

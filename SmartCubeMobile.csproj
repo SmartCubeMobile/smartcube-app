@@ -12,9 +12,10 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <ApplicationTitle>SmartCube Mobile</ApplicationTitle>
+    <ApplicationIcon>Images\SmartCube.ico</ApplicationIcon>
     <ApplicationId>com.smartcube.mobile</ApplicationId>
-    <ApplicationDisplayVersion>1.0.6</ApplicationDisplayVersion>
-    <ApplicationVersion>7</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0.7</ApplicationDisplayVersion>
+    <ApplicationVersion>8</ApplicationVersion>
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
@@ -142,9 +143,9 @@
   <!-- Images -->
   <ItemGroup>
     <MauiImage Include="Images\*.jpg" Exclude="Images\appicon.jpg" />
-    <MauiImage Include="Images\*.png" />
+    <MauiImage Include="Images\*.png" Exclude="Images\appicon.png" />
     <MauiImage Include="Images\*.jfif" />
-    <MauiIcon Include="Images\appicon.svg" />
+    <MauiIcon Include="Images\appicon.png" />
   </ItemGroup>
 
   <!-- Language dictionaries -->

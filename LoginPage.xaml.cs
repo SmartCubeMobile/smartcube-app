@@ -12,6 +12,17 @@ public partial class LoginPage : ContentPage
         UpdateServerLabel();
     }
 
+    // Password sign-in needed to unlock the data (e.g. first start after the vault arrived, or a PIN
+    // unlock that couldn't open the data). Skips the automatic PIN screen.
+    public LoginPage(string message, string username = null) : this()
+    {
+        _autoTried = true;
+        if (!string.IsNullOrEmpty(username)) LoginEntry.Text = username;
+        StatusLabel.TextColor = Color.FromArgb("#94A3B8");
+        StatusLabel.Text = message;
+        StatusLabel.IsVisible = !string.IsNullOrEmpty(message);
+    }
+
     private void UpdateServerLabel()
     {
         var host = SessionService.ServerBase.Replace("https://", "").Replace("http://", "");
@@ -57,7 +68,7 @@ public partial class LoginPage : ContentPage
         if (r.Ok)
         {
             if (r.NeedsPin) { SetBusy(false, null); await Navigation.PushAsync(new PinPage(PinPage.Mode.CreateForExisting)); }
-            else await EnterDashboard();
+            else GoToApp();
             return;
         }
         if (r.PinRequired)   // the server has a PIN for it even though this PC didn't know
@@ -72,11 +83,47 @@ public partial class LoginPage : ContentPage
     // Leave the sign-in screens for the app (or the forced password change).
     public static void GoToApp()
     {
+        var window = Application.Current?.Windows.FirstOrDefault();
+        if (window == null) return;
+
+        // Never open the app with the data still locked: ask for the password instead.
+        if (KeyVault.Exists && !KeyVault.IsUnlocked)
+        {
+            window.Page = new NavigationPage(new LoginPage(
+                "Enter your password to unlock your data on this PC.", SessionService.Current?.Username));
+            return;
+        }
+
         Page next = SessionService.Current?.MustChangePassword == true
             ? new ChangePasswordPage(forced: true)
             : new SmartCubeDashboard();
-        var window = Application.Current?.Windows.FirstOrDefault();
-        if (window != null) window.Page = new NavigationPage(next);
+        window.Page = new NavigationPage(next);
+    }
+
+    // Data key is open: convert older files to it, add the "this PC" slot if remembered, show a new
+    // recovery key if one was just created, then offer a PIN (if asked to remember) and open the app.
+    public static async Task ContinueAfterUnlock(INavigation nav, bool remember)
+    {
+        try { await Task.Run(SecureFile.EncryptExistingFiles); } catch { }
+        try { SessionService.SyncProfileFromSession(); } catch { }
+        await SessionService.EnsureDeviceSlot();
+
+        if (KeyVault.PendingRecoveryKey != null)
+        {
+            await nav.PushAsync(new RecoveryKeyPage(KeyVault.PendingRecoveryKey,
+                then: () => NextAfterUnlock(nav, remember)));
+            return;
+        }
+        await NextAfterUnlock(nav, remember);
+    }
+
+    private static async Task NextAfterUnlock(INavigation nav, bool remember)
+    {
+        var alreadyRemembered = !string.IsNullOrEmpty(SessionService.DeviceToken) && SessionService.DeviceHasPin;
+        if (remember && !alreadyRemembered)
+            await nav.PushAsync(new PinPage(PinPage.Mode.CreateNew));
+        else
+            GoToApp();
     }
 
     private async void OnSignInClicked(object sender, EventArgs e) => await SignIn();
@@ -142,15 +189,23 @@ public partial class LoginPage : ContentPage
             return;
         }
 
-        if (RememberCheck.IsChecked)
+        // Open the data with the password (creating the vault and a recovery key on first use).
+        SetBusy(true, "Unlocking your data…");
+        var username = SessionService.Current?.Username ?? login;
+        KeyVault.UnlockResult unlock;
+        try { unlock = await Task.Run(() => KeyVault.UnlockWithPassword(username, password)); }
+        catch (Exception ex) { SetBusy(false, "Could not unlock your data: " + ex.Message); return; }
+
+        var remember = RememberCheck.IsChecked;
+        SetBusy(false, null);
+        PasswordEntry.Text = "";
+
+        if (unlock is KeyVault.UnlockResult.WrongPassword or KeyVault.UnlockResult.WrongOwner)
         {
-            // Remembering this PC now needs a PIN; the PIN page registers the device and opens the app.
-            SetBusy(false, null);
-            PasswordEntry.Text = "";
-            await Navigation.PushAsync(new PinPage(PinPage.Mode.CreateNew));
+            await Navigation.PushAsync(new RecoveryUnlockPage(unlock, username, password, remember));
             return;
         }
-        await EnterDashboard();
+        await ContinueAfterUnlock(Navigation, remember);
     }
 
     private void SetBusy(bool busy, string status)

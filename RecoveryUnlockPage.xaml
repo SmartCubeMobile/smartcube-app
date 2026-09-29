@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.RecoveryUnlockPage"
+             BackgroundColor="#0A0F1E"
+             NavigationPage.HasNavigationBar="False">
+
+    <ScrollView>
+        <Border BackgroundColor="#131B2E" Stroke="#1E2D4A" StrokeThickness="1"
+                Padding="36,30" WidthRequest="500" Margin="0,30"
+                VerticalOptions="Center" HorizontalOptions="Center">
+            <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+
+            <VerticalStackLayout Spacing="0">
+                <Label x:Name="TitleLabel" Text="Unlock your data" FontSize="22" FontAttributes="Bold"
+                       TextColor="#F1F5F9" HorizontalOptions="Center" />
+                <Label x:Name="IntroLabel" Text="" FontSize="13" TextColor="#94A3B8"
+                       HorizontalTextAlignment="Center" LineBreakMode="WordWrap" Margin="0,10,0,20" />
+
+                <Label Text="Recovery key" FontSize="12" TextColor="#94A3B8" Margin="0,0,0,6" />
+                <Border BackgroundColor="#0A0F1E" Stroke="#1E2D4A" StrokeThickness="1" Padding="12,0" HeightRequest="48">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="10" /></Border.StrokeShape>
+                    <Entry x:Name="KeyEntry" Placeholder="XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" PlaceholderColor="#475569"
+                           TextColor="#F1F5F9" BackgroundColor="Transparent" FontFamily="Consolas" FontSize="16"
+                           VerticalOptions="Center" ReturnType="Go" Completed="OnUnlockClicked"
+                           ToolTipProperties.Text="The recovery key you saved or printed when you set up SmartCube on this PC." />
+                </Border>
+
+                <Button x:Name="UnlockBtn" Text="Unlock with recovery key" FontSize="15" FontAttributes="Bold"
+                        BackgroundColor="#3B82F6" TextColor="White" CornerRadius="12" HeightRequest="48"
+                        Margin="0,18,0,0" Clicked="OnUnlockClicked" />
+
+                <Button x:Name="PinBtn" Text="Use my PIN for this PC instead" FontSize="13" IsVisible="False"
+                        BackgroundColor="#1E3A5F" TextColor="#60A5FA" CornerRadius="10" HeightRequest="40"
+                        Margin="0,10,0,0" Clicked="OnUsePinClicked"
+                        ToolTipProperties.Text="This PC is remembered: your PIN can unlock your data too." />
+
+                <Label x:Name="StatusLabel" Text="" FontSize="12" TextColor="#F87171" LineBreakMode="WordWrap"
+                       HorizontalOptions="Center" HorizontalTextAlignment="Center" Margin="0,12,0,0" IsVisible="False" />
+
+                <BoxView HeightRequest="1" Color="#1E2D4A" Margin="0,22,0,14" />
+                <Label Text="I don't have my recovery key" FontSize="13" TextColor="#94A3B8" HorizontalOptions="Center">
+                    <Label.GestureRecognizers><TapGestureRecognizer Tapped="OnNoKeyTapped" /></Label.GestureRecognizers>
+                </Label>
+                <Label Text="Back to sign in" FontSize="13" TextColor="#60A5FA" HorizontalOptions="Center" Margin="0,10,0,0">
+                    <Label.GestureRecognizers><TapGestureRecognizer Tapped="OnBackTapped" /></Label.GestureRecognizers>
+                </Label>
+            </VerticalStackLayout>
+        </Border>
+    </ScrollView>
+</ContentPage>

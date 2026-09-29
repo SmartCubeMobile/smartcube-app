@@ -86,7 +86,20 @@ public partial class PinPage : ContentPage
             var r = await SessionService.TryDeviceLogin(pin);
             if (r.Ok)
             {
-                LoginPage.GoToApp();
+                // Signed in. Now open the data with this PC's key (needs the server half the PIN released).
+                if (!KeyVault.Exists)
+                {
+                    // Data from before the recovery key existed: one password sign-in sets it up.
+                    GoToPasswordStep("One-time step: enter your password to set up your recovery key and finish securing your data.");
+                    return;
+                }
+                var opened = await Task.Run(() => KeyVault.UnlockWithDevice(r.DeviceKey));
+                if (!opened)
+                {
+                    GoToPasswordStep("Enter your password to unlock your data on this PC.");
+                    return;
+                }
+                await LoginPage.ContinueAfterUnlock(Navigation, remember: false);
                 return;
             }
             SetBusy(false, r.Error ?? "Could not unlock.");
@@ -144,6 +157,13 @@ public partial class PinPage : ContentPage
                 await Navigation.PopAsync();
                 break;
         }
+    }
+
+    private static void GoToPasswordStep(string message)
+    {
+        var window = Application.Current?.Windows.FirstOrDefault();
+        if (window != null)
+            window.Page = new NavigationPage(new LoginPage(message, SessionService.Current?.Username));
     }
 
     private void SetBusy(bool busy, string status)
