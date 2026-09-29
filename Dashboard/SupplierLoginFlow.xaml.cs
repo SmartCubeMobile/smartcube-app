@@ -490,6 +490,14 @@ namespace SmartCubeMobile.Dashboard
             }
         }
 
+        // The download is only a staging copy: once the bill is read and an encrypted copy is in
+        // Documents, the plain download is removed so no unencrypted bill stays on disk.
+        private static void DeleteDownload(string path)
+        {
+            try { if (System.IO.File.Exists(path)) System.IO.File.Delete(path); }
+            catch (Exception ex) { SupplierLog.Error("Remove staging download", ex); }
+        }
+
         private static string NewDownloadPath(string name)
         {
             var dir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "SupplierDownloads");
@@ -529,7 +537,7 @@ namespace SmartCubeMobile.Dashboard
             if (parsed == null)
             {
                 SupplierLog.Write($"Parse {name}: no bill data recognised. Saved to Documents.");
-                try { DocumentStorageService.AddDocument(path, "Bill", name); } catch (Exception ex) { SupplierLog.Error("Save document", ex); }
+                try { DocumentStorageService.AddDocument(path, "Bill", name); DeleteDownload(path); } catch (Exception ex) { SupplierLog.Error("Save document", ex); }
                 PageSubtitle.Text = "Downloaded, but it didn't look like a bill. Saved to your Documents instead.";
                 ShowBillStrip("That file didn't look like a bill. Saved to your Documents instead.", busy: false, ok: false);
                 return;
@@ -549,7 +557,7 @@ namespace SmartCubeMobile.Dashboard
                 if (ok) added++; else dupes++;
             }
             EnsureSupplierRecords(split, parsed.AccountNumber);
-            try { DocumentStorageService.AddDocument(path, "Bill", $"{parsed.Supplier} {parsed.BillDate:MMM yyyy}.pdf"); }
+            try { DocumentStorageService.AddDocument(path, "Bill", $"{parsed.Supplier} {parsed.BillDate:MMM yyyy}.pdf"); DeleteDownload(path); }
             catch (Exception ex) { SupplierLog.Error("Save document", ex); }
 
             if (added > 0)

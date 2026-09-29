@@ -191,7 +191,9 @@ namespace SmartCubeMobile.Services
         // ---- Simulated Smart Scan (testing without server credits) ----
         // The app writes the OCR text to SimulationDir\last_ocr.txt; a person (or Claude Code) writes
         // SimulationDir\response.json in the same shape the server returns, tagged with the text hash.
-        public static readonly string SimulationDir = @"D:\SmartCubeMobile\Data\SmartScan";
+        // Kept on C: (Documents, so drive encryption covers it) rather than D:, since it holds real policy text.
+        public static readonly string SimulationDir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "SmartCube Private", "SmartScan");
 
         private static (InsurancePolicyOcrData Data, string Error) ParseViaSimulation(string ocrText, string categoryHint)
         {

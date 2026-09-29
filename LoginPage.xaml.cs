@@ -42,17 +42,41 @@ public partial class LoginPage : ContentPage
         if (_autoTried) return;
         _autoTried = true;
 
-        if (!string.IsNullOrEmpty(SessionService.DeviceToken))
+        if (string.IsNullOrEmpty(SessionService.DeviceToken)) return;
+
+        // Remembered PC with a PIN: ask for the PIN (the server checks it).
+        if (SessionService.DeviceHasPin)
         {
-            SetBusy(true, "Signing you in…");
-            var (ok, error) = await SessionService.TryDeviceLogin();
-            if (ok)
-            {
-                await EnterDashboard();
-                return;
-            }
-            SetBusy(false, error);
+            await Navigation.PushAsync(new PinPage(PinPage.Mode.Unlock), false);
+            return;
         }
+
+        // PC remembered before PINs existed: sign in once more, then ask for a PIN to keep it remembered.
+        SetBusy(true, "Signing you in…");
+        var r = await SessionService.TryDeviceLogin();
+        if (r.Ok)
+        {
+            if (r.NeedsPin) { SetBusy(false, null); await Navigation.PushAsync(new PinPage(PinPage.Mode.CreateForExisting)); }
+            else await EnterDashboard();
+            return;
+        }
+        if (r.PinRequired)   // the server has a PIN for it even though this PC didn't know
+        {
+            SetBusy(false, null);
+            await Navigation.PushAsync(new PinPage(PinPage.Mode.Unlock), false);
+            return;
+        }
+        SetBusy(false, r.Error);
+    }
+
+    // Leave the sign-in screens for the app (or the forced password change).
+    public static void GoToApp()
+    {
+        Page next = SessionService.Current?.MustChangePassword == true
+            ? new ChangePasswordPage(forced: true)
+            : new SmartCubeDashboard();
+        var window = Application.Current?.Windows.FirstOrDefault();
+        if (window != null) window.Page = new NavigationPage(next);
     }
 
     private async void OnSignInClicked(object sender, EventArgs e) => await SignIn();
@@ -115,6 +139,15 @@ public partial class LoginPage : ContentPage
             PasswordEntry.Text = "";
             CodeSection.IsVisible = false;
             PasswordEntry.Focus();
+            return;
+        }
+
+        if (RememberCheck.IsChecked)
+        {
+            // Remembering this PC now needs a PIN; the PIN page registers the device and opens the app.
+            SetBusy(false, null);
+            PasswordEntry.Text = "";
+            await Navigation.PushAsync(new PinPage(PinPage.Mode.CreateNew));
             return;
         }
         await EnterDashboard();

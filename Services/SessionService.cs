@@ -95,14 +95,66 @@ namespace SmartCubeMobile.Services
             if (!ok) return (false, error, json?["twoFactorRequired"]?.Value<bool>() ?? false);
 
             ApplySession(json);
-
-            if (rememberDevice)
-            {
-                var (dOk, _, dJson) = await Post("/api/account/device/register", new { deviceName = Environment.MachineName });
-                if (dOk && dJson["token"] != null)
-                    SaveDeviceToken(dJson["token"].ToString());
-            }
+            // Remembering the device now happens separately, once the user has chosen a PIN (RegisterDevice).
             return (true, null, false);
+        }
+
+        // ---- Remembered device + PIN ----
+
+        public static bool DeviceHasPin
+        {
+            get
+            {
+                try
+                {
+                    if (!File.Exists(_deviceFile)) return false;
+                    return JObject.Parse(SecureFile.ReadAllText(_deviceFile))["pin"]?.Value<bool>() ?? false;
+                }
+                catch { return false; }
+            }
+        }
+
+        // Same rules as the server, so the user gets the message before anything is sent.
+        public static string PinProblem(string pin)
+        {
+            if (string.IsNullOrEmpty(pin) || pin.Length < 4 || pin.Length > 6 || !pin.All(char.IsDigit))
+                return "Your PIN must be 4 to 6 digits.";
+            if (pin.Distinct().Count() == 1) return "Choose a PIN that isn't the same digit repeated.";
+            const string up = "0123456789012345", down = "9876543210987654";
+            if (up.Contains(pin) || down.Contains(pin)) return "Choose a PIN that isn't a simple sequence like 1234.";
+            return null;
+        }
+
+        // Remember this device, protected by a PIN the server checks. Call after a password sign-in.
+        public static async Task<(bool Ok, string Error)> RegisterDevice(string pin)
+        {
+            var (ok, error, json) = await Post("/api/account/device/register", new { deviceName = Environment.MachineName, pin });
+            if (!ok || json?["token"] == null) return (false, error ?? "Could not remember this device.");
+            SaveDeviceToken(json["token"].ToString(), hasPin: true);
+            return (true, null);
+        }
+
+        // Set or change the PIN on the device already remembered (user must be signed in).
+        public static async Task<(bool Ok, string Error)> SetDevicePin(string pin)
+        {
+            var token = DeviceToken;
+            if (string.IsNullOrEmpty(token)) return (false, "This device isn't remembered.");
+            var (ok, error, _) = await Post("/api/account/device/pin", new { token, pin });
+            if (ok) SaveDeviceToken(token, hasPin: true);
+            return (ok, error);
+        }
+
+        // Stop remembering this PC locally (the saved token is deleted, so it can't be used again).
+        public static void ForgetThisDevice() => ClearDeviceToken();
+
+        public class DeviceLoginResult
+        {
+            public bool Ok { get; set; }
+            public string Error { get; set; }
+            public bool PinRequired { get; set; }   // server wants the PIN (first try, or a wrong one)
+            public bool NeedsPin { get; set; }      // signed in, but this device has no PIN yet
+            public bool Forgotten { get; set; }     // device no longer remembered: use the password
+            public int AttemptsLeft { get; set; }
         }
 
         // ---- Two-factor (authenticator app) ----
@@ -157,20 +209,28 @@ namespace SmartCubeMobile.Services
             }
         }
 
-        public static async Task<(bool Ok, string Error)> TryDeviceLogin()
+        public static async Task<DeviceLoginResult> TryDeviceLogin(string pin = null)
         {
             var token = DeviceToken;
-            if (string.IsNullOrEmpty(token)) return (false, null);
+            if (string.IsNullOrEmpty(token)) return new DeviceLoginResult { Forgotten = true };
 
-            var (ok, error, json) = await Post("/api/account/device/login", new { token });
+            var (ok, error, json) = await Post("/api/account/device/login", new { token, pin });
             if (!ok)
             {
-                if (error != null && !error.StartsWith("Could not reach"))
-                    ClearDeviceToken();
-                return (false, error);
+                var pinRequired = json?["pinRequired"]?.Value<bool>() ?? false;
+                var unreachable = error != null && error.StartsWith("Could not reach");
+                if (!pinRequired && !unreachable)
+                    ClearDeviceToken();   // revoked, too many wrong PINs, or unknown
+                return new DeviceLoginResult
+                {
+                    Error = error,
+                    PinRequired = pinRequired,
+                    Forgotten = !pinRequired && !unreachable,
+                    AttemptsLeft = json?["attemptsLeft"]?.Value<int>() ?? 0,
+                };
             }
             ApplySession(json);
-            return (true, null);
+            return new DeviceLoginResult { Ok = true, NeedsPin = json["needsPin"]?.Value<bool>() ?? false };
         }
 
         public static async Task<(bool Ok, string Error)> ChangePassword(string currentPassword, string newPassword)
@@ -250,13 +310,13 @@ namespace SmartCubeMobile.Services
             }
         }
 
-        private static void SaveDeviceToken(string token)
+        private static void SaveDeviceToken(string token, bool hasPin)
         {
             try
             {
                 var dir = Path.GetDirectoryName(_deviceFile);
                 if (!Directory.Exists(dir)) Directory.CreateDirectory(dir);
-                SecureFile.WriteAllText(_deviceFile, JsonConvert.SerializeObject(new { token, saved = DateTime.UtcNow }));
+                SecureFile.WriteAllText(_deviceFile, JsonConvert.SerializeObject(new { token, pin = hasPin, saved = DateTime.UtcNow }));
             }
             catch { }
         }

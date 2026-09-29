@@ -107,6 +107,12 @@ namespace SmartCubeMobile.Dashboard.Faces
             TwoFactorBtn.IsEnabled = true;
         }
 
+        private async void OnChangePinClicked(object sender, EventArgs e)
+        {
+            var nav = Application.Current?.Windows.FirstOrDefault()?.Page?.Navigation;
+            if (nav != null) await nav.PushAsync(new PinPage(PinPage.Mode.Change));
+        }
+
         private async void OnSignOutClicked(object sender, EventArgs e)
         {
             var window = Application.Current?.Windows.FirstOrDefault();
@@ -150,6 +156,7 @@ namespace SmartCubeMobile.Dashboard.Faces
             TraceLabel.Text = profile.TraceEnabled ? "Enabled" : "Disabled";
             TraceLabel.TextColor = profile.TraceEnabled ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
             RefreshTwoFactor();
+            ChangePinBtn.IsVisible = !string.IsNullOrEmpty(SessionService.DeviceToken);
 
             LoadPersonalData();
             LoadProperties();
@@ -2580,9 +2587,11 @@ namespace SmartCubeMobile.Dashboard.Faces
             {
                 try
                 {
+                    // Stored documents are encrypted; open a temporary decrypted copy.
+                    var viewPath = SecureFile.DecryptForViewing(btn.ClassId);
                     await Launcher.OpenAsync(new OpenFileRequest
                     {
-                        File = new ReadOnlyFile(btn.ClassId)
+                        File = new ReadOnlyFile(viewPath)
                     });
                 }
                 catch (Exception ex)

@@ -74,8 +74,8 @@
 
                 <HorizontalStackLayout Spacing="6" Margin="0,14,0,0">
                     <CheckBox x:Name="RememberCheck" IsChecked="True" Color="#3B82F6" VerticalOptions="Center"
-                              ToolTipProperties.Text="Keep this device signed in so you're not asked for a two-factor code here again." />
-                    <Label Text="Remember this device" FontSize="13" TextColor="#CBD5E1" VerticalOptions="Center"
+                              ToolTipProperties.Text="Remember this PC: you'll choose a PIN and use it instead of your password next time." />
+                    <Label Text="Remember this device (with a PIN)" FontSize="13" TextColor="#CBD5E1" VerticalOptions="Center"
                            ToolTipProperties.Text="Tap to toggle whether this device stays signed in.">
                         <Label.GestureRecognizers>
                             <TapGestureRecognizer Tapped="OnRememberLabelTapped" />

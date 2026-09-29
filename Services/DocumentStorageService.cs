@@ -47,9 +47,10 @@ namespace SmartCubeMobile.Services
             var safeName = $"{category}_{id}{ext}";
             var destPath = Path.Combine(_docsDir, safeName);
 
-            File.Copy(sourceFilePath, destPath, true);
+            // Stored encrypted for this Windows user; opened via SecureFile.DecryptForViewing.
+            var originalSize = new FileInfo(sourceFilePath).Length;
+            SecureFile.CopyEncrypted(sourceFilePath, destPath);
 
-            var fi = new FileInfo(destPath);
             var doc = new StoredDocument
             {
                 Id = id,
@@ -58,7 +59,7 @@ namespace SmartCubeMobile.Services
                 FilePath = destPath,
                 OriginalFileName = fileName,
                 DateAdded = DateTime.Now,
-                FileSizeBytes = fi.Length,
+                FileSizeBytes = originalSize,
             };
 
             _documents.Add(doc);

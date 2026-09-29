@@ -18,6 +18,15 @@ public partial class App : Application
                 $"App constructor: {ex}");
             throw;
         }
+
+        // Encrypt any local data still stored in plain form (older files, documents), and tidy up
+        // decrypted copies left from viewing documents. Runs before any page reads the data.
+        try
+        {
+            SecureFile.EncryptExistingFiles();
+            SecureFile.CleanOpenedCopies();
+        }
+        catch { }
     }
 
     // Keep the window inside the screen's usable area (taskbar/title bar allowed for) so nothing

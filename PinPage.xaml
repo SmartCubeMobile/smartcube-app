@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.PinPage"
+             BackgroundColor="#0A0F1E"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid>
+        <Border x:Name="Card"
+                BackgroundColor="#131B2E"
+                Stroke="#1E2D4A"
+                StrokeThickness="1"
+                Padding="36,32"
+                WidthRequest="400"
+                VerticalOptions="Center" HorizontalOptions="Center">
+            <Border.StrokeShape>
+                <RoundRectangle CornerRadius="18" />
+            </Border.StrokeShape>
+
+            <VerticalStackLayout Spacing="0">
+                <Image Source="smartcube_mobile_logo_square.png"
+                       WidthRequest="64" HeightRequest="64"
+                       Aspect="AspectFit" HorizontalOptions="Center" />
+
+                <Label x:Name="TitleLabel" Text="Enter your PIN" FontSize="22" FontAttributes="Bold"
+                       TextColor="#F1F5F9" HorizontalOptions="Center" Margin="0,14,0,0" />
+                <Label x:Name="IntroLabel" Text=""
+                       FontSize="13" TextColor="#64748B" HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" LineBreakMode="WordWrap" Margin="0,6,0,22" />
+
+                <Label x:Name="PinLabel" Text="PIN" FontSize="12" TextColor="#94A3B8" Margin="0,0,0,6" />
+                <Border BackgroundColor="#0A0F1E" Stroke="#1E2D4A" StrokeThickness="1" Padding="12,0" HeightRequest="50">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="10" /></Border.StrokeShape>
+                    <Entry x:Name="PinEntry" IsPassword="True" Keyboard="Numeric" MaxLength="6"
+                           Placeholder="4 to 6 digits" PlaceholderColor="#475569"
+                           TextColor="#F1F5F9" BackgroundColor="Transparent"
+                           FontSize="22" CharacterSpacing="8" HorizontalTextAlignment="Center"
+                           VerticalOptions="Center" ReturnType="Go"
+                           ToolTipProperties.Text="Your SmartCube PIN for this PC."
+                           Completed="OnPinCompleted" />
+                </Border>
+
+                <VerticalStackLayout x:Name="ConfirmSection" IsVisible="False" Spacing="0">
+                    <Label Text="Type it again" FontSize="12" TextColor="#94A3B8" Margin="0,14,0,6" />
+                    <Border BackgroundColor="#0A0F1E" Stroke="#1E2D4A" StrokeThickness="1" Padding="12,0" HeightRequest="50">
+                        <Border.StrokeShape><RoundRectangle CornerRadius="10" /></Border.StrokeShape>
+                        <Entry x:Name="ConfirmEntry" IsPassword="True" Keyboard="Numeric" MaxLength="6"
+                               PlaceholderColor="#475569" TextColor="#F1F5F9" BackgroundColor="Transparent"
+                               FontSize="22" CharacterSpacing="8" HorizontalTextAlignment="Center"
+                               VerticalOptions="Center" ReturnType="Go"
+                               ToolTipProperties.Text="Type the same PIN again to confirm it."
+                               Completed="OnPrimaryClicked" />
+                    </Border>
+                    <Label Text="Avoid obvious PINs like 1234 or your birthday. Five wrong tries and this PC is forgotten, so you'd need your password."
+                           FontSize="11" TextColor="#475569" Margin="0,8,0,0" LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+
+                <Button x:Name="PrimaryBtn" Text="Unlock" FontSize="15" FontAttributes="Bold"
+                        BackgroundColor="#3B82F6" TextColor="White" CornerRadius="12" HeightRequest="48"
+                        Margin="0,20,0,0" Clicked="OnPrimaryClicked" />
+
+                <Label x:Name="StatusLabel" Text="" FontSize="12" TextColor="#F87171"
+                       HorizontalOptions="Center" HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap" Margin="0,12,0,0" IsVisible="False" />
+
+                <Label x:Name="SecondaryLink" Text="Use my password instead" FontSize="13" TextColor="#60A5FA"
+                       HorizontalOptions="Center" Margin="0,16,0,0">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnSecondaryTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+</ContentPage>

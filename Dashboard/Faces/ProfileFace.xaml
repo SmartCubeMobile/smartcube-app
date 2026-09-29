@@ -745,9 +745,16 @@
             <!-- Session Info -->
             <Border x:Name="SessionCard" Style="{StaticResource CardFrame}" Padding="16">
                 <VerticalStackLayout Spacing="8">
-                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="6">
+                    <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="6">
                         <Label Text="Session" Style="{StaticResource Heading2}"
                                ToolTipProperties.Text="Your sign-in status, two-factor authentication and this device's login history." />
+                        <Button Grid.Column="3" x:Name="ChangePinBtn" Text="Change PIN" IsVisible="False"
+                                BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                FontSize="11" FontAttributes="Bold"
+                                CornerRadius="8" Padding="10,2"
+                                HeightRequest="26"
+                                ToolTipProperties.Text="Change the PIN you use to open SmartCube on this PC."
+                                Clicked="OnChangePinClicked" />
                         <Button Grid.Column="1" x:Name="ChangePasswordBtn" Text="Change Password"
                                 BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                                 FontSize="11" FontAttributes="Bold"
@@ -755,7 +762,7 @@
                                 HeightRequest="26"
                                 ToolTipProperties.Text="Change the password for your SmartCube account."
                                 Clicked="OnChangePasswordClicked" />
-                        <Button Grid.Column="2" x:Name="SignOutBtn" Text="Sign Out"
+                        <Button Grid.Column="2" x:Name="SignOutBtn" Text="Sign Out" Margin="0,0,0,0"
                                 BackgroundColor="#3B1A1A" TextColor="#EF4444"
                                 FontSize="11" FontAttributes="Bold"
                                 CornerRadius="8" Padding="10,2"
