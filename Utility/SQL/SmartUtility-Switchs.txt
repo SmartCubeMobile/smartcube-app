@@ -1,0 +1,10 @@
+Doesn't appear to be anything in Switches???
+
+INSERT INTO SmartUtility.Switches
+           ([USERNAME]
+           ,[CATEGORY_CODE]
+           ,[SUPPLIER_CODE]
+           ,[BRAND_CODE]
+           ,[SWITCH_CREATED])
+     VALUES
+('MARIA','U',77,77, ....);

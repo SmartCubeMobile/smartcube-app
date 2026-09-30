@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.WelcomePage"
+             BackgroundColor="#0A0F1E"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="*,Auto" Padding="0">
+
+        <!-- Main content centred -->
+        <VerticalStackLayout Grid.Row="0" Spacing="0"
+                             VerticalOptions="Center" HorizontalOptions="Center">
+
+            <!-- Cube logo -->
+            <Image x:Name="CubeLogo"
+                   Source="smartcube_mobile_logo_square.png"
+                   WidthRequest="180" HeightRequest="180"
+                   Aspect="AspectFit"
+                   HorizontalOptions="Center"
+                   Opacity="0" />
+
+            <!-- App name -->
+            <Label x:Name="AppTitle" Text="SmartCube"
+                   FontSize="42" FontAttributes="Bold"
+                   TextColor="#F1F5F9"
+                   HorizontalOptions="Center"
+                   Margin="0,24,0,0"
+                   Opacity="0" />
+
+            <!-- Tagline -->
+            <Label x:Name="Tagline" Text="Your finances, all in one place"
+                   FontSize="16"
+                   TextColor="#64748B"
+                   HorizontalOptions="Center"
+                   Margin="0,8,0,0"
+                   Opacity="0" />
+
+            <!-- Enter button -->
+            <Button x:Name="EnterBtn" Text="Enter"
+                    FontSize="17" FontAttributes="Bold"
+                    BackgroundColor="#3B82F6"
+                    TextColor="White"
+                    CornerRadius="16"
+                    WidthRequest="200" HeightRequest="54"
+                    HorizontalOptions="Center"
+                    Margin="0,48,0,0"
+                    Opacity="0"
+                    Clicked="OnEnterClicked" />
+
+        </VerticalStackLayout>
+
+        <!-- Footer branding -->
+        <VerticalStackLayout Grid.Row="1" Spacing="4"
+                             HorizontalOptions="Center"
+                             Margin="0,0,0,32">
+            <Label x:Name="CreatedBy" Text="Created by"
+                   FontSize="11" TextColor="#475569"
+                   HorizontalOptions="Center"
+                   Opacity="0" />
+            <Label x:Name="CompanyName" Text="Keasdon Energy"
+                   FontSize="14" FontAttributes="Bold"
+                   TextColor="#64748B"
+                   HorizontalOptions="Center"
+                   Opacity="0" />
+        </VerticalStackLayout>
+
+    </Grid>
+</ContentPage>

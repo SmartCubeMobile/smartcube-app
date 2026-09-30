@@ -1,0 +1,437 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_columnWeight="1"
+        android:rowCount="2"
+        android:orientation="vertical"
+        android:background="@android:color/white">
+        <LinearLayout
+            android:layout_row= "0"
+            android:layout_column="0"
+            android:layout_rowWeight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/SaveButton"
+                    android:layout_width="100dp"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center"
+                    android:height="40dp"
+                    android:text="@string/save"
+                    android:background="@android:color/holo_green_light"/>
+                <TextView
+                    android:id="@+id/UserName"
+                    android:layout_width="wrap_content"
+                    android:layout_height="25dp"
+                    android:layout_gravity="center_horizontal"
+                    android:textColor="@android:color/black"/>
+            </LinearLayout>
+
+            <TableLayout
+                android:id="@+id/simpleTableLayout"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:stretchColumns="1"> <!-- stretch the second column of the layout-->
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:text="@string/displaynamecolon"
+                        android:layout_gravity="end"
+                        android:gravity="center"
+                        android:textColor="@android:color/black"/>
+                    <EditText
+                        android:id="@+id/DisplayName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:autofillHints="name"
+                        android:hint="@string/displayname"
+                        android:layout_gravity="start"
+                        android:inputType="text"
+                        android:padding="0sp"
+                        android:gravity="top"
+                        android:layout_marginStart="10sp"
+                        android:textColor="@android:color/black"/>
+
+                </TableRow>
+
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:text="@string/lastnamecolon"
+                        android:layout_gravity="end"
+                        android:gravity="center"
+                        android:textColor="@android:color/black"/>
+                    <EditText
+                        android:id="@+id/LastName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:autofillHints="name"
+                        android:hint="@string/lastname"
+                        android:inputType="text"
+                        android:padding="0sp"
+                        android:layout_gravity="start"
+                        android:gravity="top"
+                        android:layout_marginStart="10sp"
+                        android:textColor="@android:color/black"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:text="@string/firstnamecolon"
+                        android:layout_gravity="end"
+                        android:gravity="center"
+                        android:textColor="@android:color/black"/>
+                    <EditText
+                        android:id="@+id/FirstName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:autofillHints="name"
+                        android:hint="@string/firstname"
+                        android:inputType="text"
+                        android:padding="0sp"
+                        android:layout_gravity="start"
+                        android:gravity="top"
+                        android:layout_marginStart="10sp"
+                        android:textColor="@android:color/black"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:text="@string/middlenamecolon"
+                        android:layout_gravity="end"
+                        android:gravity="center"
+                        android:textColor="@android:color/black"/>
+                    <EditText
+                        android:id="@+id/MiddleName"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:autofillHints="name"
+                        android:hint="@string/middlename"
+                        android:inputType="text"
+                        android:padding="0sp"
+                        android:layout_gravity="start"
+                        android:gravity="top"
+                        android:layout_marginStart="10sp"
+                        android:textColor="@android:color/black"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:text="@string/dateofbirthcolon"
+                        android:layout_gravity="end"
+                        android:gravity="center"
+                        android:textColor="@android:color/black"/>
+                    <EditText
+                        android:id="@+id/DateOfBirth"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:autofillHints="name"
+                        android:hint="@string/dateofbirth"
+                        android:inputType="date"
+                        android:padding="0sp"
+                        android:layout_gravity="start"
+                        android:gravity="top"
+                        android:layout_marginStart="10sp"
+                        android:textColor="@android:color/black"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:text="@string/titlecolon"
+                        android:layout_gravity="end"
+                        android:gravity="center"
+                        android:textColor="@android:color/black"/>
+                    <EditText
+                        android:id="@+id/Title"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:autofillHints="name"
+                        android:hint="@string/title"
+                        android:inputType="text"
+                        android:padding="0sp"
+                        android:layout_gravity="start"
+                        android:gravity="top"
+                        android:layout_marginStart="10sp"
+                        android:textColor="@android:color/black"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:text="@string/gendercolon"
+                        android:layout_gravity="end"
+                        android:gravity="center"
+                        android:textColor="@android:color/black"/>
+                    <EditText
+                        android:id="@+id/Gender"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:autofillHints="name"
+                        android:hint="@string/gender"
+                        android:inputType="text"
+                        android:padding="0sp"
+                        android:layout_gravity="start"
+                        android:gravity="top"
+                        android:layout_marginStart="10sp"
+                        android:textColor="@android:color/black"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:text="@string/telephonenocolon"
+                        android:layout_gravity="end"
+                        android:gravity="center"
+                        android:textColor="@android:color/black"/>
+                    <EditText
+                        android:id="@+id/TelephoneNo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:autofillHints="phone"
+                        android:hint="@string/phoneno"
+                        android:inputType="phone"
+                        android:padding="0sp"
+                        android:layout_gravity="start"
+                        android:gravity="top"
+                        android:layout_marginStart="10sp"
+                        android:textColor="@android:color/black"/>
+                </TableRow>
+                <TableRow
+                    android:layout_width="fill_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:text="@string/emailcolon"
+                        android:layout_gravity="end"
+                        android:gravity="center"
+                        android:textColor="@android:color/black"/>
+                    <EditText
+                        android:id="@+id/EmailAddress"
+                        android:layout_width="wrap_content"
+                        android:layout_height="30sp"
+                        android:autofillHints="emailAddress"
+                        android:hint="@string/email"
+                        android:inputType="textEmailAddress"
+                        android:padding="0sp"
+                        android:layout_gravity="start"
+                        android:gravity="top"
+                        android:layout_marginStart="10sp"
+                        android:textColor="@android:color/black"/>
+                </TableRow>
+            </TableLayout>
+        </LinearLayout>
+
+        <GridLayout
+            android:layout_row= "1"
+            android:layout_rowWeight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:rowCount="2"
+            android:orientation="vertical">
+            <LinearLayout
+                android:layout_row="0"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_rowWeight="1">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:textAlignment="center"
+                        android:text="@string/cubefaces"
+                        android:textColor="@android:color/holo_blue_light"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content">
+                    <TextView
+                        android:layout_width="150dp"
+                        android:layout_height="30dp"
+                        android:text="@string/cubeface"
+                        android:textColor="@android:color/black"
+                        android:textSize="15sp"/>
+                    <TextView
+                        android:layout_width="80dp"
+                        android:layout_height="30dp"
+                        android:text="@string/active"
+                        android:textColor="@android:color/black"
+                        android:textSize="15sp"/>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:background="@android:color/holo_blue_light"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fillViewport="true">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:background="@android:color/white"
+                        android:id="@+id/profileCubefaces"
+                        android:scrollbars="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent" />
+                </FrameLayout>
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_row="1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_rowWeight="1">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@android:color/white">
+                    <Button
+                        android:id="@+id/AddButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="35dp"
+                        android:layout_gravity="start"
+                        android:text="@string/add"
+                        android:background="@android:color/holo_green_light"
+                        android:textSize="15sp" />
+                    <TextView
+                        android:layout_width="match_parent"
+                        android:layout_height="30dp"
+                        android:layout_gravity="center"
+                        android:textAlignment="center"
+                        android:text="@string/multiuser"
+                        android:layout_marginEnd="75sp"
+                        android:textColor="@android:color/holo_blue_light"
+                        android:textSize="15sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <TextView
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@android:color/black"
+                        android:text="@string/groupname"
+                        android:layout_width = "150dp"
+                        android:layout_weight = "1"
+                        android:gravity = "start"
+                        android:textSize = "15sp"
+                        android:layout_height="25dp"/>
+                    <TextView
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@android:color/black"
+                        android:text="@string/active"
+                        android:layout_width = "80dp"
+                        android:layout_weight = "1"
+                        android:gravity = "start"
+                        android:textSize = "15sp"
+                        android:layout_height = "25dp"/>
+                    <TextView
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@android:color/black"
+                        android:text="@string/sendf"
+                        android:layout_width = "80dp"
+                        android:layout_weight = "1"
+                        android:gravity = "start"
+                        android:textSize = "15sp"
+                        android:layout_height = "25dp"/>
+                    <TextView
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@android:color/black"
+                        android:text="@string/sendu"
+                        android:layout_width = "80dp"
+                        android:layout_weight = "1"
+                        android:gravity = "start"
+                        android:textSize = "15sp"
+                        android:layout_height = "25dp"/>
+                    <TextView
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@android:color/black"
+                        android:text="@string/receive"
+                        android:layout_width = "80dp"
+                        android:layout_weight = "1"
+                        android:gravity = "start"
+                        android:textSize = "15sp"
+                        android:layout_height = "25dp"/>
+                    <TextView
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@android:color/black"
+                        android:text="@string/displaynameheader"
+                        android:layout_width = "150dp"
+                        android:layout_weight = "1"
+                        android:gravity = "start"
+                        android:textSize = "15sp"
+                        android:layout_height = "25dp"/>
+                    <TextView
+                        android:textAppearance="?android:attr/textAppearanceMedium"
+                        android:textColor="@android:color/black"
+                        android:text="@string/delete"
+                        android:layout_width = "80dp"
+                        android:layout_weight = "1"
+                        android:gravity = "center"
+                        android:textSize = "15sp"
+                        android:layout_height = "25dp"/>
+                </LinearLayout>
+
+                <FrameLayout
+                    android:background="@android:color/holo_blue_light"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:fillViewport="true">
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:background="@android:color/white"
+                        android:id="@+id/profileGroups"
+                        android:scrollbars="vertical"
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"/>
+                </FrameLayout>
+            </LinearLayout>
+
+        </GridLayout>
+    </GridLayout>
+</LinearLayout>

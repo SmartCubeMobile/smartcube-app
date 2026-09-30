@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.AddInvestmentFlow"
+             BackgroundColor="{StaticResource PageBg}"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*" Padding="0">
+
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="{StaticResource NavBg}"
+                Stroke="{StaticResource BorderColor}" StrokeThickness="0,0,0,1"
+                Padding="20,14">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                <Button x:Name="BackButton" Text="←" BackgroundColor="Transparent"
+                        TextColor="{StaticResource TextSecondary}" FontSize="20"
+                        Padding="0" WidthRequest="40" HeightRequest="40"
+                        ToolTipProperties.Text="Go back to the previous step, or leave this screen."
+                        Clicked="OnBackClicked" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label x:Name="PageTitle" Text="Add Investment"
+                           FontSize="22" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}" />
+                    <Label x:Name="PageSubtitle" Text="Enter purchase details"
+                           FontSize="13" TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+                <Label x:Name="StepLabel" Grid.Column="2" Text="Step 1 of 2"
+                       TextColor="{StaticResource TextMuted}" FontSize="12"
+                       VerticalOptions="Center" />
+                <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does"
+                        FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26"
+                        Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                        VerticalOptions="Center" Clicked="OnHelpClicked" />
+            </Grid>
+        </Border>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1" Padding="20,16">
+            <VerticalStackLayout Spacing="16" WidthRequest="500" HorizontalOptions="Center">
+
+                <!-- Step 1: Investment details -->
+                <VerticalStackLayout x:Name="Step1" Spacing="16">
+
+                    <Border Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="14">
+                            <Label Text="Investment Details" Style="{StaticResource Heading2}"
+                                   ToolTipProperties.Text="The type, symbol, name and sector of the investment you're adding." />
+
+                            <!-- Type picker -->
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Type" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Picker x:Name="TypePicker"
+                                            TextColor="{StaticResource TextPrimary}"
+                                            BackgroundColor="Transparent" FontSize="14"
+                                            ToolTipProperties.Text="Choose whether this is a Share, ETF or Investment Trust." />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Symbol -->
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Symbol / Ticker" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Entry x:Name="SymbolEntry" Placeholder="e.g. TSLA, VWRL"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent" FontSize="14"
+                                           ToolTipProperties.Text="The stock market ticker symbol for this investment, e.g. TSLA or VWRL."
+                                           HeightRequest="44" CharacterSpacing="1" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Name -->
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Company / Fund Name" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Entry x:Name="NameEntry" Placeholder="e.g. Tesla Inc"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent" FontSize="14"
+                                           ToolTipProperties.Text="The full company or fund name for this investment."
+                                           HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Sector -->
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Sector" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Picker x:Name="SectorPicker"
+                                            TextColor="{StaticResource TextPrimary}"
+                                            BackgroundColor="Transparent" FontSize="14"
+                                            ToolTipProperties.Text="Choose the sector or category this investment belongs to." />
+                                </Border>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Border Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="14">
+                            <Label Text="Purchase Details" Style="{StaticResource Heading2}"
+                                   ToolTipProperties.Text="When you bought it, how many shares, the price, fee and platform used." />
+
+                            <!-- Date -->
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Date of Purchase" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <DatePicker x:Name="PurchaseDatePicker"
+                                                TextColor="{StaticResource TextPrimary}"
+                                                BackgroundColor="Transparent" FontSize="14"
+                                                ToolTipProperties.Text="The date you bought these shares; cannot be in the future." />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Shares -->
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Number of Shares" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Entry x:Name="SharesEntry" Placeholder="e.g. 100"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent" FontSize="14"
+                                           ToolTipProperties.Text="How many whole shares or units you bought."
+                                           Keyboard="Numeric" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Price at purchase -->
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Price per Share (£)" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Entry x:Name="PriceEntry" Placeholder="e.g. 12.50"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent" FontSize="14"
+                                           ToolTipProperties.Text="The price you paid per share, in pounds."
+                                           Keyboard="Numeric" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Fee -->
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Transaction Fee (£)" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Entry x:Name="FeeEntry" Placeholder="e.g. 9.95" Text="9.95"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent" FontSize="14"
+                                           ToolTipProperties.Text="The dealing or transaction fee you paid, in pounds."
+                                           Keyboard="Numeric" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <!-- Platform -->
+                            <VerticalStackLayout Spacing="4">
+                                <Label Text="Platform" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Picker x:Name="PlatformPicker"
+                                            TextColor="{StaticResource TextPrimary}"
+                                            BackgroundColor="Transparent" FontSize="14"
+                                            ToolTipProperties.Text="The investment platform or broker you bought this through." />
+                                </Border>
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Button x:Name="ReviewBtn" Text="Review"
+                            FontSize="16" FontAttributes="Bold"
+                            CornerRadius="14" HeightRequest="50"
+                            HorizontalOptions="Fill"
+                            ToolTipProperties.Text="Check your entries before adding this investment to your portfolio."
+                            Clicked="OnReviewClicked" />
+                </VerticalStackLayout>
+
+                <!-- Step 2: Confirm -->
+                <VerticalStackLayout x:Name="Step2" Spacing="16" IsVisible="False">
+
+                    <Border Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="10">
+                            <Label Text="Confirm Investment" Style="{StaticResource Heading2}"
+                                   ToolTipProperties.Text="Review the details below before adding this investment to your portfolio." />
+                            <VerticalStackLayout x:Name="SummaryList" Spacing="6" />
+                        </VerticalStackLayout>
+                    </Border>
+
+                    <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+                        <Button Text="Back" Style="{StaticResource SecondaryButton}"
+                                ToolTipProperties.Text="Go back and edit the details you entered."
+                                Clicked="OnEditClicked" />
+                        <Button Grid.Column="1" Text="Add to Portfolio"
+                                FontSize="15" FontAttributes="Bold"
+                                CornerRadius="14" HeightRequest="50"
+                                ToolTipProperties.Text="Save this investment to your portfolio; it is stored locally on this PC."
+                                Clicked="OnConfirmClicked" />
+                    </Grid>
+                </VerticalStackLayout>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

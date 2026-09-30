@@ -1,0 +1,85 @@
+﻿<ResourceDictionary>
+	
+	<!-- SignIn strings -->
+	<string Key="UsernameBox">Usuario</string>
+	<string Key="PasswordBox">Contraseña</string>
+	<string Key="LoginStatusMessage">Debe iniciar sesión para ejecutar SmartSwitch</string>
+	<string Key="Signin">Iniciar sesión</string>
+	<string Key="ResetUTC">Restablecer UTC</string>
+	<string Key="Fatalerror">Error grave</string>
+	<string Key="CreateHandlerFailure">No se pudo crear el controlador Uri</string>
+	<string Key="EnsureConnectedToInternet">Asegúrate de que el dispositivo esté conectado a Internet antes de iniciar sesión</string>
+	<string Key="Problem UTC">Problema al recuperar UTC ... pulse Reset</string>
+	<string Key="PleaseSignin">Inicie sesión para continuar por favor</string>
+	<string Key="CannotSignin">No se puede iniciar sesión en este momento</string>
+	<string Key="EnterUsernameAndPassword">Introduzca su nombre de usuario y contraseña antes de iniciar sesión</string>
+	<string Key="InvalidSignin">Inicio de sesión no válido</string>
+	<string Key="CannotLoadFromMothership">No se puede cargar desde la Mothership</string>
+	<string Key="UnableToAuthenticate">No se puede autenticar: no ha iniciado sesión</string>
+	<string Key="CancellationTokenNone">Token de cancelación Ninguno</string>
+	<string Key="CreateAccount">Crear una cuenta</string>
+
+	<!-- MessageBox strings -->
+	<string Key="ReallyLeave">¿De verdad quieres dejar SmartSwitch?</string>
+	<string Key="ConfirmationRequired">Confirmación necesaria</string>
+	<string Key="Yes">Si</string>
+	<string Key="No">No</string>
+
+	<string Key="SubscribersOnly">Conviértase en Suscriptor para utilizar esta función</string>
+
+	<string Key="ZoomTooltip">Presione para alternar el modo de pantalla completa</string>
+	<string Key="AutoSwitchTooltip">Presione para iniciar el cambio automático</string>
+	<string Key="OpenCloseTooltip">Presione para operar las puertas del medidor</string>
+	<string Key="QuitTooltip">Presione para salir de SmartSwitch</string>
+
+	<string Key="SaveProfileTooltip">Guardar información en almacenamiento local o remoto</string>
+	<string Key="AddGroupsTooltip">Agregar un nuevo grupo para el procesamiento de Multi-Meter</string>
+
+	<string Key="FinanceSubmitTooltip">Presione para recopilar las transacciones de la cuenta de su proveedor</string>
+	<string Key="FinanceCancelTooltip">Presione para borrar cualquier error de procesamiento del proveedor</string>
+	<string Key="FinanceInstitutionsTooltip">Elija su institución de la lista desplegable y luego haga doble clic en ella para configurar la conexión</string>
+	<string Key="FinanceProvidersTooltip">Elija Proveedores para refinar la visualización</string>
+	<string Key="FinanceAccountsTooltip">Elija Cuentas para refinar la visualización</string>
+	<string Key="FinanceTransactionsTooltip">Elija Transacciones para refinar la visualización</string>
+	<string Key="FinanceBanksTooltip">Haga clic para obtener datos bancarios</string>
+	<string Key="FinanceSavingsTooltip">Haga clic para obtener datos de ahorro</string>
+	<string Key="FinanceInvestmentsTooltip">Haga clic para obtener datos de inversiones</string>
+	<string Key="FinanceCryptosTooltip">Haga clic para obtener datos sobre criptomonedas</string>
+	<string Key="FinanceAddressesTooltip">Elija una dirección para refinar los datos mostrados</string>
+	<string Key="FinanceStartDateTooltip">Elija una fecha de inicio para refinar los datos mostrados</string>
+	<string Key="FinanceResetDatesTooltip">Presione para restablecer las fechas de la transacción</string>
+	<string Key="FinanceEndDateTooltip">Elija una fecha de finalización para refinar los datos mostrados</string>
+	<string Key="FinanceResultStartDateTooltip">Fecha de inicio de los datos mostrados</string>
+	<string Key="FinanceResultEndDateTooltip">Fecha de finalización de los datos mostrados</string>
+	<string Key="FinancePostCodeTooltip">El código postal de la dirección mostrada</string>
+	<string Key="FinanceCultureTooltip">Presione para configurar la cultura para todos los formatos de fecha/hora y monetarios</string>
+	<string Key="ConversionsTooltip">Las tarifas son APROXIMACIONES y *NO* deben usarse para tomar decisiones financieras</string>
+
+	<string Key="N">Non</string>
+	<string Key="Y">Si</string>
+
+	<string Key="NoValidConnections">No hay conexiones válidas disponibles</string>
+	<string Key="NoProvidersLoginMethods">Ningún proveedor tiene métodos de Login gratuitos</string>
+	<string Key="ProviderNoLoginMethods">El proveedor no tiene métodos de Login</string>
+	<string Key="NoFreeLoginMethods">No hay métodos de Login gratuitos disponibles</string>
+	<string Key="Parameter1Empty">El parámetro1 no puede estar vacío</string>
+	<string Key="Parameter1Failed">El parámetro 1 falló la validación</string>
+	<string Key="LoginMethodNotSelected">Se debe seleccionar el método de Login</string>
+	<string Key="LoginExists">Login ya existe</string>
+	<string Key="ConnectionDeleteFail">No se puede eliminar el conexión</string>
+	<string Key="ConnectionUpdateFail">No se puede actualizar el conexión</string>
+	<string Key="ConnectionAddFail">No se puede agregar conexión</string>
+	<string Key="ConnectionDeleteSuccess">Conexión eliminado</string>
+	<string Key="ConnectionUpdateSuccess">Conexión actualizado</string>
+	<string Key="ConnectionAddSuccess">Conexión agregado</string>
+	<string Key="LoginDeleteFail">No se puede eliminar el Login</string>
+	<string Key="LoginUpdateFail">No se puede actualizar el Login</string>
+	<string Key="LoginAddFail">No se puede agregar el Login</string>
+	<string Key="LoginDeleteSuccess">Login eliminado</string>
+	<string Key="LoginUpdateSuccess">Login actualizado</string>
+	<string Key="LoginAddSuccess">Login agregado</string>
+	<string Key="ConfirmDelete">Confirmar eliminación</string>
+	<string Key="DeleteConnection">Eliminar conexión</string>
+	<string Key="AllAssociatedLogins">También se eliminarán todos los inicios de sesión asociados</string>
+	<string Key="DeleteLogin">¿Estás seguro de que quieres eliminar el proveedor de inicio de sesión</string>
+</ResourceDictionary>

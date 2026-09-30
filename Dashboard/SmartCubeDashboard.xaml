@@ -1,0 +1,224 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.SmartCubeDashboard"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid ColumnDefinitions="72,*" RowDefinitions="*">
+
+        <!-- LEFT NAV BAR -->
+        <Border Grid.Column="0"
+                BackgroundColor="{StaticResource NavBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="0,0,1,0"
+                Padding="0">
+
+            <Grid RowDefinitions="Auto,*,Auto">
+
+                <!-- Logo -->
+                <Image Grid.Row="0"
+                       Source="smartcube_mobile_logo_cube.png"
+                       WidthRequest="48" HeightRequest="48"
+                       Aspect="AspectFit"
+                       Margin="12,16,12,12"
+                       HorizontalOptions="Center" />
+
+                <!-- Face Buttons with indicator (scrolls if the window is too short to show them all) -->
+                <ScrollView Grid.Row="1" VerticalScrollBarVisibility="Never" HorizontalScrollBarVisibility="Never">
+                <Grid Padding="0,0,0,0">
+                    <!-- Active Indicator Bar -->
+                    <BoxView x:Name="NavIndicator"
+                             Color="{StaticResource Primary}"
+                             WidthRequest="3" HeightRequest="32"
+                             CornerRadius="2"
+                             HorizontalOptions="Start"
+                             VerticalOptions="Start"
+                             Margin="0,10,0,0" />
+
+                    <VerticalStackLayout Spacing="4"
+                                         Padding="10,0"
+                                         VerticalOptions="Start">
+
+                        <Button x:Name="NavBanking"
+                                Text="&#x1F3E6;"
+                                Style="{StaticResource ActiveNavButton}"
+                                ToolTipProperties.Text="Banking" />
+
+                        <Button x:Name="NavUtility"
+                                Text="&#x26A1;"
+                                Style="{StaticResource NavButton}"
+                                ToolTipProperties.Text="Utility" />
+
+                        <Button x:Name="NavCrypto"
+                                Text="&#x1FA99;"
+                                Style="{StaticResource NavButton}"
+                                ToolTipProperties.Text="Crypto" />
+
+                        <Button x:Name="NavExchange"
+                                Text="&#x1F4B1;"
+                                Style="{StaticResource NavButton}"
+                                ToolTipProperties.Text="Exchange" />
+
+                        <Button x:Name="NavInvestments"
+                                Text="&#x1F4C8;"
+                                Style="{StaticResource NavButton}"
+                                ToolTipProperties.Text="Investments" />
+
+                        <Button x:Name="NavCharts"
+                                Text="&#x1F4CA;"
+                                Style="{StaticResource NavButton}"
+                                ToolTipProperties.Text="Charts" />
+
+                        <Button x:Name="NavSubscriptions"
+                                Text="&#x1F4CB;"
+                                Style="{StaticResource NavButton}"
+                                ToolTipProperties.Text="Subscriptions" />
+
+                        <Button x:Name="NavInsurance"
+                                Text="&#x1F6E1;"
+                                Style="{StaticResource NavButton}"
+                                ToolTipProperties.Text="Insurance" />
+
+                        <Button x:Name="NavNews"
+                                Text="&#x1F4F0;"
+                                Style="{StaticResource NavButton}"
+                                ToolTipProperties.Text="News" />
+
+                        <Button x:Name="NavProfile"
+                                Text="&#x1F510;"
+                                Style="{StaticResource NavButton}"
+                                ToolTipProperties.Text="Profile" />
+
+                        <Button x:Name="NavSupport"
+                                Text="&#x1F4AC;"
+                                Style="{StaticResource NavButton}"
+                                ToolTipProperties.Text="Help &amp; support: contact us, see replies and join live chat" />
+
+                    </VerticalStackLayout>
+                </Grid>
+                </ScrollView>
+
+                <!-- Bottom: Time -->
+                <VerticalStackLayout Grid.Row="2"
+                                     Padding="4,8"
+                                     Spacing="2">
+                    <Label x:Name="ClockLabel"
+                           Text="--:--"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="11"
+                           HorizontalOptions="Center" />
+                    <Label x:Name="DateLabel"
+                           Text="--/--"
+                           TextColor="{StaticResource TextMuted}"
+                           FontSize="9"
+                           HorizontalOptions="Center" />
+                </VerticalStackLayout>
+
+            </Grid>
+        </Border>
+
+        <!-- MAIN CONTENT AREA -->
+        <Grid Grid.Column="1" RowDefinitions="Auto,*">
+
+            <!-- Top Header Bar -->
+            <Border Grid.Row="0"
+                    BackgroundColor="{StaticResource NavBg}"
+                    Stroke="{StaticResource BorderColor}"
+                    StrokeThickness="0,0,0,1"
+                    Padding="24,14">
+                <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="16">
+                    <Image Source="smartcube_mobile_logo_text.png"
+                           HeightRequest="56"
+                           Aspect="AspectFit"
+                           VerticalOptions="Center" />
+                    <VerticalStackLayout Grid.Column="1" Spacing="4">
+                        <Label x:Name="HeaderTitle"
+                               Text="Banking"
+                               FontSize="26"
+                               FontAttributes="Bold"
+                               TextColor="{StaticResource TextPrimary}" />
+                        <Label x:Name="HeaderSubtitle"
+                               Text="Accounts and transactions"
+                               Style="{StaticResource SubHeading}" />
+                    </VerticalStackLayout>
+                    <HorizontalStackLayout Grid.Column="2" Spacing="12"
+                                           VerticalOptions="Center">
+                        <Label x:Name="UserLabel"
+                               Text=""
+                               TextColor="{StaticResource TextSecondary}"
+                               FontSize="13"
+                               VerticalOptions="Center" />
+                        <Border WidthRequest="36" HeightRequest="36"
+                                StrokeShape="RoundRectangle 18"
+                                Stroke="#3B82F640"
+                                StrokeThickness="2">
+                            <Border.Background>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                    <GradientStop Color="#3B82F6" Offset="0" />
+                                    <GradientStop Color="#8B5CF6" Offset="1" />
+                                </LinearGradientBrush>
+                            </Border.Background>
+                            <Label x:Name="UserInitials" Text=""
+                                   TextColor="White"
+                                   FontSize="12"
+                                   FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   VerticalOptions="Center" />
+                        </Border>
+                    </HorizontalStackLayout>
+                </Grid>
+            </Border>
+
+            <!-- Content View (swapped per face) -->
+            <ContentView x:Name="FaceContent"
+                         Grid.Row="1"
+                         HorizontalOptions="Fill"
+                         VerticalOptions="Fill" />
+        </Grid>
+
+        <!-- Loading Overlay -->
+        <Grid x:Name="LoadingOverlay"
+              Grid.ColumnSpan="2"
+              BackgroundColor="#E60A0F1E"
+              IsVisible="False"
+              ZIndex="100"
+              InputTransparent="False">
+            <VerticalStackLayout Spacing="24"
+                                 VerticalOptions="Center"
+                                 HorizontalOptions="Center">
+                <Image x:Name="LoadingImage"
+                       Source="smartcube_loading.png"
+                       WidthRequest="180" HeightRequest="180"
+                       Aspect="AspectFit" />
+                <Label x:Name="LoadingMessage"
+                       Text="Loading..."
+                       TextColor="#E2E8F0"
+                       FontSize="16"
+                       FontAttributes="Bold"
+                       HorizontalOptions="Center" />
+                <Grid WidthRequest="260" HeightRequest="6"
+                      HorizontalOptions="Center">
+                    <Border BackgroundColor="#1E2D4A"
+                            StrokeShape="RoundRectangle 3"
+                            Stroke="Transparent"
+                            HeightRequest="6" />
+                    <Border x:Name="LoadingBar"
+                            BackgroundColor="#3B82F6"
+                            StrokeShape="RoundRectangle 3"
+                            Stroke="Transparent"
+                            HeightRequest="6"
+                            HorizontalOptions="Start"
+                            WidthRequest="0" />
+                </Grid>
+                <Label x:Name="LoadingDetail"
+                       Text=""
+                       TextColor="#64748B"
+                       FontSize="12"
+                       HorizontalOptions="Center" />
+            </VerticalStackLayout>
+        </Grid>
+
+    </Grid>
+
+</ContentPage>

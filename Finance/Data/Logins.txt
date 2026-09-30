@@ -1,0 +1,13 @@
+USERNAME nvarchar(18)	CUBEFACE_CODE nchar(1)	INSTITUTION_CODE smallint(2)	BRAND_CODE smallint(2)	LOGIN_METHOD smallint(2)	ACTIVE_FLAG nchar(1)	BANKSCHECKED bit(1)	SAVINGSCHECKED bit(1)	INVESTMENTSCHECKED bit(1)	CRYPTOSCHECKED bit(1)	OWNER nvarchar(16)	CONTACT_EMAIL nvarchar(64)	CONTACT_PHONENO nvarchar(16)
+ANNA	F	1002	1002	1	Y	1	1	0	0		atmc_21@hotmail.com	077313 297026
+Daniel	F	2000	20001	1	Y	0	0	0	1		danchapman85@outlook.com	
+Daniel	F	2000	20001	2	Y	0	0	0	1		chapmandan16@gmail.com	
+RAY	F	1001	1001	1	Y	1	1	0	0	Genius	hammondreg@hotmail.com	07845026967
+RAY	F	2000	20001	1	Y	1	1	0	1		ray_chapman48@hotmail.com	
+RAY	F	1003	1003	1	Y	1	1	0	0	Genus	hammondreg@hotmail.com	07845026967
+RAY	F	1004	1004	1	Y	1	1	0	0	Genius	hammondreg@hotmail.com	07845026967
+RAY	F	1004	10041	1	Y	1	1	0	0	Genius	hammondreg@hotmail.com	07845026967
+RAY	F	1004	10042	1	Y	1	1	0	0	Genius	hammondreg@hotmail.com	07845026967
+RAY	F	1006	1006	1	Y	1	1	0	0	Genius	hammondreg@hotmail.com	07845026967
+RAY	F	1007	1007	1	Y	1	1	0	0	Genius	hammondreg@hotmail.com	07845026967
+RAY	F	1500	1500	1	Y	0	0	1	0	Genius	ray_chapman48@hotmail.com	07845026967

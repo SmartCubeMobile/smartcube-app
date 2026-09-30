@@ -1,0 +1,6 @@
+WebElement pageElement = driver.findElement(By.id("someId"));
+WebDriverWait wait = new WebDriverWait(webDriver, 10);
+// do something that changes state of pageElement
+wait.until(ExpectedConditions.stalenessOf(pageElement));
+https://stackoverflow.com/questions/25415849/check-if-a-webelement-is-stale-without-handling-an-exception
+

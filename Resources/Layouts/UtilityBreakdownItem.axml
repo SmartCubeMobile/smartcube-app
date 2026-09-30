@@ -1,0 +1,122 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
+    
+        <!--<ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:scaleType="centerCrop" />-->
+    <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownFromDate"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownToDate"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+    <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownCode"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownDescription"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownItems"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownChargesDiscounts"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownDayUnits"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownDayRate"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownNightUnits"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownNightRate"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownTotalUnits"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/breakdownTotal"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+</LinearLayout>

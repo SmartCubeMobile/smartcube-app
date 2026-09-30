@@ -1,0 +1,202 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.AddCryptoFlow"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid RowDefinitions="Auto,*" Padding="0">
+
+        <!-- Header -->
+        <Border BackgroundColor="{StaticResource NavBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="0,0,0,1"
+                Padding="24,14">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                <Button x:Name="BackButton" Text="← Back"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource TextSecondary}"
+                        FontSize="13" Padding="8,4"
+                        ToolTipProperties.Text="Go back a step, or leave this screen if you haven't started."
+                        Clicked="OnBackClicked" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
+                    <Label x:Name="PageTitle" Text="Add Crypto"
+                           FontSize="20" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           HorizontalOptions="Center" />
+                    <Label x:Name="PageSubtitle" Text="Choose connection type"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+                <Label Grid.Column="2" x:Name="StepIndicator" Text="Step 1 of 3"
+                       TextColor="{StaticResource TextMuted}" FontSize="12"
+                       VerticalOptions="Center" Margin="0,0,8,0" />
+                <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does"
+                        FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26"
+                        Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                        VerticalOptions="Center" Clicked="OnHelpClicked" />
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="1">
+
+            <!-- Step 1: Choose type -->
+            <ScrollView x:Name="Step1" Padding="32,20">
+                <VerticalStackLayout Spacing="16" HorizontalOptions="Center" WidthRequest="500">
+
+                    <!-- Wallet Address -->
+                    <Border x:Name="WalletOption" Style="{StaticResource CardFrame}" Padding="20"
+                            ToolTipProperties.Text="Add a crypto wallet by its public address so SmartCube can read its balance.">
+                        <HorizontalStackLayout Spacing="16">
+                            <Label Text="🔑" FontSize="32" VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="4" VerticalOptions="Center">
+                                <Label Text="Wallet Address" TextColor="{StaticResource TextPrimary}"
+                                       FontSize="18" FontAttributes="Bold" />
+                                <Label Text="Connect a blockchain wallet by address"
+                                       TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                <Label Text="Bitcoin, Ethereum, XRP and more"
+                                       TextColor="{StaticResource TextMuted}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                    <!-- Exchange Account -->
+                    <Border x:Name="ExchangeOption" Style="{StaticResource CardFrame}" Padding="20"
+                            ToolTipProperties.Text="Link an exchange account using an API key so SmartCube can read your holdings.">
+                        <HorizontalStackLayout Spacing="16">
+                            <Label Text="🏛" FontSize="32" VerticalOptions="Center" />
+                            <VerticalStackLayout Spacing="4" VerticalOptions="Center">
+                                <Label Text="Exchange Account" TextColor="{StaticResource TextPrimary}"
+                                       FontSize="18" FontAttributes="Bold" />
+                                <Label Text="Link a crypto exchange via API key"
+                                       TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                <Label Text="Coinbase, Binance, Kraken and more"
+                                       TextColor="{StaticResource TextMuted}" FontSize="12" />
+                            </VerticalStackLayout>
+                        </HorizontalStackLayout>
+                    </Border>
+
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- Step 2: Form -->
+            <ScrollView x:Name="Step2" IsVisible="False" Padding="32,20">
+                <VerticalStackLayout Spacing="16" HorizontalOptions="Center" WidthRequest="480">
+                    <Border Style="{StaticResource CardFrame}" Padding="24">
+                        <VerticalStackLayout Spacing="16">
+                            <HorizontalStackLayout Spacing="12">
+                                <Label x:Name="FormIcon" FontSize="28" VerticalOptions="Center" />
+                                <Label x:Name="FormTitle" FontSize="18" FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}" VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+                            <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+
+                            <!-- Network/Exchange picker -->
+                            <VerticalStackLayout x:Name="PickerSection" Spacing="6">
+                                <Label x:Name="PickerLabel" Text="Network"
+                                       TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                <VerticalStackLayout x:Name="PickerList" Spacing="6" />
+                            </VerticalStackLayout>
+
+                            <!-- Address / API fields -->
+                            <VerticalStackLayout x:Name="FieldsSection" IsVisible="False" Spacing="12">
+                                <VerticalStackLayout Spacing="6">
+                                    <Label x:Name="Field1Label" Text="Address"
+                                           TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                    <Border BackgroundColor="{StaticResource CardBgLight}"
+                                            Stroke="{StaticResource BorderColor}"
+                                            StrokeShape="RoundRectangle 10" Padding="4,0">
+                                        <Entry x:Name="Field1Entry" Placeholder="Enter here"
+                                               TextColor="{StaticResource TextPrimary}"
+                                               BackgroundColor="Transparent"
+                                               ToolTipProperties.Text="Enter the wallet address or exchange API key requested above."
+                                               FontSize="14" HeightRequest="44" />
+                                    </Border>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout x:Name="Field2Section" Spacing="6">
+                                    <Label x:Name="Field2Label" Text="API Secret"
+                                           TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                    <Border BackgroundColor="{StaticResource CardBgLight}"
+                                            Stroke="{StaticResource BorderColor}"
+                                            StrokeShape="RoundRectangle 10" Padding="4,0">
+                                        <Entry x:Name="Field2Entry" Placeholder="Enter here"
+                                               TextColor="{StaticResource TextPrimary}"
+                                               BackgroundColor="Transparent" IsPassword="True"
+                                               ToolTipProperties.Text="Enter the exchange's secret or private key requested above; hidden as you type."
+                                               FontSize="14" HeightRequest="44" />
+                                    </Border>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout x:Name="PrivateKeySection" Spacing="6" IsVisible="False">
+                                    <Label x:Name="PrivateKeyLabel" Text="Private Key (PEM)"
+                                           TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                    <Border BackgroundColor="{StaticResource CardBgLight}"
+                                            Stroke="{StaticResource BorderColor}"
+                                            StrokeShape="RoundRectangle 10" Padding="8">
+                                        <Editor x:Name="PrivateKeyEditor"
+                                                Placeholder="Paste your private key here"
+                                                TextColor="{StaticResource TextPrimary}"
+                                                BackgroundColor="Transparent"
+                                                ToolTipProperties.Text="Paste your Coinbase API private key (PEM) here; used only to read your holdings."
+                                                FontSize="11" HeightRequest="120"
+                                                FontFamily="Consolas"
+                                                AutoSize="TextChanges" />
+                                    </Border>
+                                </VerticalStackLayout>
+                                <VerticalStackLayout x:Name="Field3Section" Spacing="6" IsVisible="False">
+                                    <Label x:Name="Field3Label" Text="Label"
+                                           TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                                    <Border BackgroundColor="{StaticResource CardBgLight}"
+                                            Stroke="{StaticResource BorderColor}"
+                                            StrokeShape="RoundRectangle 10" Padding="4,0">
+                                        <Entry x:Name="Field3Entry" Placeholder="Optional label"
+                                               TextColor="{StaticResource TextPrimary}"
+                                               BackgroundColor="Transparent"
+                                               ToolTipProperties.Text="Optional name to help you tell this wallet or exchange account apart from others."
+                                               FontSize="14" HeightRequest="44" />
+                                    </Border>
+                                </VerticalStackLayout>
+                                <Label Text="Keys are encrypted locally and never shared."
+                                       TextColor="{StaticResource TextMuted}" FontSize="11"
+                                       HorizontalOptions="Center" />
+                                <Button x:Name="ConnectBtn" Text="Connect"
+                                        FontSize="15" CornerRadius="12" HeightRequest="48"
+                                        ToolTipProperties.Text="Look up your balance or holdings and add them to SmartCube; keys are stored only on this PC."
+                                        Clicked="OnConnectClicked" />
+                            </VerticalStackLayout>
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </ScrollView>
+
+            <!-- Step 3: Connecting / Result -->
+            <ScrollView x:Name="Step3" IsVisible="False" Padding="32,20">
+                <VerticalStackLayout Spacing="20" HorizontalOptions="Center"
+                                     WidthRequest="480">
+                    <VerticalStackLayout x:Name="ConnectingState" Spacing="16" HorizontalOptions="Center">
+                        <ActivityIndicator IsRunning="True" Color="{StaticResource Primary}"
+                                           HeightRequest="48" WidthRequest="48" HorizontalOptions="Center" />
+                        <Label x:Name="ConnectingLabel" Text="Scanning blockchain..."
+                               TextColor="{StaticResource TextPrimary}" FontSize="18"
+                               FontAttributes="Bold" HorizontalOptions="Center" />
+                        <Label x:Name="ConnectingDetail" Text=""
+                               TextColor="{StaticResource TextSecondary}" FontSize="13"
+                               HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+                    <VerticalStackLayout x:Name="SuccessState" IsVisible="False" Spacing="16">
+                        <Label Text="✓" TextColor="{StaticResource Success}" FontSize="48"
+                               HorizontalOptions="Center" />
+                        <Label x:Name="SuccessTitle" Text="" TextColor="{StaticResource TextPrimary}"
+                               FontSize="20" FontAttributes="Bold" HorizontalOptions="Center" />
+                        <VerticalStackLayout x:Name="FoundAssetsList" Spacing="8" />
+                        <Button Text="Add to SmartCube" FontSize="15" CornerRadius="12"
+                                HeightRequest="48"
+                                ToolTipProperties.Text="Close this screen and return to the dashboard now these assets have been added."
+                                Clicked="OnAddClicked" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </ScrollView>
+
+        </Grid>
+    </Grid>
+
+</ContentPage>

@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.SupplierDetails"
+             Title="Supplier Details"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid Padding="20">
+        <Border Style="{StaticResource CardFrame}"
+                BackgroundColor="{StaticResource CardBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="1"
+                StrokeShape="RoundRectangle 12">
+            <VerticalStackLayout Padding="16" Spacing="14">
+                <Label Text="Supplier Details"
+                       Style="{StaticResource Heading2}"
+                       TextColor="{StaticResource TextPrimary}" />
+
+                <BoxView HeightRequest="1"
+                         Color="{StaticResource BorderColor}" />
+
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Supplier Name"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Label Text="-"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="15" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Contact"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Label Text="-"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="15" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Email"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Label Text="-"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="15" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Phone"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Label Text="-"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="15" />
+                </VerticalStackLayout>
+
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Address"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" />
+                    <Label Text="-"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="15" />
+                </VerticalStackLayout>
+
+                <Button Text="Close"
+                        Style="{StaticResource SecondaryButton}"
+                        HorizontalOptions="End"
+                        Margin="0,8,0,0" />
+            </VerticalStackLayout>
+        </Border>
+    </Grid>
+
+</ContentPage>

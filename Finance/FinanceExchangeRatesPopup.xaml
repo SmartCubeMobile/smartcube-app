@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.FinanceExchangeRatesPopup"
+             BackgroundColor="{StaticResource PageBg}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*" Padding="16">
+
+        <!-- Header -->
+        <Grid ColumnDefinitions="*,Auto" Grid.Row="0" Padding="0,8,0,16">
+            <Label Text="Exchange Rates"
+                   Style="{StaticResource Heading2}"
+                   TextColor="{StaticResource TextPrimary}"
+                   VerticalOptions="Center" />
+            <Button Grid.Column="1"
+                    Text="Close"
+                    Style="{StaticResource SecondaryButton}"
+                    Clicked="OnCloseClicked" />
+        </Grid>
+
+        <!-- Card with Data Grid -->
+        <Border Grid.Row="1"
+                Style="{StaticResource CardFrame}"
+                BackgroundColor="{StaticResource CardBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeShape="RoundRectangle 12"
+                Padding="12">
+            <Grid x:Name="ExchangeRatesReduced" RowDefinitions="Auto,*">
+
+                <!-- Column Headers -->
+                <Grid Grid.Row="0"
+                      ColumnDefinitions="*,*,*"
+                      Padding="8,8,8,12">
+                    <Label Text="Currency"
+                           TextColor="{StaticResource TextMuted}"
+                           FontAttributes="Bold"
+                           FontSize="12" />
+                    <Label Grid.Column="1"
+                           Text="Rate"
+                           TextColor="{StaticResource TextMuted}"
+                           FontAttributes="Bold"
+                           FontSize="12"
+                           HorizontalTextAlignment="End" />
+                    <Label Grid.Column="2"
+                           Text="Change"
+                           TextColor="{StaticResource TextMuted}"
+                           FontAttributes="Bold"
+                           FontSize="12"
+                           HorizontalTextAlignment="End" />
+                </Grid>
+
+                <!-- Data Rows -->
+                <CollectionView Grid.Row="1"
+                                ItemsSource="{Binding ExchangeRates}">
+                    <CollectionView.EmptyView>
+                        <Label Text="No exchange rates available."
+                               TextColor="{StaticResource TextMuted}"
+                               HorizontalOptions="Center"
+                               VerticalOptions="Center"
+                               Margin="0,40" />
+                    </CollectionView.EmptyView>
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="{StaticResource CardBgLight}"
+                                    Stroke="{StaticResource BorderColor}"
+                                    StrokeShape="RoundRectangle 8"
+                                    Padding="8"
+                                    Margin="0,2">
+                                <Grid ColumnDefinitions="*,*,*">
+                                    <Label Text="{Binding CurrencyCode}"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding Rate}"
+                                           TextColor="{StaticResource Accent}"
+                                           HorizontalTextAlignment="End"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Change}"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           HorizontalTextAlignment="End"
+                                           VerticalOptions="Center" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+</ContentPage>

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.DropdownView">
+
+    <Border BackgroundColor="{StaticResource CardBg}"
+            Stroke="{StaticResource BorderColor}"
+            StrokeThickness="1"
+            StrokeShape="RoundRectangle 8"
+            Padding="4">
+        <CollectionView x:Name="ItemsView">
+            <CollectionView.EmptyView>
+                <Label Text="No items"
+                       TextColor="{StaticResource TextMuted}"
+                       HorizontalTextAlignment="Center"
+                       Margin="8" />
+            </CollectionView.EmptyView>
+        </CollectionView>
+    </Border>
+
+</ContentView>

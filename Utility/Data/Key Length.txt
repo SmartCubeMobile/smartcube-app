@@ -1,0 +1,11 @@
+EDiscounts 		96
+EReadings 		128 32
+EStanding 		128
+EUnitCharges 	144	0
+Usage			64
+
+GDiscounts		128
+Greadings		128	32
+GStanding		128	0
+GUnit			128	0
+GUsage		32	0

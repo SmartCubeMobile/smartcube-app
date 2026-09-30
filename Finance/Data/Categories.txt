@@ -1,0 +1,10 @@
+USERNAME nvarchar(18)	CUBEFACE_CODE nchar(1)	CATEGORY_CODE nchar(1)	CHECKED nvarchar(1)
+ANNA	F	B	X
+ANNA	F	I	
+ANNA	F	S	
+Daniel	F	C	X
+MARIA	F	B	
+RAY	F	B	X
+RAY	F	C	
+RAY	F	I	
+RAY	F	S	

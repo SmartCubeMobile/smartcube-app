@@ -1,0 +1,179 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.Faces.ExchangeFace"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid ColumnDefinitions="340,*" Padding="16" ColumnSpacing="12">
+
+        <!-- Left: Converter -->
+        <ScrollView Grid.Column="0">
+            <VerticalStackLayout Spacing="12">
+
+                <Border x:Name="ConverterCard" Style="{StaticResource CardFrame}" Padding="20">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Currency Converter" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Convert between currencies and cryptocurrencies using live exchange rates." />
+
+                        <!-- From -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="From" TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                            <Grid ColumnDefinitions="*,110" ColumnSpacing="8">
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Entry x:Name="FromAmount" Text="1000.00"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent"
+                                           Keyboard="Numeric" FontSize="16" HeightRequest="44"
+                                           TextChanged="OnAmountChanged"
+                                           ToolTipProperties.Text="Enter the amount you want to convert." />
+                                </Border>
+                                <Border Grid.Column="1" BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Picker x:Name="FromCurrency"
+                                            TextColor="{StaticResource TextPrimary}"
+                                            BackgroundColor="Transparent" FontSize="14"
+                                            SelectedIndexChanged="OnCurrencyChanged"
+                                            ToolTipProperties.Text="Choose the currency you're converting from." />
+                                </Border>
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!-- Swap -->
+                        <Button x:Name="SwapBtn" Text="⇅" BackgroundColor="Transparent"
+                                TextColor="{StaticResource Primary}" FontSize="22"
+                                HeightRequest="36" Padding="0"
+                                HorizontalOptions="Center"
+                                Clicked="OnSwapClicked"
+                                ToolTipProperties.Text="Swap the From and To currencies." />
+
+                        <!-- To -->
+                        <VerticalStackLayout Spacing="6">
+                            <Label Text="To" TextColor="{StaticResource TextSecondary}" FontSize="13" />
+                            <Grid ColumnDefinitions="*,110" ColumnSpacing="8">
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Entry x:Name="ToAmount" Text=""
+                                           TextColor="{StaticResource Accent}"
+                                           BackgroundColor="Transparent"
+                                           IsReadOnly="True"
+                                           FontSize="16" HeightRequest="44"
+                                           ToolTipProperties.Text="Shows the converted amount in your chosen currency." />
+                                </Border>
+                                <Border Grid.Column="1" BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 8" Padding="4,0">
+                                    <Picker x:Name="ToCurrency"
+                                            TextColor="{StaticResource TextPrimary}"
+                                            BackgroundColor="Transparent" FontSize="14"
+                                            SelectedIndexChanged="OnCurrencyChanged"
+                                            ToolTipProperties.Text="Choose the currency you're converting to." />
+                                </Border>
+                            </Grid>
+                        </VerticalStackLayout>
+
+                        <!-- Rate display -->
+                        <Border BackgroundColor="{StaticResource CardBgLight}"
+                                StrokeShape="RoundRectangle 8" Stroke="Transparent"
+                                Padding="14,10">
+                            <VerticalStackLayout Spacing="2" HorizontalOptions="Center">
+                                <Label x:Name="RateLabel" Text=""
+                                       TextColor="{StaticResource TextPrimary}"
+                                       FontSize="14" FontAttributes="Bold"
+                                       HorizontalOptions="Center" />
+                                <Label x:Name="ReverseRateLabel" Text=""
+                                       TextColor="{StaticResource TextMuted}" FontSize="11"
+                                       HorizontalOptions="Center" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Border>
+
+                <Border x:Name="SourceCard" Style="{StaticResource CardFrame}" Padding="12">
+                    <VerticalStackLayout Spacing="4">
+                        <Label Text="Fiat: European Central Bank · Crypto: CoinGecko"
+                               TextColor="{StaticResource TextMuted}" FontSize="11" />
+                        <Label x:Name="RateDate" Text=""
+                               TextColor="{StaticResource TextMuted}" FontSize="11" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Right: Tracked Rates -->
+        <Border x:Name="RatesCard" Grid.Column="1" Style="{StaticResource CardFrame}" Padding="16">
+            <Grid RowDefinitions="Auto,*,Auto">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto" Margin="0,0,0,12">
+                    <Label Text="Tracked Rates vs GBP" Style="{StaticResource Heading2}"
+                           ToolTipProperties.Text="Shows live exchange rates against the pound for the currencies you're tracking." />
+                    <Label Grid.Column="1" Text="Fiat &amp; Crypto"
+                           Style="{StaticResource SubHeading}" VerticalOptions="Center" />
+                    <Button Grid.Column="2" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
+                </Grid>
+                <CollectionView Grid.Row="1" x:Name="RatesList" SelectionMode="None">
+                    <CollectionView.ItemTemplate>
+                        <DataTemplate>
+                            <Border BackgroundColor="{StaticResource CardBgLight}"
+                                    StrokeShape="RoundRectangle 8"
+                                    Stroke="Transparent"
+                                    Padding="14,10"
+                                    Margin="0,0,0,6">
+                                <Grid ColumnDefinitions="50,Auto,*,Auto,Auto" ColumnSpacing="10">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding Code}"
+                                           TextColor="{Binding CodeColour}"
+                                           FontSize="14" FontAttributes="Bold"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="1"
+                                           Text="{Binding TypeBadge}"
+                                           TextColor="{Binding TypeColour}"
+                                           FontSize="9"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="2"
+                                           Text="{Binding Name}"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           FontSize="13"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="3"
+                                           Text="{Binding RateFormatted}"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           FontSize="14" FontAttributes="Bold"
+                                           VerticalOptions="Center" />
+                                    <Label Grid.Column="4"
+                                           Text="{Binding ChangeFormatted}"
+                                           TextColor="{Binding ChangeColour}"
+                                           FontSize="12"
+                                           VerticalOptions="Center"
+                                           WidthRequest="60"
+                                           HorizontalTextAlignment="End" />
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </CollectionView.ItemTemplate>
+                </CollectionView>
+
+                <!-- Add Currency -->
+                <Border Grid.Row="2" x:Name="AddCurrencyBtn"
+                        BackgroundColor="Transparent"
+                        Stroke="{StaticResource GlowBorder}"
+                        StrokeThickness="2"
+                        StrokeDashArray="6,4"
+                        StrokeShape="RoundRectangle 10"
+                        Padding="12,10" Margin="0,8,0,0"
+                        ToolTipProperties.Text="Add a new currency or cryptocurrency to the tracked rates list.">
+                    <HorizontalStackLayout Spacing="8" HorizontalOptions="Center">
+                        <Label Text="+" TextColor="{StaticResource Primary}" FontSize="18"
+                               VerticalOptions="Center" />
+                        <Label Text="Add Currency" TextColor="{StaticResource Primary}"
+                               FontSize="13" FontAttributes="Bold" VerticalOptions="Center" />
+                    </HorizontalStackLayout>
+                </Border>
+            </Grid>
+        </Border>
+
+    </Grid>
+</ContentView>

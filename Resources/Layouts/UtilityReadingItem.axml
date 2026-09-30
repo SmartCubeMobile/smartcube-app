@@ -1,0 +1,95 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:card_view="http://schemas.android.com/apk/res-auto"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@android:color/white">
+    
+        <!--<ImageView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/imageView"
+            android:scaleType="centerCrop" />-->
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/readingsAccountNo"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/readingsStatementId"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/readingsReadingsPeriodEnd"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/readingsMeterSerialNo"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/readingsReadType"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/readingsThisRead"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/readingsLastRead"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/readingsUnitsUsed"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+        <TextView
+            android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
+            android:id="@+id/readingsUnitOfMeasure"
+            android:layout_width = "80dp"
+            android:layout_weight = "1"
+            android:gravity = "left"
+            android:textSize = "15sp"
+            android:layout_height = "25dp"/>
+</LinearLayout>

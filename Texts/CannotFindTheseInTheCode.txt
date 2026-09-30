@@ -1,0 +1,27 @@
+AccountNo	Account No.	
+Address	Address:	
+BrandItem	Problem with: lookup brand item	
+ConsumerEnergy	Problem with: consumer energy	
+DisplayMeter	Problem with: display meter	
+EncryptionError	Error: {0}	
+EnterBankDetails	Enter your Account Name, Sort Code and Account Number	
+EnterLoginDetails	Enter your Customer No, your Memorable data and your Passcode	
+FailedToLoad	Failed to load:	
+FuckingChimps	Nothingeverworks	
+GetConfirmation	Get confirmation:	
+Greetings	Hello	
+NewLine	\n	
+Payment	Payment:	
+PaymentPlan	Problem with: lookup payment plan	
+PersonalDetails	Personal Details:	
+Problem	Problem: 	
+Processed	Processed:	
+QuoteId	Quote Id:	
+QuoteProceedOnline	Quote Proceed Online:	
+ReferralSignupCode	Referral Signup Code:	
+SignupCode	Signup Code:	
+SwitchNow	Switch Now:	
+Switchover	Problem with: Switchover	
+TariffItem	Problem with: lookup tariff item	
+UpdateConsumerEnergy	Problem with: update CE	
+Vulnerability	Vulnerability:	

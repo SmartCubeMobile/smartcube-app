@@ -1,0 +1,1 @@
+USERNAME nvarchar(18)	CUBEFACE_CODE nchar(1)	SUPPLIER_CODE smallint(2)	BRAND_CODE smallint(2)	ACCOUNT_CREATED datetime(8)	ACCOUNT_NO nvarchar(12)	STATEMENT_ID nvarchar(18)	BILL_DATE datetime(8)	PAYMENT_DATE datetime(8)	PAYMENT_ITEM smallint(2)	PAYMENT_CODE smallint(2)	PAYMENT_AMOUNT int(4)	PAYMENT_BALANCE int(4)

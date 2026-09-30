@@ -1,0 +1,27 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+     android:orientation="horizontal"
+     android:background="@android:color/white">
+
+    <TextView
+       android:id="@+id/cubefacesCubeface"
+       android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black"
+        android:background="@android:color/white"
+        android:layout_width = "150dp"
+        android:gravity = "start"
+        android:textSize = "16sp"
+        android:singleLine="true"
+        android:layout_height = "20dp"/>
+    <CheckBox
+       android:id="@+id/cubefacesActiveflag"
+       android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="@android:color/black"
+        android:background="@android:color/white"
+        android:layout_width = "80dp"
+        android:gravity = "center"
+        android:textSize = "16sp"
+        android:layout_height = "20dp"/>
+</LinearLayout>

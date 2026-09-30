@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.Faces.CryptoFace"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <ScrollView>
+    <VerticalStackLayout Padding="16" Spacing="12">
+
+        <!-- Portfolio Summary -->
+        <Border x:Name="PortfolioCard" Style="{StaticResource CardFrame}" Padding="20">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="24">
+                <VerticalStackLayout Grid.Column="0" Spacing="4">
+                    <Label Text="Portfolio Value" Style="{StaticResource SubHeading}"
+                           ToolTipProperties.Text="The current total value of all your connected crypto wallets and exchanges." />
+                    <Label x:Name="TotalCryptoValue" Text="£0.00"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="28" FontAttributes="Bold" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="1" Spacing="4" VerticalOptions="Center">
+                    <Label Text="24h Change" Style="{StaticResource SubHeading}"
+                           HorizontalOptions="End"
+                           ToolTipProperties.Text="How much your portfolio's value has moved in the last 24 hours." />
+                    <Label x:Name="TotalChange" Text=""
+                           TextColor="{StaticResource Success}"
+                           FontSize="18" FontAttributes="Bold"
+                           HorizontalOptions="End" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
+                    <Label Text="Total P&amp;L" Style="{StaticResource SubHeading}"
+                           HorizontalOptions="End"
+                           ToolTipProperties.Text="Your total profit or loss compared with what you originally paid for your holdings." />
+                    <Label x:Name="TotalPnL" Text=""
+                           FontSize="18" FontAttributes="Bold"
+                           HorizontalOptions="End" />
+                </VerticalStackLayout>
+                <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
+            </Grid>
+        </Border>
+
+        <!-- Holdings Cards (with P&L and sparkline) -->
+        <ScrollView Orientation="Horizontal">
+            <HorizontalStackLayout Spacing="12" x:Name="HoldingCards" />
+        </ScrollView>
+
+        <!-- Top Assets -->
+        <Border x:Name="TopAssetsCard" Style="{StaticResource CardFrame}" Padding="16" Opacity="0">
+            <VerticalStackLayout Spacing="8">
+                <Label Text="Top Assets" Style="{StaticResource Heading2}"
+                       ToolTipProperties.Text="Your biggest crypto holdings combined across all connected wallets and exchanges." />
+                <VerticalStackLayout x:Name="TopAssetsList" Spacing="6" />
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Portfolio Transaction History -->
+        <Border x:Name="TxHistoryCard" Style="{StaticResource CardFrame}" Padding="16" Opacity="0">
+            <VerticalStackLayout Spacing="8">
+                <Grid ColumnDefinitions="*,Auto">
+                    <Label Text="Transaction History" Style="{StaticResource Heading2}"
+                           ToolTipProperties.Text="Every buy, sell, send, receive and swap across all your connected crypto sources." />
+                    <Button x:Name="TxExportPdfBtn" Grid.Column="1" Text="Export PDF"
+                            BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                            FontSize="12" CornerRadius="6" Padding="12,4"
+                            HeightRequest="30"
+                            Clicked="OnExportPortfolioPdf"
+                            ToolTipProperties.Text="Save the transactions currently shown below as a PDF report." />
+                </Grid>
+                <ScrollView Orientation="Horizontal">
+                    <HorizontalStackLayout x:Name="TxFilterBar" Spacing="6" />
+                </ScrollView>
+                <ScrollView Orientation="Horizontal">
+                    <VerticalStackLayout x:Name="TxHistoryHeader" Spacing="0" />
+                </ScrollView>
+                <ScrollView HeightRequest="500" Orientation="Vertical">
+                    <ScrollView Orientation="Horizontal">
+                        <VerticalStackLayout x:Name="TxHistoryList" Spacing="2" />
+                    </ScrollView>
+                </ScrollView>
+            </VerticalStackLayout>
+        </Border>
+
+        <!-- Crypto Bubbles -->
+        <Border x:Name="BubbleCard" Style="{StaticResource CardFrame}" Padding="0" Opacity="0">
+            <WebView x:Name="BubbleWebView"
+                     Source="https://cryptobubbles.net/en"
+                     HeightRequest="600" />
+        </Border>
+
+        <!-- Fear & Greed + Price Alerts -->
+        <Grid ColumnDefinitions="*,2*" ColumnSpacing="12">
+
+            <!-- Fear & Greed Index -->
+            <Border x:Name="FearGreedCard" Grid.Column="0" Style="{StaticResource CardFrame}" Padding="20">
+                <VerticalStackLayout Spacing="10" HorizontalOptions="Center">
+                    <Label Text="Fear &amp; Greed Index" Style="{StaticResource Heading2}"
+                           HorizontalOptions="Center"
+                           ToolTipProperties.Text="A market sentiment score from 0 (extreme fear) to 100 (extreme greed), based on live crypto market data." />
+                    <Grid WidthRequest="140" HeightRequest="140"
+                          HorizontalOptions="Center" VerticalOptions="Center">
+                        <GraphicsView x:Name="FearGreedGauge"
+                                      WidthRequest="140" HeightRequest="140" />
+                        <VerticalStackLayout VerticalOptions="Center" HorizontalOptions="Center"
+                                             Spacing="0" Margin="0,20,0,0">
+                            <Label x:Name="FearGreedScore" Text=""
+                                   FontSize="36" FontAttributes="Bold"
+                                   HorizontalOptions="Center"
+                                   TextColor="{StaticResource TextPrimary}" />
+                            <Label x:Name="FearGreedLabel" Text=""
+                                   FontSize="14" FontAttributes="Bold"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Grid>
+                    <Label x:Name="FearGreedDesc" Text=""
+                           TextColor="{StaticResource TextMuted}" FontSize="11"
+                           HorizontalTextAlignment="Center"
+                           MaxLines="3" LineBreakMode="WordWrap" />
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Price Alerts -->
+            <Border x:Name="AlertsCard" Grid.Column="1" Style="{StaticResource CardFrame}" Padding="16">
+                <Grid RowDefinitions="Auto,*">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,10">
+                        <Label Text="Price Alerts" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Alerts you've set to flag when a coin's price crosses a target you chose." />
+                        <Button Grid.Column="1" x:Name="AddAlertBtn" Text="+ Add Alert"
+                                BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                FontSize="12" CornerRadius="6" Padding="12,4"
+                                HeightRequest="30"
+                                Clicked="OnAddAlertClicked"
+                                ToolTipProperties.Text="Set a new alert for a coin reaching a target price you choose." />
+                    </Grid>
+                    <ScrollView Grid.Row="1">
+                        <VerticalStackLayout x:Name="AlertsList" Spacing="6" />
+                    </ScrollView>
+                </Grid>
+            </Border>
+
+        </Grid>
+
+    </VerticalStackLayout>
+    </ScrollView>
+</ContentView>

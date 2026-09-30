@@ -1,0 +1,370 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using Android.App;
+using Android.OS;
+using Android.Text;
+using Android.Views;
+using Android.Widget;
+using AndroidX.RecyclerView.Widget;
+
+namespace SmartCubeMobile
+{
+    public static class AppState
+    {
+        public static MainViewModel ourviewmodel { get; set; }
+        public static FinanceViewModel financeviewmodel { get; set; }
+    }
+
+    [Activity(Label = "Connections", MainLauncher = true)]
+    public class MainActivity : Activity
+    {
+        MainViewModel ourviewmodel;
+        FinanceViewModel financeviewmodel;
+
+        RecyclerView recyclerView;
+        Button btnAdd;
+
+        List<ConnectionGroup> connectionItems;
+        ConnectionsAdapter adapter;
+
+        short DefaultInstitutionCode = 1004;
+
+        protected override void OnCreate(Bundle savedInstanceState)
+        {
+            base.OnCreate(savedInstanceState);
+            SetContentView(Resource.Layout.activity_main);
+
+            LoadStartupData();
+            financeviewmodel.ConnectionsViewList.Clear();
+
+            recyclerView = FindViewById<RecyclerView>(Resource.Id.recyclerView);
+            btnAdd = FindViewById<Button>(Resource.Id.btnAdd);
+
+            BuildConnectionList();
+
+            recyclerView.SetLayoutManager(new LinearLayoutManager(this));
+            adapter = new ConnectionsAdapter(connectionItems, financeviewmodel, DefaultInstitutionCode);
+            recyclerView.SetAdapter(adapter);
+
+            btnAdd.Click += BtnAdd_Click;
+        }
+
+        private void BtnAdd_Click(object sender, EventArgs e)
+        {
+            // Prevent multiple dropdown rows at the same time
+            if (connectionItems.Any(x => x.ShowProviderDropdown))
+                return;
+
+            connectionItems.Add(new ConnectionGroup
+            {
+                INSTITUTION_CODE = DefaultInstitutionCode,
+                ShowProviderDropdown = true
+            });
+
+            adapter.NotifyItemInserted(connectionItems.Count - 1);
+        }
+
+        private void BuildConnectionList()
+        {
+            connectionItems = financeviewmodel.ConnectionsViewList
+                .Where(x => x.INSTITUTION_CODE == DefaultInstitutionCode)
+                .Select(x =>
+                {
+                    var brand = financeviewmodel.CreatedBrands
+                        .FirstOrDefault(b => b.BRAND_CODE == x.BRAND_CODE);
+
+                    return new ConnectionGroup
+                    {
+                        INSTITUTION_CODE = x.INSTITUTION_CODE,
+                        BRAND_CODE = x.BRAND_CODE,
+                        BrandName = brand?.BrandName ?? "",
+                        SelectedLoginMethod = x.LOGIN_METHOD,
+                        PARAMETER1 = x.Parameter1,
+                        PARAMETER2 = x.Parameter2,
+                        PARAMETER3 = x.Parameter3,
+                        ShowProviderDropdown = false
+                    };
+                })
+                .ToList();
+        }
+
+        private void LoadStartupData()
+        {
+            ourviewmodel = new MainViewModel();
+            financeviewmodel = new FinanceViewModel();
+
+            AppState.ourviewmodel = ourviewmodel;
+            AppState.financeviewmodel = financeviewmodel;
+
+            financeviewmodel.CreatedBrands = new List<BrandItem>();
+            financeviewmodel.ConnectionsViewList = new List<SmartFinance.Connections>();
+
+            using (var stream = this.Assets.Open("CATEGORY_CODES.txt"))
+                DataLoading.LoadCategoryCodes(stream, financeviewmodel);
+            using (var stream = this.Assets.Open("INSTITUTIONS.txt"))
+                DataLoading.LoadInstitutions(stream, financeviewmodel);
+            using (var stream = this.Assets.Open("INSTITUTION_INFO.txt"))
+                DataLoading.LoadInstitutionInfo(stream, financeviewmodel);
+            using (var stream = this.Assets.Open("BRANDS.txt"))
+                DataLoading.LoadBrands(stream, financeviewmodel);
+            using (var stream = this.Assets.Open("BRAND_CONNECTION.txt"))
+                DataLoading.LoadBrandConnection(stream, financeviewmodel);
+            using (var stream = this.Assets.Open("Connections.txt"))
+                DataLoading.LoadConnections(stream, financeviewmodel, DefaultInstitutionCode);
+
+            foreach (SmartFinance.Brands brand in financeviewmodel.PLO.brandsList)
+            {
+                if (brand.INSTITUTION_CODE == DefaultInstitutionCode)
+                {
+                    financeviewmodel.CreatedBrands.Add(new BrandItem()
+                    {
+                        InstitutionCode = brand.INSTITUTION_CODE,
+                        BRAND_CODE = brand.BRAND_CODE,
+                        BrandName = brand.BRAND_NAME
+                    });
+                }
+            }
+        }
+    }
+
+    // ============================================================
+    // CONNECTION MODEL
+    // ============================================================
+
+    public class ConnectionGroup
+    {
+        public short INSTITUTION_CODE { get; set; }
+        public int BRAND_CODE { get; set; }
+        public string BrandName { get; set; }
+        public int SelectedLoginMethod { get; set; }
+        public string PARAMETER1 { get; set; }
+        public string PARAMETER2 { get; set; }
+        public string PARAMETER3 { get; set; }
+        public bool ShowProviderDropdown { get; set; }
+    }
+
+    // ============================================================
+    // ADAPTER
+    // ============================================================
+
+    public class ConnectionsAdapter : RecyclerView.Adapter
+    {
+        private readonly List<ConnectionGroup> Items;
+        private readonly FinanceViewModel financeviewmodel;
+        private readonly short DefaultInstitutionCode;
+
+        public ConnectionsAdapter(List<ConnectionGroup> items,
+                                  FinanceViewModel vm,
+                                  short institutionCode)
+        {
+            Items = items;
+            financeviewmodel = vm;
+            DefaultInstitutionCode = institutionCode;
+        }
+
+        public override int ItemCount => Items.Count;
+
+        public override RecyclerView.ViewHolder OnCreateViewHolder(ViewGroup parent, int viewType)
+        {
+            var view = LayoutInflater.From(parent.Context)
+                .Inflate(Resource.Layout.spinner_row_item, parent, false);
+
+            return new ConnectionsViewHolder(view);
+        }
+
+        public override void OnBindViewHolder(RecyclerView.ViewHolder holder, int position)
+        {
+            var vh = (ConnectionsViewHolder)holder;
+            var item = Items[position];
+
+            if (item.ShowProviderDropdown)
+            {
+                vh.ProviderTextView.Visibility = ViewStates.Gone;
+                vh.ProviderSpinner.Visibility = ViewStates.Visible;
+
+                var usedBrandCodes = Items
+                    .Where(x => !x.ShowProviderDropdown)
+                    .Select(x => x.BRAND_CODE)
+                    .ToList();
+
+                var availableBrandCodes = financeviewmodel.PLO.brand_connectionList
+                    .Where(b => b.INSTITUTION_CODE == DefaultInstitutionCode &&
+                                b.LOGIN_METHOD >= 1 &&
+                                !usedBrandCodes.Contains(b.BRAND_CODE))
+                    .Select(b => b.BRAND_CODE)
+                    .Distinct()
+                    .ToList();
+
+                var brands = financeviewmodel.CreatedBrands
+                    .Where(b => availableBrandCodes.Contains(b.BRAND_CODE))
+                    .ToList();
+
+                if (brands.Count == 0)
+                    return;
+
+                var spinnerAdapter = new ArrayAdapter<string>(
+                    vh.ItemView.Context,
+                    Resource.Layout.spinner_item_large,
+                    brands.Select(b => b.BrandName).ToList()
+                );
+                spinnerAdapter.SetDropDownViewResource(Resource.Layout.spinner_dropdown_item_large);
+                vh.ProviderSpinner.Adapter = spinnerAdapter;
+
+                // Ignore first automatic call of ItemSelected
+                bool spinnerInitialized = false;
+                vh.ProviderSpinner.ItemSelected -= vh.ProviderSelected;
+
+                vh.ProviderSelected = (s, e) =>
+                {
+                    if (!spinnerInitialized)
+                    {
+                        spinnerInitialized = true;
+                        return;
+                    }
+
+                    if (e.Position < 0 || e.Position >= brands.Count)
+                        return;
+
+                    var selected = brands[e.Position];
+
+                    item.BRAND_CODE = selected.BRAND_CODE;
+                    item.BrandName = selected.BrandName;
+                    item.SelectedLoginMethod = 1;
+                    item.ShowProviderDropdown = false;
+
+                    NotifyItemChanged(position);
+                };
+
+                vh.ProviderSpinner.ItemSelected += vh.ProviderSelected;
+            }
+            else
+            {
+                vh.ProviderSpinner.Visibility = ViewStates.Gone;
+                vh.ProviderTextView.Visibility = ViewStates.Visible;
+                vh.ProviderTextView.Text = item.BrandName;
+            }
+
+            vh.LoginMethodTextView.Text = item.SelectedLoginMethod.ToString();
+
+            // Parameter Text
+            vh.Parameter1EditText.TextChanged -= vh.Parameter1Changed;
+            vh.Parameter2EditText.TextChanged -= vh.Parameter2Changed;
+            vh.Parameter3EditText.TextChanged -= vh.Parameter3Changed;
+
+            vh.Parameter1EditText.Text = item.PARAMETER1 ?? "";
+            vh.Parameter2EditText.Text = item.PARAMETER2 ?? "";
+            vh.Parameter3EditText.Text = item.PARAMETER3 ?? "";
+
+            vh.Parameter1Changed = (s, e) => item.PARAMETER1 = vh.Parameter1EditText.Text;
+            vh.Parameter2Changed = (s, e) => item.PARAMETER2 = vh.Parameter2EditText.Text;
+            vh.Parameter3Changed = (s, e) => item.PARAMETER3 = vh.Parameter3EditText.Text;
+
+            vh.Parameter1EditText.TextChanged += vh.Parameter1Changed;
+            vh.Parameter2EditText.TextChanged += vh.Parameter2Changed;
+            vh.Parameter3EditText.TextChanged += vh.Parameter3Changed;
+        }
+    }
+
+    // ============================================================
+    // VIEW HOLDER
+    // ============================================================
+
+    public class ConnectionsViewHolder : RecyclerView.ViewHolder
+    {
+        public TextView ProviderTextView { get; }
+        public Spinner ProviderSpinner { get; }
+        public TextView LoginMethodTextView { get; }
+        public EditText Parameter1EditText { get; }
+        public EditText Parameter2EditText { get; }
+        public EditText Parameter3EditText { get; }
+
+        public EventHandler<TextChangedEventArgs> Parameter1Changed;
+        public EventHandler<TextChangedEventArgs> Parameter2Changed;
+        public EventHandler<TextChangedEventArgs> Parameter3Changed;
+        public EventHandler<AdapterView.ItemSelectedEventArgs> ProviderSelected;
+
+        public ConnectionsViewHolder(View itemView) : base(itemView)
+        {
+            ProviderTextView = itemView.FindViewById<TextView>(Resource.Id.providerTextView);
+            ProviderSpinner = itemView.FindViewById<Spinner>(Resource.Id.providerSpinner);
+            LoginMethodTextView = itemView.FindViewById<TextView>(Resource.Id.loginMethodTextView);
+            Parameter1EditText = itemView.FindViewById<EditText>(Resource.Id.parameter1EditText);
+            Parameter2EditText = itemView.FindViewById<EditText>(Resource.Id.parameter2EditText);
+            Parameter3EditText = itemView.FindViewById<EditText>(Resource.Id.parameter3EditText);
+        }
+    }
+}
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:padding="8dp">
+
+	<!-- Provider Text (hidden when Spinner is visible) -->
+	<TextView
+        android:id="@+id/providerTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:textSize="24sp"
+        android:gravity="start"
+        android:padding="4dp"
+        android:visibility="gone"/>
+
+	<!-- Provider Spinner -->
+	<Spinner
+        android:id="@+id/providerSpinner"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2"
+        android:spinnerMode="dropdown"/>
+
+	<!-- Login Method -->
+	<TextView
+        android:id="@+id/loginMethodTextView"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:padding="4dp"/>
+
+	<!-- Parameter1 -->
+	<EditText
+        android:id="@+id/parameter1EditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="Parameter1"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:padding="4dp"/>
+
+	<!-- Parameter2 -->
+	<EditText
+        android:id="@+id/parameter2EditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="Parameter2"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:padding="4dp"/>
+
+	<!-- Parameter3 -->
+	<EditText
+        android:id="@+id/parameter3EditText"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:hint="Parameter3"
+        android:textSize="24sp"
+        android:gravity="center"
+        android:padding="4dp"/>
+</LinearLayout>
+

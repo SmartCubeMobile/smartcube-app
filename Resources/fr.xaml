@@ -1,0 +1,27 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!-- SignIn strings -->
+	<x:String Key="UsernameBox">Utilisateur</x:String>
+	<x:String Key="PasswordBox">Mot de passe</x:String>
+	<x:String Key="LoginStatusMessage">Vous devez être connecté pour exécuter SmartSwitch</x:String>
+	<x:String Key="Signin">Connexion</x:String>
+	<x:String Key="ResetUTC">Réinitialiser UTC</x:String>
+	<x:String Key="Fatalerror">Erreur fatale</x:String>
+	<x:String Key="CreateHandlerFailure">Échec de la création du gestionnaire Uri</x:String>
+	<x:String Key="EnsureConnectedToInternet">Vérifiez que votre appareil est connecté à Internet avant de vous connecter</x:String>
+	<x:String Key="ProblemUTC">Problème de récupération de UTC ... appuyez sur Réinitialiser</x:String>
+	<x:String Key="PleaseSignin">Connectez-vous pour continuer s'il vous plaît</x:String>
+	<x:String Key="CannotSignin">Connexion impossible pour l'instant</x:String>
+	<x:String Key="EnterUsernameAndPassword">Veuillez entrer votre nom d'utilisateur et votre mot de passe avant de vous connecter</x:String>
+	<x:String Key="InvalidSignin">Connexion non valide</x:String>
+	<x:String Key="CannotLoadFromMothership">Chargement impossible à partir du Mothership</x:String>
+	<x:String Key="UnableToAuthenticate">Authentification impossible - vous n'êtes pas connecté</x:String>
+	<x:String Key="CancellationTokenNone">Cancellation token None</x:String>
+	<x:String Key="CreateAccount">Créer un compte</x:String>
+
+	<!-- MessageBox strings -->
+	<x:String Key="ReallyLeave">Voulez-vous vraiment quitter SmartSwitch?</x:String>
+	<x:String Key="ConfirmationRequired">Confirmation requise</x:String>
+	<x:String Key="Yes">Oui</x:String>
+	<x:String Key="No">Non</x:String>
+</ResourceDictionary>

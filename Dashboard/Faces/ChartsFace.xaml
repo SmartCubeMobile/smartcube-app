@@ -1,0 +1,246 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.Faces.ChartsFace"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <ScrollView>
+    <VerticalStackLayout Padding="16" Spacing="12">
+
+        <!-- Account Selector + Search -->
+        <Grid ColumnDefinitions="*,*,Auto" ColumnSpacing="12">
+            <Border Grid.Column="0" Style="{StaticResource CardFrame}" Padding="12,8">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+                    <Label Text="Account:" TextColor="{StaticResource TextSecondary}"
+                           FontSize="13" VerticalOptions="Center" />
+                    <Picker x:Name="AccountPicker" Grid.Column="1"
+                            TextColor="{StaticResource TextPrimary}"
+                            FontSize="13"
+                            ToolTipProperties.Text="Filter every chart below to one account, or choose All Accounts to see everything combined."
+                            SelectedIndexChanged="OnAccountChanged" />
+                </Grid>
+            </Border>
+            <Border Grid.Column="1" Style="{StaticResource CardFrame}" Padding="12,8">
+                <Grid ColumnDefinitions="Auto,*" ColumnSpacing="10">
+                    <Label Text="🔍" FontSize="16" VerticalOptions="Center" />
+                    <Entry x:Name="SearchEntry" Grid.Column="1"
+                           Placeholder="Search merchants..."
+                           PlaceholderColor="{StaticResource TextMuted}"
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="13"
+                           BackgroundColor="Transparent"
+                           ToolTipProperties.Text="Type part of a merchant name to see how much you've spent with them."
+                           TextChanged="OnSearchTextChanged" />
+                </Grid>
+            </Border>
+            <Button Grid.Column="2" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
+        </Grid>
+
+        <!-- Top: Summary KPIs -->
+        <HorizontalStackLayout x:Name="KpiRow" Spacing="12">
+
+            <Border Style="{StaticResource CardFrame}" Padding="16" WidthRequest="200">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Net Worth" Style="{StaticResource SubHeading}" ToolTipProperties.Text="Your combined bank and crypto balance for the selected account(s)." />
+                    <Label x:Name="NetWorthLabel" Text=""
+                           TextColor="{StaticResource Success}"
+                           FontSize="22" FontAttributes="Bold" />
+                    <Label x:Name="NetWorthChangeLabel" Text=""
+                           TextColor="{StaticResource Success}" FontSize="11" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource CardFrame}" Padding="16" WidthRequest="200">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Monthly Spend" Style="{StaticResource SubHeading}" ToolTipProperties.Text="What you've spent this month, compared with last month." />
+                    <Label x:Name="MonthlySpendLabel" Text=""
+                           TextColor="{StaticResource Warning}"
+                           FontSize="22" FontAttributes="Bold" />
+                    <Label x:Name="MonthlySpendCompare" Text=""
+                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource CardFrame}" Padding="16" WidthRequest="200">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Bank Accounts" Style="{StaticResource SubHeading}" ToolTipProperties.Text="Your total balance across connected bank accounts, and how many accounts are included." />
+                    <Label x:Name="BankTotalLabel" Text=""
+                           TextColor="{StaticResource Primary}"
+                           FontSize="22" FontAttributes="Bold" />
+                    <Label x:Name="BankCountLabel" Text=""
+                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                </VerticalStackLayout>
+            </Border>
+
+            <Border Style="{StaticResource CardFrame}" Padding="16" WidthRequest="200">
+                <VerticalStackLayout Spacing="4">
+                    <Label Text="Crypto Holdings" Style="{StaticResource SubHeading}" ToolTipProperties.Text="The current GBP value of your crypto and stock holdings, and how many assets you hold." />
+                    <Label x:Name="CryptoTotalLabel" Text=""
+                           TextColor="{StaticResource Secondary}"
+                           FontSize="22" FontAttributes="Bold" />
+                    <Label x:Name="CryptoCountLabel" Text=""
+                           TextColor="{StaticResource TextMuted}" FontSize="11" />
+                </VerticalStackLayout>
+            </Border>
+
+        </HorizontalStackLayout>
+
+        <!-- Search Results (hidden by default) -->
+        <Border x:Name="SearchResultsCard" Style="{StaticResource CardFrame}" Padding="16"
+                IsVisible="False">
+            <Grid RowDefinitions="Auto,*">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,12">
+                    <Label x:Name="SearchResultsTitle" Text="Search Results"
+                           Style="{StaticResource Heading2}"
+                           ToolTipProperties.Text="Merchants matching your search, with how much you've spent at each." />
+                    <Button Grid.Column="1" Text="Clear" BackgroundColor="Transparent"
+                            TextColor="{StaticResource Primary}" FontSize="12" Padding="8,2"
+                            ToolTipProperties.Text="Clear the search box and hide these results."
+                            Clicked="OnClearSearch" />
+                </Grid>
+                <ScrollView Grid.Row="1" HeightRequest="300">
+                    <VerticalStackLayout x:Name="SearchResultsList" Spacing="4" />
+                </ScrollView>
+            </Grid>
+        </Border>
+
+        <!-- Row 1: Spending + Net Worth -->
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" HeightRequest="280">
+
+            <!-- Spending by Category (tappable for drill-down) -->
+            <Border x:Name="SpendingCard" Grid.Column="0" Style="{StaticResource CardFrame}" Padding="16">
+                <Grid RowDefinitions="Auto,Auto,*">
+                    <Grid Grid.Row="0" ColumnDefinitions="*,Auto" Margin="0,0,0,4">
+                        <Label x:Name="SpendingTitle" Text="Spending by Category"
+                               Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Your spending broken down by category; tap a category to see the merchants behind it." />
+                        <Button x:Name="SpendingBackBtn" Grid.Column="1" Text="← Back"
+                                BackgroundColor="Transparent"
+                                TextColor="{StaticResource Primary}" FontSize="12"
+                                Padding="8,2" IsVisible="False"
+                                ToolTipProperties.Text="Go back to the full spending-by-category list."
+                                Clicked="OnSpendingBack" />
+                    </Grid>
+                    <Label Grid.Row="1" x:Name="SpendingHint"
+                           Text="Tap a category to drill down"
+                           TextColor="{StaticResource TextMuted}" FontSize="10"
+                           Margin="0,0,0,8" />
+                    <ScrollView Grid.Row="2">
+                        <VerticalStackLayout x:Name="SpendingStack" Spacing="4" />
+                    </ScrollView>
+                </Grid>
+            </Border>
+
+            <!-- Net Worth Trend -->
+            <Border x:Name="NetWorthCard" Grid.Column="1" Style="{StaticResource CardFrame}" Padding="16">
+                <Grid RowDefinitions="Auto,*">
+                    <Label Grid.Row="0" Text="Net Worth (12 Months)"
+                           Style="{StaticResource Heading2}" Margin="0,0,0,12"
+                           ToolTipProperties.Text="Your combined bank and crypto balance over the last 12 months." />
+                    <ScrollView Grid.Row="1">
+                    <CollectionView x:Name="NetWorthList" SelectionMode="None">
+                        <CollectionView.ItemTemplate>
+                            <DataTemplate>
+                                <Grid ColumnDefinitions="70,*,Auto"
+                                      Padding="0,6" ColumnSpacing="12">
+                                    <Label Grid.Column="0"
+                                           Text="{Binding Month}"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           FontSize="12"
+                                           VerticalOptions="Center" />
+                                    <Border Grid.Column="1"
+                                            BackgroundColor="{StaticResource CardBgLight}"
+                                            StrokeShape="RoundRectangle 3"
+                                            Stroke="Transparent"
+                                            HeightRequest="8"
+                                            HorizontalOptions="Fill">
+                                        <Border BackgroundColor="{StaticResource Success}"
+                                                StrokeShape="RoundRectangle 3"
+                                                Stroke="Transparent"
+                                                HeightRequest="8"
+                                                WidthRequest="{Binding BarWidth}"
+                                                HorizontalOptions="Start" />
+                                    </Border>
+                                    <Label Grid.Column="2"
+                                           Text="{Binding ValueFormatted}"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           FontSize="12" FontAttributes="Bold"
+                                           VerticalOptions="Center"
+                                           WidthRequest="65"
+                                           HorizontalTextAlignment="End" />
+                                </Grid>
+                            </DataTemplate>
+                        </CollectionView.ItemTemplate>
+                    </CollectionView>
+                    </ScrollView>
+                </Grid>
+            </Border>
+
+        </Grid>
+
+        <!-- Row 2: Pie Charts -->
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="12" HeightRequest="220">
+
+            <!-- Bank Accounts Pie -->
+            <Border x:Name="BankPieCard" Grid.Column="0" Style="{StaticResource CardFrame}" Padding="16">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="20">
+                    <ScrollView Grid.Column="0" VerticalOptions="Fill">
+                        <VerticalStackLayout x:Name="BankPieLegend"
+                                             Spacing="6" VerticalOptions="Start" />
+                    </ScrollView>
+                    <GraphicsView Grid.Column="1" x:Name="BankPieView" WidthRequest="160" HeightRequest="160"
+                                VerticalOptions="Center" />
+                </Grid>
+            </Border>
+
+            <!-- Crypto/Stocks Pie -->
+            <Border x:Name="CryptoPieCard" Grid.Column="1" Style="{StaticResource CardFrame}" Padding="16">
+                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="20">
+                    <ScrollView Grid.Column="0" VerticalOptions="Fill">
+                        <VerticalStackLayout x:Name="CryptoPieLegend"
+                                             Spacing="6" VerticalOptions="Start" />
+                    </ScrollView>
+                    <GraphicsView Grid.Column="1" x:Name="CryptoPieView" WidthRequest="160" HeightRequest="160"
+                                VerticalOptions="Center" />
+                </Grid>
+            </Border>
+
+        </Grid>
+
+        <!-- Row 3: Budget Analysis & Investment Suggestions -->
+        <Grid ColumnDefinitions="*,*" ColumnSpacing="12">
+
+            <!-- Budget Breakdown -->
+            <Border x:Name="BudgetCard" Grid.Column="0" Style="{StaticResource CardFrame}" Padding="16">
+                <Grid RowDefinitions="Auto,Auto,*">
+                    <Label Grid.Row="0" Text="Suggested Monthly Budget"
+                           Style="{StaticResource Heading2}" Margin="0,0,0,4"
+                           ToolTipProperties.Text="A suggested monthly budget per category, based on your average spending." />
+                    <Label Grid.Row="1" x:Name="BudgetSubtitle" Text="Based on 12-month average spending"
+                           TextColor="{StaticResource TextMuted}" FontSize="11" Margin="0,0,0,10" />
+                    <ScrollView Grid.Row="2">
+                        <VerticalStackLayout x:Name="BudgetList" Spacing="6" />
+                    </ScrollView>
+                </Grid>
+            </Border>
+
+            <!-- Savings & Investment Suggestions -->
+            <Border x:Name="InvestCard" Grid.Column="1" Style="{StaticResource CardFrame}" Padding="16">
+                <Grid RowDefinitions="Auto,Auto,*">
+                    <Label Grid.Row="0" Text="Savings Opportunities"
+                           Style="{StaticResource Heading2}" Margin="0,0,0,4"
+                           ToolTipProperties.Text="Ideas for cutting spending and where to put spare money, based on your transactions." />
+                    <Label Grid.Row="1" x:Name="SavingsSubtitle" Text=""
+                           TextColor="{StaticResource Success}" FontSize="12"
+                           FontAttributes="Bold" Margin="0,0,0,10" />
+                    <ScrollView Grid.Row="2">
+                        <VerticalStackLayout x:Name="SavingsList" Spacing="10" />
+                    </ScrollView>
+                </Grid>
+            </Border>
+
+        </Grid>
+
+    </VerticalStackLayout>
+    </ScrollView>
+</ContentView>

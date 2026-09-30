@@ -1,0 +1,77 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+	<!-- SignIn strings -->
+	<x:String Key="UsernameBox">Username</x:String>
+	<x:String Key="PasswordBox">Password</x:String>
+	<x:String Key="LoginStatusMessage">You need to be logged-in to run SmartSwitch</x:String>
+	<x:String Key="Signin">Sign-in</x:String>
+	<x:String Key="ResetUTC">Reset UTC</x:String>
+	<x:String Key="Fatalerror">Fatal error</x:String>
+	<x:String Key="CreateHandlerFailure">Failed to create Uri handler</x:String>
+	<x:String Key="EnsureConnectedToInternet">Please ensure your device is connected to the Internet before signing in</x:String>
+	<x:String Key="ProblemUTC">Problem retrieving UTC ... please press Reset</x:String>
+	<x:String Key="PleaseSignin">Please Sign-in to continue</x:String>
+	<x:String Key="CannotSignin">Cannot sign in at this time</x:String> 
+	<x:String Key="EnterUsernameAndPassword">Please enter your Username and Password before Sign-in</x:String> 
+	<x:String Key="InvalidSignin">Sign-in invalid</x:String>
+	<x:String Key="CannotLoadFromMothership">Cannot load from Mothership</x:String>
+	<x:String Key="UnableToAuthenticate">Unable to authenticate - you are not logged-in</x:String>
+	<x:String Key="CancellationTokenNone">Cancellation Token None</x:String>
+	<x:String Key="CreateAccount">Create an Account</x:String>
+	
+	<x:String Key="AnalyzeBrandMatrix">Failed Brand Matri</x:String>
+	<x:String Key="AnalyzeConditionsDates">Failed Conditions Dates:</x:String>
+	<x:String Key="AnalyzeConditionsPlans">Failed Conditions_Plans:</x:String>
+	<x:String Key="AnalyzeCosts">Problem with: analyze costs</x:String>
+	<x:String Key="AnalyzeFieldName">Failed Conditions_Limits: FieldName</x:String>
+	<x:String Key="AnalyzeFixedArea">Failed Conditions_Limits: Fixed Area NOT SET</x:String>
+	<x:String Key="AnalyzeLimitCode">Failed Conditions_Limits: LimitCode</x:String>
+	<x:String Key="AnalyzeLimitType">Failed Conditions_Limits: LimitType</x:String>
+	<x:String Key="AnalyzePostFieldName">Failed Post_Limits: Field Name</x:String>
+	<x:String Key="AnalyzePreConditions">Failed Pre_Conditions:</x:String>
+	<x:String Key="AnalyzePreFieldName">Failed Pre_Conditions: Field Name</x:String>
+	<x:String Key="AnalyzeTariffEngine">Failed Tariff Engine:</x:String>
+	<x:String Key="AnalyzeTariffMatrix">Failed Tariff Matri</x:String>
+	<x:String Key="AnalyzeTier">Failed Conditions_Limits: Tier</x:String>
+	<x:String Key="AnalyzeTierCount">Failed Conditions_Limits: Tier Count</x:String>
+	<x:String Key="AnalyzeTierThree">Failed Conditions_Limits: TIER3</x:String>
+	<x:String Key="AnalyzeVatRates">Failed Vat Rates: not found</x:String>
+	
+	<x:String Key="Asterisks">********</x:String>
+	<x:String Key="UserId">UserId:</x:String>
+	<x:String Key="LogOnAttempted">LogOn attempted ...</x:String>
+	<x:String Key="QuoteId">Quote Id:</x:String>
+	
+	<x:String Key="SwitchAddressCode">Address Code:</x:String>
+	<x:String Key="SwitchBankDetails">Enter your Account Name, Sort Code and Account Number</x:String>
+	<x:String Key="SwitchCityTown">City/Town:</x:String>
+	<x:String Key="SwitchConfirmation">Confirmation :</x:String>
+	<x:String Key="Switchdetailsincomplete">Switch details are incomplete</x:String>
+	<x:String Key="SwitchHouseName">House Name:</x:String>
+	<x:String Key="SwitchHouseNo">House No:</x:String>
+	<x:String Key="SwitchStreet">Street:</x:String>
+	<x:String Key="SwitchAddress">Address :</x:String>
+	<x:String Key="EdFSwitchStep2">Step 2 Form Build Id:</x:String>
+	<x:String Key="EdFSwitchStep3">Step 3 Form Build Id:</x:String>
+	<x:String Key="EdFSwitchStep4">Step 4 Form Build Id:</x:String>
+	<x:String Key="EdFSwitchStep5">Step 5 Form Build Id:</x:String>
+	<x:String Key="EdFSwitchStep5Bank">Step 5: Bank account details incorrect</x:String>
+	<x:String Key="HeavyTick">\u2714</x:String>
+	<x:String Key="True">true</x:String>
+	<x:String Key="False">false</x:String>
+	<x:String Key="Confirmation">Confirmation:</x:String>
+	<x:String Key="Logindetailsincomplete">Login details are incomplete</x:String>
+	<x:String Key="CancelMeter">Problem with: cancel meter</x:String>
+	<x:String Key="SwitchingNow">Switching now:</x:String>
+	<x:String Key="CannotFindWebServiceKey">Cannot find Web Service Key</x:String>
+	<x:String Key="WebServiceKey">Web Service Key:</x:String>
+	<x:String Key="CannotDecodeJson">Cannot decode JSON</x:String>
+	<x:String Key="SignupLinkEmpty">SignupLink is empty</x:String>
+	
+	<x:String Key="LoggingOut">Logging out...</x:String>
+	<x:String Key="ConfirmationRequired">Confirmation required</x:String>
+	<x:String Key="ReallyLeave">Do you really want to leave SmartSwitch?</x:String>
+	<x:String Key="Yes">Yes</x:String>
+	<x:String Key="No">No</x:String>
+</ResourceDictionary>
+

@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.SignIn"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <ScrollView VerticalOptions="Fill">
+        <VerticalStackLayout Spacing="0"
+                             VerticalOptions="Center"
+                             Padding="24,40">
+
+            <!-- ============================================================ -->
+            <!-- APP LOGO / TITLE                                              -->
+            <!-- ============================================================ -->
+            <Label Text="&#x25A0;"
+                   TextColor="{StaticResource Primary}"
+                   FontSize="48"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,4" />
+
+            <Label Text="SmartCube"
+                   Style="{StaticResource Heading1}"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,4" />
+
+            <Label Text="Sign in to your account"
+                   Style="{StaticResource SubHeading}"
+                   HorizontalOptions="Center"
+                   Margin="0,0,0,24" />
+
+            <!-- ============================================================ -->
+            <!-- LOGIN CARD                                                    -->
+            <!-- ============================================================ -->
+            <Border Style="{StaticResource CardFrame}"
+                    BackgroundColor="{StaticResource CardBg}"
+                    StrokeShape="RoundRectangle 16"
+                    MaximumWidthRequest="420"
+                    HorizontalOptions="Center"
+                    Padding="28,32"
+                    Margin="0,0,0,20">
+                <Border.Shadow>
+                    <Shadow Brush="{StaticResource Primary}" Offset="0,4" Radius="20" Opacity="0.15" />
+                </Border.Shadow>
+
+                <VerticalStackLayout Spacing="16">
+
+                    <!-- Username -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Username"
+                               TextColor="{StaticResource TextSecondary}"
+                               FontSize="13"
+                               FontAttributes="Bold" />
+                        <Border BackgroundColor="{StaticResource CardBgLight}"
+                                Stroke="{StaticResource BorderColor}"
+                                StrokeShape="RoundRectangle 8"
+                                Padding="4,0">
+                            <Entry x:Name="UserName"
+                                   Placeholder="Enter your username"
+                                   PlaceholderColor="{StaticResource TextMuted}"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   BackgroundColor="Transparent"
+                                   FontSize="15"
+                                   HeightRequest="44" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Password -->
+                    <VerticalStackLayout Spacing="6">
+                        <Label Text="Password"
+                               TextColor="{StaticResource TextSecondary}"
+                               FontSize="13"
+                               FontAttributes="Bold" />
+                        <Border BackgroundColor="{StaticResource CardBgLight}"
+                                Stroke="{StaticResource BorderColor}"
+                                StrokeShape="RoundRectangle 8"
+                                Padding="4,0">
+                            <Entry x:Name="PassWord"
+                                   Placeholder="Enter your password"
+                                   PlaceholderColor="{StaticResource TextMuted}"
+                                   TextColor="{StaticResource TextPrimary}"
+                                   BackgroundColor="Transparent"
+                                   IsPassword="True"
+                                   FontSize="15"
+                                   HeightRequest="44" />
+                        </Border>
+                    </VerticalStackLayout>
+
+                    <!-- Login Button -->
+                    <Button x:Name="LoginButton"
+                            Text="Sign In"
+                            BackgroundColor="{StaticResource Primary}"
+                            TextColor="{StaticResource TextPrimary}"
+                            FontSize="16"
+                            FontAttributes="Bold"
+                            HeightRequest="48"
+                            CornerRadius="10"
+                            Margin="0,8,0,0">
+                        <Button.Shadow>
+                            <Shadow Brush="{StaticResource Primary}" Offset="0,3" Radius="10" Opacity="0.45" />
+                        </Button.Shadow>
+                    </Button>
+
+                    <!-- Reset UTC (hidden by default) -->
+                    <Button x:Name="ResetUTC"
+                            Text="Reset UTC"
+                            Style="{StaticResource SecondaryButton}"
+                            IsVisible="False"
+                            HeightRequest="40"
+                            CornerRadius="8" />
+
+                    <!-- Error Message -->
+                    <Label x:Name="ErrorMessageText"
+                           Text="{Binding errorMessage}"
+                           TextColor="{StaticResource Danger}"
+                           FontSize="13"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center" />
+
+                    <!-- Login Status -->
+                    <Label x:Name="LoginStatusMessageText"
+                           Style="{StaticResource StatusLabel}"
+                           HorizontalOptions="Center"
+                           HorizontalTextAlignment="Center"
+                           FontSize="13" />
+
+                    <!-- Create Account Link -->
+                    <Label x:Name="CreateAccountText"
+                           Text="Create an account"
+                           TextColor="{StaticResource Accent}"
+                           FontSize="14"
+                           TextDecorations="Underline"
+                           HorizontalOptions="Center"
+                           Margin="0,4,0,0" />
+
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- LANGUAGE SELECTORS                                            -->
+            <!-- ============================================================ -->
+            <HorizontalStackLayout HorizontalOptions="Center"
+                                   Spacing="12"
+                                   Margin="0,0,0,16">
+                <ImageButton x:Name="English"
+                             WidthRequest="44" HeightRequest="32"
+                             BackgroundColor="{StaticResource CardBgLight}"
+                             CornerRadius="6"
+                             Padding="8,4"
+                             Source="flag_en.png" />
+                <ImageButton x:Name="French"
+                             WidthRequest="44" HeightRequest="32"
+                             BackgroundColor="{StaticResource CardBgLight}"
+                             CornerRadius="6"
+                             Padding="8,4"
+                             Source="flag_fr.png" />
+                <ImageButton x:Name="German"
+                             WidthRequest="44" HeightRequest="32"
+                             BackgroundColor="{StaticResource CardBgLight}"
+                             CornerRadius="6"
+                             Padding="8,4"
+                             Source="flag_de.png" />
+                <ImageButton x:Name="Spanish"
+                             WidthRequest="44" HeightRequest="32"
+                             BackgroundColor="{StaticResource CardBgLight}"
+                             CornerRadius="6"
+                             Padding="8,4"
+                             Source="flag_es.png" />
+            </HorizontalStackLayout>
+
+            <!-- Culture display -->
+            <Label x:Name="SignInCultureText"
+                   Style="{StaticResource StatusLabel}"
+                   HorizontalOptions="Center"
+                   FontSize="12"
+                   Margin="0,0,0,12" />
+
+            <!-- ============================================================ -->
+            <!-- LED STATUS ROW                                                -->
+            <!-- ============================================================ -->
+            <Border BackgroundColor="{StaticResource CardBg}"
+                    StrokeShape="RoundRectangle 10"
+                    Stroke="{StaticResource BorderColor}"
+                    Padding="16,8"
+                    MaximumWidthRequest="300"
+                    HorizontalOptions="Center"
+                    Margin="0,0,0,16">
+                <HorizontalStackLayout HorizontalOptions="Center" Spacing="14">
+                    <Label x:Name="LoginLed1" Style="{StaticResource LedLabel}"
+                           Text="&#x25CF;" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                    <Label x:Name="LoginLed2" Style="{StaticResource LedLabel}"
+                           Text="&#x25CF;" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                    <Label x:Name="LoginLed3" Style="{StaticResource LedLabel}"
+                           Text="&#x25CF;" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                    <Label x:Name="LoginLed4" Style="{StaticResource LedLabel}"
+                           Text="&#x25CF;" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                    <Label x:Name="LoginLed5" Style="{StaticResource LedLabel}"
+                           Text="&#x25CF;" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                    <Label x:Name="LoginLed6" Style="{StaticResource LedLabel}"
+                           Text="&#x25CF;" FontSize="12" TextColor="{StaticResource TextMuted}" />
+                </HorizontalStackLayout>
+            </Border>
+
+            <!-- ============================================================ -->
+            <!-- TIME OFFSET                                                   -->
+            <!-- ============================================================ -->
+            <Label x:Name="TimeOffsetMessageText"
+                   Style="{StaticResource StatusLabel}"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   FontSize="12"
+                   Margin="0,0,0,8" />
+
+            <!-- ============================================================ -->
+            <!-- FOOTER: VERSION & PLATFORM                                    -->
+            <!-- ============================================================ -->
+            <VerticalStackLayout Spacing="2" Margin="0,12,0,0">
+                <Label x:Name="VersionMessageText"
+                       TextColor="{StaticResource TextMuted}"
+                       FontSize="11"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+                <Label x:Name="PlatformText"
+                       TextColor="{StaticResource TextMuted}"
+                       FontSize="11"
+                       HorizontalOptions="Center"
+                       HorizontalTextAlignment="Center" />
+            </VerticalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
+
+</ContentView>

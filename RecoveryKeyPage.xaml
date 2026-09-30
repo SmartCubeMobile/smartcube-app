@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.RecoveryKeyPage"
+             BackgroundColor="#0A0F1E"
+             NavigationPage.HasNavigationBar="False">
+
+    <ScrollView>
+        <Border BackgroundColor="#131B2E" Stroke="#1E2D4A" StrokeThickness="1"
+                Padding="36,30" WidthRequest="520" Margin="0,30"
+                VerticalOptions="Center" HorizontalOptions="Center">
+            <Border.StrokeShape><RoundRectangle CornerRadius="18" /></Border.StrokeShape>
+
+            <VerticalStackLayout Spacing="0">
+                <Label x:Name="TitleLabel" Text="Save your recovery key" FontSize="22" FontAttributes="Bold"
+                       TextColor="#F1F5F9" HorizontalOptions="Center" />
+                <Label Text="Your SmartCube data on this PC is locked with a key that only you hold. If you ever forget your password, this recovery key is the only way to open your data on a new or reset PC."
+                       FontSize="13" TextColor="#94A3B8" HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap" Margin="0,10,0,6" />
+                <Label Text="SmartCube cannot recover it for you. Nobody at SmartCube can see your data."
+                       FontSize="13" TextColor="#FBBF24" FontAttributes="Bold" HorizontalTextAlignment="Center"
+                       LineBreakMode="WordWrap" Margin="0,0,0,18" />
+
+                <Border BackgroundColor="#0A0F1E" Stroke="#3B82F6" StrokeThickness="1" Padding="16,18">
+                    <Border.StrokeShape><RoundRectangle CornerRadius="12" /></Border.StrokeShape>
+                    <Label x:Name="KeyLabel" Text="" FontFamily="Consolas" FontSize="20" CharacterSpacing="1"
+                           TextColor="#F1F5F9" HorizontalOptions="Center" HorizontalTextAlignment="Center"
+                           LineBreakMode="WordWrap" />
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="10" Margin="0,14,0,0">
+                    <Button x:Name="CopyBtn" Text="Copy" FontSize="13" FontAttributes="Bold"
+                            BackgroundColor="#1E3A5F" TextColor="#60A5FA" CornerRadius="10" HeightRequest="40"
+                            ToolTipProperties.Text="Copy the recovery key so you can paste it into a password manager."
+                            Clicked="OnCopyClicked" />
+                    <Button Grid.Column="1" x:Name="SaveBtn" Text="Save as a file" FontSize="13" FontAttributes="Bold"
+                            BackgroundColor="#1E3A5F" TextColor="#60A5FA" CornerRadius="10" HeightRequest="40"
+                            ToolTipProperties.Text="Save the recovery key as a text file in your Documents folder, ready to print."
+                            Clicked="OnSaveClicked" />
+                </Grid>
+                <Label x:Name="SavedLabel" Text="" FontSize="12" TextColor="#34D399" LineBreakMode="WordWrap"
+                       HorizontalTextAlignment="Center" Margin="0,8,0,0" IsVisible="False" />
+
+                <Label Text="Good places: printed and kept with your important papers, or in a password manager. Not in an email, and not only on this PC."
+                       FontSize="12" TextColor="#64748B" LineBreakMode="WordWrap" HorizontalTextAlignment="Center" Margin="0,14,0,0" />
+
+                <HorizontalStackLayout Spacing="8" Margin="0,18,0,0" HorizontalOptions="Center">
+                    <CheckBox x:Name="SavedCheck" Color="#3B82F6" VerticalOptions="Center" CheckedChanged="OnSavedChanged"
+                              ToolTipProperties.Text="Tick once your recovery key is saved somewhere safe." />
+                    <Label Text="I've saved my recovery key somewhere safe" FontSize="13" TextColor="#CBD5E1" VerticalOptions="Center">
+                        <Label.GestureRecognizers><TapGestureRecognizer Tapped="OnSavedLabelTapped" /></Label.GestureRecognizers>
+                    </Label>
+                </HorizontalStackLayout>
+
+                <Button x:Name="ContinueBtn" Text="Continue" FontSize="15" FontAttributes="Bold" IsEnabled="False"
+                        BackgroundColor="#3B82F6" TextColor="White" CornerRadius="12" HeightRequest="48"
+                        Margin="0,16,0,0" Clicked="OnContinueClicked" />
+            </VerticalStackLayout>
+        </Border>
+    </ScrollView>
+</ContentPage>

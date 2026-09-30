@@ -1,0 +1,138 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.FullReportPage"
+             BackgroundColor="{StaticResource PageBg}"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*" Padding="0">
+
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="{StaticResource NavBg}"
+                Stroke="{StaticResource BorderColor}" StrokeThickness="0,0,0,1"
+                Padding="20,14">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                <Button x:Name="BackButton" Text="←" BackgroundColor="Transparent"
+                        TextColor="{StaticResource TextSecondary}" FontSize="20"
+                        Padding="0" WidthRequest="40" HeightRequest="40"
+                        ToolTipProperties.Text="Go back to the previous screen."
+                        Clicked="OnBackClicked" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="SmartCube Report" FontSize="22" FontAttributes="Bold"
+                           TextColor="{StaticResource Primary}" />
+                    <Label x:Name="ReportDate" FontSize="12"
+                           TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+                <Image Grid.Column="2" Source="smartcube_mobile_logo.png"
+                       WidthRequest="36" HeightRequest="36" Aspect="AspectFit"
+                       VerticalOptions="Center" Margin="0,0,8,0" />
+                <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
+            </Grid>
+        </Border>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1" Padding="24,16">
+            <VerticalStackLayout Spacing="20" MaximumWidthRequest="950" HorizontalOptions="Center">
+
+                <!-- Net Worth Overview -->
+                <Border x:Name="NetWorthCard" Style="{StaticResource CardFrame}" Padding="24">
+                    <VerticalStackLayout Spacing="16">
+                        <Label Text="Net Worth Overview" Style="{StaticResource Heading2}" ToolTipProperties.Text="Your total net worth, split by banking, crypto and investment balances." />
+                        <Grid x:Name="NetWorthGrid" ColumnDefinitions="*,*,*,*" ColumnSpacing="16" />
+                        <BoxView HeightRequest="1" Color="{StaticResource BorderColor}" />
+                        <Grid x:Name="NetWorthBreakdown" ColumnDefinitions="*,*,*,*" ColumnSpacing="16" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- ═══ BANKING ═══ -->
+                <Label Text="Banking" TextColor="{StaticResource Primary}" FontSize="18" FontAttributes="Bold" Margin="0,8,0,0" ToolTipProperties.Text="Summary of your bank accounts and recent spending, from data stored locally on this PC." />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                    <Border x:Name="BankSummaryCard" Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Account Summary" Style="{StaticResource Heading2}" ToolTipProperties.Text="Your bank accounts, ranked by balance, with the type of each account." />
+                            <VerticalStackLayout x:Name="BankAccountsList" Spacing="6" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border x:Name="SpendingCard" Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Spending by Category" Style="{StaticResource Heading2}" ToolTipProperties.Text="Where your money has gone, grouped by spending category." />
+                            <VerticalStackLayout x:Name="SpendingList" Spacing="6" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- ═══ UTILITY ═══ -->
+                <Label Text="Utility" TextColor="{StaticResource Primary}" FontSize="18" FontAttributes="Bold" Margin="0,8,0,0" ToolTipProperties.Text="Summary of your gas, electricity and other utility bills." />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                    <Border x:Name="UtilitySummaryCard" Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Monthly Costs" Style="{StaticResource Heading2}" ToolTipProperties.Text="Your total utility spend for each of the last 6 billing periods." />
+                            <VerticalStackLayout x:Name="UtilityMonthlyCosts" Spacing="6" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border x:Name="UtilitySupplierCard" Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Supplier Breakdown" Style="{StaticResource Heading2}" ToolTipProperties.Text="What you've spent with each utility supplier over the last 6 months." />
+                            <VerticalStackLayout x:Name="UtilitySupplierList" Spacing="6" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- ═══ CRYPTO ═══ -->
+                <Label Text="Crypto" TextColor="{StaticResource Primary}" FontSize="18" FontAttributes="Bold" Margin="0,8,0,0" ToolTipProperties.Text="Summary of your cryptocurrency holdings across all connected wallets and exchanges." />
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                    <Border x:Name="CryptoSummaryCard" Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Portfolio Holdings" Style="{StaticResource Heading2}" ToolTipProperties.Text="Every coin you hold, its current value and its 24-hour price change." />
+                            <VerticalStackLayout x:Name="CryptoHoldingsList" Spacing="6" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <Border x:Name="CryptoKpiCard" Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Crypto Summary" Style="{StaticResource Heading2}" ToolTipProperties.Text="Key figures for your crypto portfolio: total value, number of assets, average change and top holding." />
+                            <Grid x:Name="CryptoKpiGrid" ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" RowSpacing="14" ColumnSpacing="16" />
+                        </VerticalStackLayout>
+                    </Border>
+                </Grid>
+
+                <!-- ═══ INVESTMENTS ═══ -->
+                <Label Text="Investments" TextColor="{StaticResource Primary}" FontSize="18" FontAttributes="Bold" Margin="0,8,0,0" ToolTipProperties.Text="Summary of your stocks and shares portfolio performance." />
+
+                <Border x:Name="InvKpiCard" Style="{StaticResource CardFrame}" Padding="20">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Portfolio Performance" Style="{StaticResource Heading2}" ToolTipProperties.Text="Overall investment value, profit or loss, number of holdings, average yield and estimated income." />
+                        <Grid x:Name="InvKpiGrid" ColumnDefinitions="*,*,*,*,*" ColumnSpacing="12" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <Grid ColumnDefinitions="*,*" ColumnSpacing="16">
+                    <Border x:Name="InvHoldingsCard" Style="{StaticResource CardFrame}" Padding="20">
+                        <VerticalStackLayout Spacing="12">
+                            <Label Text="Holdings" Style="{StaticResource Heading2}" ToolTipProperties.Text="Every investment you hold, its current value and profit or loss." />
+                            <VerticalStackLayout x:Name="InvHoldingsList" Spacing="4" />
+                        </VerticalStackLayout>
+                    </Border>
+                    <VerticalStackLayout Grid.Column="1" Spacing="16">
+                        <Border x:Name="InvSectorCard" Style="{StaticResource CardFrame}" Padding="20">
+                            <VerticalStackLayout Spacing="12">
+                                <Label Text="Sector Allocation" Style="{StaticResource Heading2}" ToolTipProperties.Text="How your investment portfolio is spread across different market sectors." />
+                                <VerticalStackLayout x:Name="InvSectorList" Spacing="6" />
+                            </VerticalStackLayout>
+                        </Border>
+                        <Border x:Name="InvDividendCard" Style="{StaticResource CardFrame}" Padding="20">
+                            <VerticalStackLayout Spacing="12">
+                                <Label Text="Dividend Income (Est.)" Style="{StaticResource Heading2}" ToolTipProperties.Text="Estimated yearly dividend income from your highest-yielding holdings." />
+                                <VerticalStackLayout x:Name="InvDividendList" Spacing="6" />
+                            </VerticalStackLayout>
+                        </Border>
+                    </VerticalStackLayout>
+                </Grid>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

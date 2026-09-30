@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.ConnectBankPage"
+             BackgroundColor="{StaticResource PageBg}"
+             NavigationPage.HasNavigationBar="False">
+
+    <Grid RowDefinitions="Auto,*" Padding="0">
+
+        <!-- Header -->
+        <Border Grid.Row="0" BackgroundColor="{StaticResource NavBg}"
+                Stroke="{StaticResource BorderColor}" StrokeThickness="0,0,0,1"
+                Padding="20,14">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Text="←" BackgroundColor="Transparent"
+                        TextColor="{StaticResource TextSecondary}" FontSize="20"
+                        Padding="0" WidthRequest="40" HeightRequest="40"
+                        ToolTipProperties.Text="Go back to the previous screen."
+                        Clicked="OnBackClicked" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2" VerticalOptions="Center">
+                    <Label Text="Bank Connections" FontSize="22" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}" />
+                    <Label Text="Securely link your UK bank accounts"
+                           FontSize="12" TextColor="{StaticResource TextSecondary}" />
+                </VerticalStackLayout>
+                <Button Grid.Column="2" Text="?" ToolTipProperties.Text="What this section does"
+                        FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26"
+                        Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                        VerticalOptions="Center" Clicked="OnHelpClicked" />
+            </Grid>
+        </Border>
+
+        <!-- Content -->
+        <ScrollView Grid.Row="1" Padding="24,16">
+            <VerticalStackLayout Spacing="16" WidthRequest="520" HorizontalOptions="Center">
+
+                <!-- Status -->
+                <Border x:Name="StatusCard" Style="{StaticResource CardFrame}" Padding="20">
+                    <HorizontalStackLayout Spacing="12">
+                        <Label x:Name="StatusIcon" Text="🔴" FontSize="18" VerticalOptions="Center" />
+                        <VerticalStackLayout Spacing="2" VerticalOptions="Center">
+                            <Label x:Name="StatusLabel" Text="Not Connected"
+                                   TextColor="{StaticResource TextPrimary}" FontSize="15" FontAttributes="Bold" />
+                            <Label x:Name="StatusDetail" Text="No bank accounts linked"
+                                   TextColor="{StaticResource TextMuted}" FontSize="12" />
+                        </VerticalStackLayout>
+                    </HorizontalStackLayout>
+                </Border>
+
+                <!-- Connected accounts -->
+                <Border x:Name="ConnectionsCard" Style="{StaticResource CardFrame}" Padding="20"
+                        IsVisible="False">
+                    <VerticalStackLayout Spacing="12">
+                        <Label Text="Connected Banks" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Banks currently linked via TrueLayer, with their connection status." />
+                        <VerticalStackLayout x:Name="ConnectionsList" Spacing="8" />
+                    </VerticalStackLayout>
+                </Border>
+
+                <!-- Link bank form -->
+                <Border x:Name="TrueLayerForm" Style="{StaticResource CardFrame}" Padding="20">
+                    <VerticalStackLayout Spacing="14">
+                        <Label Text="Link a Bank Account" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="Connect a UK bank account through TrueLayer; SmartCube never sees your bank password." />
+                        <Label Text="Step 1: Choose your bank and authorise access."
+                               TextColor="{StaticResource TextMuted}" FontSize="12" />
+
+                        <Button x:Name="TLOpenAuthBtn" Text="Link Bank Account"
+                                FontSize="15" FontAttributes="Bold"
+                                CornerRadius="12" HeightRequest="48"
+                                HorizontalOptions="Fill"
+                                ToolTipProperties.Text="Open your bank's login page in the browser via TrueLayer to authorise access; the code comes back automatically."
+                                Clicked="OnOpenTrueLayerAuthClicked" />
+
+                        <Label Text="Step 2: After authorising, the code will be captured automatically. If not, paste it below."
+                               TextColor="{StaticResource TextMuted}" FontSize="12" />
+
+                        <VerticalStackLayout Spacing="4">
+                            <Label Text="Auth Code" TextColor="{StaticResource TextSecondary}" FontSize="12" />
+                            <Border BackgroundColor="{StaticResource CardBgLight}"
+                                    Stroke="{StaticResource BorderColor}"
+                                    StrokeShape="RoundRectangle 8" Padding="4,0">
+                                <Entry x:Name="TLAuthCodeEntry" Placeholder="Paste code from ?code=xxxxx"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       BackgroundColor="Transparent" FontSize="13"
+                                       ToolTipProperties.Text="Paste the code from the browser address bar here only if it wasn't captured automatically."
+                                       HeightRequest="44" />
+                            </Border>
+                        </VerticalStackLayout>
+
+                        <Button x:Name="TLConnectBtn" Text="Connect"
+                                FontSize="15" FontAttributes="Bold"
+                                CornerRadius="12" HeightRequest="48"
+                                HorizontalOptions="Fill"
+                                ToolTipProperties.Text="Finish linking your bank using the authorisation code above."
+                                Clicked="OnTrueLayerConnectClicked" />
+
+                        <Label x:Name="TLErrorLabel" TextColor="#EF4444" FontSize="12"
+                               IsVisible="False" />
+                    </VerticalStackLayout>
+                </Border>
+
+            </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentPage>

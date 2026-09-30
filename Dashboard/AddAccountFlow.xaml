@@ -1,0 +1,185 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.AddAccountFlow"
+             Shell.NavBarIsVisible="False"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid RowDefinitions="Auto,*" Padding="0">
+
+        <!-- Header -->
+        <Border BackgroundColor="{StaticResource NavBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeThickness="0,0,0,1"
+                Padding="24,14">
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto">
+                <Button x:Name="BackButton" Text="← Back"
+                        BackgroundColor="Transparent"
+                        TextColor="{StaticResource TextSecondary}"
+                        FontSize="13" Padding="8,4"
+                        ToolTipProperties.Text="Go back a step, or leave this screen if you haven't picked a bank yet."
+                        Clicked="OnBackClicked" />
+                <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
+                    <Label x:Name="StepTitle" Text="Add Bank Account"
+                           FontSize="20" FontAttributes="Bold"
+                           TextColor="{StaticResource TextPrimary}"
+                           HorizontalOptions="Center" />
+                    <Label x:Name="StepSubtitle" Text="Select your bank"
+                           TextColor="{StaticResource TextSecondary}"
+                           FontSize="12" HorizontalOptions="Center" />
+                </VerticalStackLayout>
+                <Label Grid.Column="2" x:Name="StepIndicator" Text="Step 1 of 3"
+                       TextColor="{StaticResource TextMuted}" FontSize="12"
+                       VerticalOptions="Center" Margin="0,0,8,0" />
+                <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does"
+                        FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26"
+                        Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                        VerticalOptions="Center" Clicked="OnHelpClicked" />
+            </Grid>
+        </Border>
+
+        <!-- Step Content -->
+        <Grid Grid.Row="1">
+
+            <!-- Step 1: Institution Selection -->
+            <ScrollView x:Name="Step1" Padding="32,20">
+                <VerticalStackLayout Spacing="8" x:Name="BankList" />
+            </ScrollView>
+
+            <!-- Step 2: Credentials -->
+            <Border x:Name="Step2" IsVisible="False"
+                    BackgroundColor="Transparent" Stroke="Transparent"
+                    Padding="32,20">
+                <VerticalStackLayout Spacing="16" HorizontalOptions="Center"
+                                     WidthRequest="420">
+                    <Border Style="{StaticResource CardFrame}" Padding="24">
+                        <VerticalStackLayout Spacing="16">
+                            <HorizontalStackLayout Spacing="12">
+                                <Label x:Name="SelectedBankIcon" FontSize="28"
+                                       VerticalOptions="Center" />
+                                <Label x:Name="SelectedBankName" FontSize="18"
+                                       FontAttributes="Bold"
+                                       TextColor="{StaticResource TextPrimary}"
+                                       VerticalOptions="Center" />
+                            </HorizontalStackLayout>
+
+                            <BoxView HeightRequest="1"
+                                     Color="{StaticResource BorderColor}" />
+
+                            <VerticalStackLayout Spacing="6">
+                                <Label x:Name="Param1Label" Text="Customer Number"
+                                       TextColor="{StaticResource TextSecondary}"
+                                       FontSize="13" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 10" Padding="4,0">
+                                    <Entry x:Name="Param1Entry"
+                                           Placeholder="Enter here"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent"
+                                           ToolTipProperties.Text="Type the login detail shown above (varies by bank, e.g. your customer number, username or email)."
+                                           FontSize="15" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Spacing="6">
+                                <Label x:Name="Param2Label" Text="Date of Birth"
+                                       TextColor="{StaticResource TextSecondary}"
+                                       FontSize="13" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 10" Padding="4,0">
+                                    <Entry x:Name="Param2Entry"
+                                           Placeholder="Enter here"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent"
+                                           ToolTipProperties.Text="Type the second login detail shown above (varies by bank, e.g. password or date of birth)."
+                                           FontSize="15" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <VerticalStackLayout Spacing="6">
+                                <Label x:Name="Param3Label" Text="Passcode"
+                                       TextColor="{StaticResource TextSecondary}"
+                                       FontSize="13" />
+                                <Border BackgroundColor="{StaticResource CardBgLight}"
+                                        Stroke="{StaticResource BorderColor}"
+                                        StrokeShape="RoundRectangle 10" Padding="4,0">
+                                    <Entry x:Name="Param3Entry"
+                                           Placeholder="Enter here"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           BackgroundColor="Transparent"
+                                           IsPassword="True"
+                                           ToolTipProperties.Text="Type the passcode, PIN or security code shown above; hidden as you type."
+                                           FontSize="15" HeightRequest="44" />
+                                </Border>
+                            </VerticalStackLayout>
+
+                            <Label Text="Your credentials are encrypted locally and never shared."
+                                   TextColor="{StaticResource TextMuted}" FontSize="11"
+                                   HorizontalOptions="Center" />
+
+                            <Button x:Name="ConnectButton" Text="Connect"
+                                    FontSize="15" CornerRadius="12"
+                                    HeightRequest="48"
+                                    ToolTipProperties.Text="Submit these details to look up your accounts at this bank; everything is stored only on this PC."
+                                    Clicked="OnConnectClicked" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Step 3: Connecting / Result -->
+            <Border x:Name="Step3" IsVisible="False"
+                    BackgroundColor="Transparent" Stroke="Transparent"
+                    Padding="32,20">
+                <VerticalStackLayout Spacing="20" HorizontalOptions="Center"
+                                     VerticalOptions="Center"
+                                     WidthRequest="420">
+
+                    <!-- Connecting state -->
+                    <VerticalStackLayout x:Name="ConnectingState" Spacing="16"
+                                         HorizontalOptions="Center">
+                        <ActivityIndicator IsRunning="True"
+                                           Color="{StaticResource Primary}"
+                                           HeightRequest="48" WidthRequest="48"
+                                           HorizontalOptions="Center" />
+                        <Label x:Name="ConnectingLabel"
+                               Text="Connecting to Nationwide..."
+                               TextColor="{StaticResource TextPrimary}"
+                               FontSize="18" FontAttributes="Bold"
+                               HorizontalOptions="Center" />
+                        <Label x:Name="ConnectingDetail"
+                               Text="Logging in securely..."
+                               TextColor="{StaticResource TextSecondary}"
+                               FontSize="13" HorizontalOptions="Center" />
+                    </VerticalStackLayout>
+
+                    <!-- Success state -->
+                    <VerticalStackLayout x:Name="SuccessState" IsVisible="False"
+                                         Spacing="16">
+                        <Label Text="✓" TextColor="{StaticResource Success}"
+                               FontSize="48" HorizontalOptions="Center" />
+                        <Label x:Name="SuccessTitle"
+                               Text="2 accounts found"
+                               TextColor="{StaticResource TextPrimary}"
+                               FontSize="20" FontAttributes="Bold"
+                               HorizontalOptions="Center" />
+
+                        <VerticalStackLayout x:Name="FoundAccountsList"
+                                             Spacing="8" />
+
+                        <Button x:Name="AddToCubeButton"
+                                Text="Add to SmartCube"
+                                FontSize="15" CornerRadius="12"
+                                HeightRequest="48"
+                                ToolTipProperties.Text="Close this screen and return to the dashboard now these accounts have been added."
+                                Clicked="OnAddToCubeClicked" />
+                    </VerticalStackLayout>
+                </VerticalStackLayout>
+            </Border>
+
+        </Grid>
+    </Grid>
+
+</ContentPage>

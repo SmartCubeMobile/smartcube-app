@@ -1,0 +1,898 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:id="@+id/LoginStatusMessage"
+        android:textStyle="normal"
+        android:textSize="20dp" />
+<!--Grid.ColumnSpan="2" Margin="0,15,43.6,15.2"/-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:id="@+id/LastLoginStatusMessage"
+        android:textStyle="normal"
+        android:textSize="14dp" />
+<!--Margin="0,0,0,0" Grid.ColumnSpan="2"/-->
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="15dp"
+        android:id="@+id/WithdrawnDateMessage"
+        android:textStyle="normal"
+        android:textSize="14dp" />
+<!--Margin="0,0,0,0" Grid.ColumnSpan="2"/-->
+    <TextView
+        android:text="3.1"
+        android:layout_width="match_parent"
+        android:layout_height="15dp" />
+    <GridLayout
+        android:layout_height="460dp"
+        android:layout_width="1000dp"
+        android:columnCount="2">
+        <LinearLayout
+            android:layout_width="120dp"
+            android:layout_height="450dp"
+            android:layout_gravity="left"
+            android:orientation="vertical">
+        <!-- android:columnCount="1">
+                        -->
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="40dp"
+                android:layout_gravity="top"
+                android:adjustViewBounds="true"
+                android:maxHeight="40dp"
+                android:minHeight="40dp"
+                android:scaleType="fitCenter"
+                android:src="@drawable/SmartSwitchLogo" />
+            <FrameLayout
+                android:id="@+id/textBlockBorder"
+                android:layout_width="96dp"
+                android:layout_height="42dp"
+                android:layout_gravity="center"
+                android:background="@android:color/holo_orange_light">
+                <ScrollView
+                    android:id="@+id/scrollViewer"
+                    android:layout_width="match_parent"
+                    android:layout_height="37dp"
+                    android:layout_gravity="center"
+                    android:background="@android:color/black"
+                    android:visibility="invisible">
+                    <TextView
+                        android:id="@+id/textBoxBrowser"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="TESTING"
+                        android:textColor="@android:color/white"
+                        android:textSize="8dp"
+                        android:textStyle="bold" />
+                </ScrollView>
+            </FrameLayout>
+            <Button
+                android:id="@+id/buttonAutoSwitch"
+                android:layout_width="57dp"
+                android:layout_height="19dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@android:color/holo_purple"
+                android:text="AUTOSWITCH" />
+        <!--android:tooltipText="Press to initiate supplier AutoSwitch"-->
+            <Button
+                android:id="@+id/buttonOpenClose"
+                android:layout_width="66dp"
+                android:layout_height="23dp"
+                android:layout_gravity="center_horizontal"
+                android:background="@android:color/holo_green_dark"
+                android:text="OPEN/CLOSE" />
+        <!--android:tooltipText="Press to Open or Close the meter doors"-->
+            <TextView
+                android:id="@+id/DateTimeNow"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:width="200dp"
+                android:height="15dp"
+                android:text="Date/Time"
+                android:textAlignment="center"
+                android:textSize="9dp" />
+            <TextView
+                android:id="@+id/NextConnection"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:width="200dp"
+                android:height="15dp"
+                android:text="Next Connection"
+                android:textAlignment="center"
+                android:textSize="9dp" />
+            <GridLayout
+                android:layout_width="100dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:columnCount="4">
+                <TextView
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="TR"
+                    android:textAlignment="center"
+                    android:textSize="5dp" />
+                <TextView
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="DBS"
+                    android:textAlignment="center"
+                    android:textSize="5dp" />
+                <TextView
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="UD"
+                    android:textAlignment="center"
+                    android:textSize="5dp" />
+                <TextView
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="TD"
+                    android:textAlignment="center"
+                    android:textSize="5dp" />
+                <TextView
+                    android:id="@+id/Led1"
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="●"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/holo_orange_light"
+                    android:textSize="5dp" />
+                <TextView
+                    android:id="@+id/Led2"
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="●"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/holo_orange_light"
+                    android:textSize="5dp" />
+                <TextView
+                    android:id="@+id/Led3"
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="●"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/holo_orange_light"
+                    android:textSize="5dp" />
+                <TextView
+                    android:id="@+id/Led4"
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="●"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/holo_orange_light"
+                    android:textSize="5dp" />
+                <TextView
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="NW"
+                    android:textAlignment="center"
+                    android:textSize="5dp" />
+                <TextView
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="MR"
+                    android:textAlignment="center"
+                    android:textSize="5dp" />
+                <TextView
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="SW"
+                    android:textAlignment="center"
+                    android:textSize="5dp" />
+                <TextView
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="FAIL"
+                    android:textAlignment="center"
+                    android:textSize="5dp" />
+                <TextView
+                    android:id="@+id/Led5"
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="●"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/holo_orange_light"
+                    android:textSize="5dp" />
+                <TextView
+                    android:id="@+id/Led6"
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="●"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/holo_orange_light"
+                    android:textSize="5dp" />
+                <TextView
+                    android:id="@+id/Led7"
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="●"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/holo_orange_light"
+                    android:textSize="5dp" />
+                <TextView
+                    android:id="@+id/Led8"
+                    android:layout_width="25dp"
+                    android:layout_height="8dp"
+                    android:layout_gravity="top"
+                    android:text="●"
+                    android:textAlignment="center"
+                    android:textColor="@android:color/holo_orange_light"
+                    android:textSize="5dp" />
+            </GridLayout>
+            <Button
+                android:id="@+id/buttonQuit"
+                android:layout_width="71dp"
+                android:layout_height="37dp"
+                android:layout_gravity="left"
+                android:text="QUIT" />
+        </LinearLayout>
+    <!--android:tooltipText="Press to Quit SmartSwitch"-->
+    <!-- End of Left Panel -->
+    <!-- Start of Right Panel -->
+        <LinearLayout
+            android:layout_height="match_parent"
+            android:layout_width="match_parent"
+            android:orientation="vertical">
+        <!-- Start of Meter top -->
+            <LinearLayout
+                android:layout_height="wrap_content"
+                android:layout_width="match_parent"
+                android:orientation="vertical">
+                <GridLayout
+                    android:id="@+id/meter_top"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:columnCount="4">
+                <!--android:background="@drawable/MeterTop"-->
+                <!-- android:columnCount="1">
+                            -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                        <GridLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:columnCount="2">
+                            <TextView
+                                android:id="@+id/TotalkWh"
+                                android:background="@android:color/holo_green_dark"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Total kWh"
+                                android:layout_gravity="left"
+                                android:textSize="10dp" />
+                            <TextView
+                                android:background="@android:color/holo_green_dark"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:layout_gravity="right"
+                                android:textSize="10dp" />
+                            <TextView
+                                android:id="@+id/Billed"
+                                android:background="@android:color/holo_green_dark"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Total Bills"
+                                android:layout_gravity="left"
+                                android:textSize="10dp" />
+                            <TextView
+                                android:background="@android:color/holo_green_dark"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:layout_gravity="right"
+                                android:textSize="10dp" />
+                            <TextView
+                                android:id="@+id/Projected"
+                                android:background="@android:color/holo_green_dark"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Projected"
+                                android:layout_gravity="left"
+                                android:textSize="10dp" />
+                            <TextView
+                                android:background="@android:color/holo_green_dark"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:text=""
+                                android:layout_gravity="right"
+                                android:textSize="10dp" />
+                        </GridLayout>
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal">
+                        <!--columnCOunt=3 -->
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+                                <Button
+                                    android:id="@+id/buttonSubmit"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="20dp"
+                                    android:layout_gravity="left"
+                                    android:background="@android:color/holo_green_light"
+                                    android:text="Submit" />
+                            <!-- android:tooltipText="Press to collect your Supplier's meter readings"-->
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="15dp"
+                                    android:text="Supplier"
+                                    android:textAlignment="textEnd"
+                                    android:textSize="10dp" />
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="15dp"
+                                    android:text="UserId"
+                                    android:textAlignment="textEnd"
+                                    android:textSize="10dp" />
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="15dp"
+                                    android:text="Tariff"
+                                    android:textAlignment="textEnd"
+                                    android:textSize="10dp" />
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="15dp"
+                                    android:text="Payment"
+                                    android:textAlignment="textEnd"
+                                    android:textSize="10dp" />
+                            </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+                                <TextView
+                                    android:id="@+id/labelUsername"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="USERNAME"
+                                    android:layout_gravity="left"
+                                    android:textSize="15dp" />
+                                <Spinner
+                                    android:id="@+id/comboBoxSuppliers"
+                                    android:layout_width="79dp"
+                                    android:layout_height="15dp"
+                                    android:layout_gravity="right" />
+                                <EditText
+                                    android:id="@+id/textUserId"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="15dp"
+                                    android:layout_gravity="left"
+                                    android:text=""
+                                    android:textSize="10dp" />
+                                <Spinner
+                                    android:id="@+id/comboBoxTariffs"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="15dp"
+                                    android:layout_gravity="right" />
+                                <Spinner
+                                    android:id="@+id/comboBoxPaymentPlan"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="15dp"
+                                    android:layout_gravity="right" />
+                            </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:orientation="vertical">
+                                <Button
+                                    android:id="@+id/buttonCancel"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="20dp"
+                                    android:layout_gravity="left"
+                                    android:background="@android:color/holo_red_light"
+                                    android:text="Cancel" />
+                            <!--android:tooltipText="Press to cancel your Supplier's meter readings"-->
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="horizontal">
+                                    <TextView
+                                        android:id="@+id/LedSwitched"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="15dp"
+                                        android:layout_gravity="top"
+                                        android:text="●"
+                                        android:textAlignment="center"
+                                        android:textColor="@android:color/holo_orange_light"
+                                        android:textSize="10dp" />
+                                    <TextView
+                                        android:layout_width="55dp"
+                                        android:layout_height="15dp"
+                                        android:text="Account"
+                                        android:textAlignment="textEnd"
+                                        android:textSize="10dp" />
+                                </LinearLayout>
+                                <TextView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="15dp"
+                                    android:text="Password"
+                                    android:textAlignment="textEnd"
+                                    android:textSize="10dp" />
+                                <TextView
+                                    android:id="@+id/labelEconomy7"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="15dp"
+                                    android:layout_gravity="center"
+                                    android:background="@android:color/white"
+                                    android:text="Economy7"
+                                    android:textAlignment="center"
+                                    android:textSize="10dp"
+                                    android:textStyle="italic" />
+                                <CheckBox
+                                    android:id="@+id/checkBox60"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="15dp"
+                                    android:text="Age 60+"
+                                    android:textAlignment="textStart"
+                                    android:textSize="10dp" />
+                            <!--android:tooltipText="Not yet implemented"-->
+                            </LinearLayout>
+                        </LinearLayout>
+                    </LinearLayout>
+                    <!--Start of Column 2-->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+                    <!-- android:columnCount="1">
+                            -->
+                        <GridLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="44dp"
+                            android:layout_gravity="center_horizontal"
+                            android:columnCount="2">
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="left"
+                                android:orientation="vertical">
+                                <RadioButton
+                                    android:id="@+id/ElectricityButton"
+                                    android:layout_width="26dp"
+                                    android:layout_height="14dp"
+                                    android:layout_gravity="left"
+                                    android:drawableRight="@drawable/electriclightbulb"
+                                    android:text="E" />
+                            <!--android:tooltipText="Electricity"-->
+                                <RadioButton
+                                    android:id="@+id/GasButton"
+                                    android:layout_width="26dp"
+                                    android:layout_height="14dp"
+                                    android:layout_gravity="left"
+                                    android:drawableRight="@drawable/gasflame"
+                                    android:text="G" />
+                            <!--android:tooltipText="Gas"-->
+                            </LinearLayout>
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="left"
+                                android:orientation="vertical">
+                                <RadioButton
+                                    android:id="@+id/DualFuelButton"
+                                    android:layout_width="26dp"
+                                    android:layout_height="14dp"
+                                    android:layout_gravity="right"
+                                    android:text="D" />
+                            <!--android:tooltipText="Click for Dual Fuel data"-->
+                            </LinearLayout>
+                        </GridLayout>
+                        <TextView
+                            android:id="@+id/AreaId"
+                            android:layout_width="match_parent"
+                            android:layout_height="15dp"
+                            android:textAlignment="center"
+                            android:textSize="10dp" />
+                        <TextView
+                            android:id="@+id/AccountNo"
+                            android:layout_width="match_parent"
+                            android:layout_height="15dp"
+                            android:text=""
+                            android:textAlignment="center"
+                            android:textSize="10dp" />
+                        <EditText
+                            android:id="@+id/textPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="15dp"
+                            android:layout_gravity="left"
+                            android:text=""
+                            android:textSize="10dp" />
+                    <!--android:tooltipText="Enter your Supplier's online account password here"-->
+                        <TextView
+                            android:layout_width="match_parent"
+                            android:layout_height="15dp"
+                            android:text=""
+                            android:textSize="10dp" />
+                        <CheckBox
+                            android:id="@+id/checkBoxSmooth"
+                            android:layout_width="match_parent"
+                            android:layout_height="15dp"
+                            android:text="Smooth"
+                            android:textAlignment="textStart"
+                            android:textSize="10dp" />
+                    <!--android:tooltipText="Not yet implemented"-->
+                    </LinearLayout>
+                <!-- End of Column2 -->
+                    <!-- Start of Column 3-->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_gravity="left">
+                    <!-- android:columnCount="1">
+                            -->
+                        <GridLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_gravity="center_horizontal"
+                            android:columnCount="1">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Address"
+                                android:layout_gravity="center"
+                                android:textAlignment="center"
+                                android:textSize="10dp" />
+                            <Spinner
+                                android:id="@+id/comboBoxUDPRN"
+                                android:layout_width="160dp"
+                                android:textAlignment="center"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center" />
+                            <GridLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:columnCount="3">
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_gravity="center">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Day Rate"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                    <TextView
+                                        android:id="@+id/DayRate1"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0.00"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                    <TextView
+                                        android:id="@+id/DayRate2"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0.00"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_gravity="center">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Night Rate"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                    <TextView
+                                        android:id="@+id/NightRate1"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0.00"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                    <TextView
+                                        android:id="@+id/NightRate2"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0.00"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_gravity="center">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Standing Charge"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                    <TextView
+                                        android:id="@+id/StandingCharge1"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0.00"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                    <TextView
+                                        android:id="@+id/StandingCharge2"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="0.00"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                </LinearLayout>
+                            </GridLayout>
+                            <GridLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_gravity="center_horizontal"
+                                android:columnCount="2">
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_gravity="center">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Date Start"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                    <DatePicker
+                                        android:id="@+id/dateTimePickerStart"
+                                        android:layout_width="30dp"
+                                        android:layout_height="10dp"
+                                        android:layout_gravity="center" />
+                                    <TextView
+                                        android:id="@+id/TotalReadings"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+                                        android:text="0.00"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                </LinearLayout>
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical"
+                                    android:layout_gravity="center">
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:text="Date Finish"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:textSize="10dp" />
+                                    <DatePicker
+                                        android:id="@+id/dateTimePickerEnd"
+                                        android:layout_width="30dp"
+                                        android:layout_height="10dp"
+                                        android:layout_gravity="center" />
+                                    <TextView
+                                        android:id="@+id/TotalCost"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_gravity="center"
+                                        android:textAlignment="center"
+                                        android:text="0.00"
+                                        android:textSize="10dp" />
+                                </LinearLayout>
+                            </GridLayout>
+                        </GridLayout>
+                    </LinearLayout>
+                <!-- End of Column 3-->
+                <!-- Start of Column 4 -->
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_gravity="left">
+                        <ImageView
+                            android:layout_width="match_parent"
+                            android:layout_height="20dp"
+                            android:layout_gravity="top"
+                            android:adjustViewBounds="true"
+                            android:maxHeight="20dp"
+                            android:minHeight="20dp"
+                            android:scaleType="fitCenter"
+                            android:id="@+id/pictureBoxDNO" />
+                      <!-- This above was the source of al my pain ....-->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Postcode"
+                            android:layout_gravity="center"
+                            android:textAlignment="center"
+                            android:textSize="10dp" />
+                        <TextView
+                            android:id="@+id/Postcode"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text=""
+                            android:layout_gravity="center"
+                            android:textAlignment="center"
+                            android:textSize="10dp" />
+                        <Button
+                            android:background="@android:color/holo_orange_light"
+                            android:layout_width="match_parent"
+                            android:layout_height="20dp"
+                            android:layout_gravity="left"
+                            android:text="Test"
+                            android:id="@+id/buttonTest" />
+                    <!--android:tooltipText="Press to Test readings"-->
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="8dp"
+                            android:text="One day"
+                            android:layout_gravity="left"
+                            android:id="@+id/radioOneDay" />
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="8dp"
+                            android:text="One month"
+                            android:layout_gravity="left"
+                            android:id="@+id/radioOneMonth" />
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="8dp"
+                            android:text="One year"
+                            android:layout_gravity="left"
+                            android:id="@+id/radioOneYear" />
+                        <RadioButton
+                            android:layout_width="wrap_content"
+                            android:layout_height="8dp"
+                            android:text="E-mail"
+                            android:layout_gravity="left"
+                            android:id="@+id/radioEmail" />
+                    </LinearLayout>
+                </GridLayout>
+            </LinearLayout>
+        <!-- End of Meter top -->
+        <!-- Start of Meter bottom -->
+            <LinearLayout
+                android:id="@+id/meter_bottom"
+                android:layout_height="90dp"
+                android:layout_width="500dp"
+                android:orientation="vertical">
+                <TabHost
+                    android:id="@android:id/tabhost"
+                    android:layout_height="wrap_content"
+                    android:layout_width="wrap_content">
+                    <LinearLayout
+                        android:layout_height="wrap_content"
+                        android:layout_width="wrap_content"
+                        android:orientation="horizontal">
+                        <FrameLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0.2">
+                            <TabWidget
+                                android:id="@android:id/tabs"
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:visibility="gone" />
+                            <LinearLayout
+                                android:layout_height="wrap_content"
+                                android:layout_width="wrap_content"
+                                android:orientation="vertical"
+                                android:layout_marginBottom="0.0dp">
+                                <Button
+                                    android:id="@+id/dataGridCosts"
+                                    android:layout_width="20dp"
+                                    android:layout_height="50dp"
+                                    android:layout_weight="1.0"
+                                    android:onClick="tabHandler"
+                                    android:rotation="270"
+                                    android:text="Costs" />
+                                <Button
+                                    android:id="@+id/dataGridBills"
+                                    android:layout_width="20dp"
+                                    android:layout_height="50dp"
+                                    android:layout_weight="1.0"
+                                    android:onClick="tabHandler"
+                                    android:rotation="270"
+                                    android:text="Bills" />
+                                <Button
+                                    android:id="@+id/dataGridReadings"
+                                    android:layout_width="20dp"
+                                    android:layout_height="50dp"
+                                    android:layout_weight="1.0"
+                                    android:onClick="tabHandler"
+                                    android:rotation="270"
+                                    android:text="Readings" />
+                                <Button
+                                    android:id="@+id/dataGridBreakdown"
+                                    android:layout_width="20dp"
+                                    android:layout_height="50dp"
+                                    android:layout_weight="1.0"
+                                    android:onClick="tabHandler"
+                                    android:rotation="270"
+                                    android:text="Breakdown" />
+                                <Button
+                                    android:id="@+id/dataGridCharts"
+                                    android:layout_width="20dp"
+                                    android:layout_height="50dp"
+                                    android:layout_weight="1.0"
+                                    android:onClick="tabHandler"
+                                    android:rotation="270"
+                                    android:text="Charts" />
+                                <Button
+                                    android:id="@+id/chart1"
+                                    android:layout_width="20dp"
+                                    android:layout_height="50dp"
+                                    android:layout_weight="1.0"
+                                    android:onClick="tabHandler"
+                                    android:rotation="270"
+                                    android:text="Chart1" />
+                                <Button
+                                    android:id="@+id/chart2"
+                                    android:layout_width="20dp"
+                                    android:layout_height="50dp"
+                                    android:layout_weight="1.0"
+                                    android:onClick="tabHandler"
+                                    android:rotation="270"
+                                    android:text="Chart2" />
+                                <Button
+                                    android:id="@+id/chart3"
+                                    android:layout_width="20dp"
+                                    android:layout_height="50dp"
+                                    android:layout_weight="1.0"
+                                    android:onClick="tabHandler"
+                                    android:rotation="270"
+                                    android:text="Chart3" />
+                            </LinearLayout>
+                            <FrameLayout
+                                android:id="@android:id/tabcontent"
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="0.8" />
+                        </FrameLayout>
+                    </LinearLayout>
+                </TabHost>
+            </LinearLayout>
+        <!-- End of Meter bottom -->
+        </LinearLayout>
+    <!-- End of Right Panel -->
+    </GridLayout>
+</LinearLayout>

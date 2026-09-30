@@ -1,0 +1,1337 @@
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.IO;
+using System.Net;
+using System.Net.Http;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
+#if WINFORMS
+using SmartDashboard;
+using System.Windows.Forms;
+#endif
+
+namespace SmartCubeMobile
+{
+    public static class HSBCV2021
+    {
+        internal static async void SetUp(
+#if WINFORMS
+                                        RichTextBox textBoxConsole,
+#endif
+                                        MainViewModel ourviewmodel,
+                                        FinanceViewModel financeviewmodel,
+                                        string organization_id,
+                                        string Client_Id,
+                                        string Client_Secret,
+                                        string url_base,
+                                        short institution_code,
+                                        short brand_code
+#if WINFORMS
+                                        //,
+                                        //                            List<SmartFinance.Accounts> accountsList,
+                                        //                            List<SmartFinance.BankTransactions> transactionsList
+#endif
+                                        )
+        {
+            CancellationToken cancel_token = new CancellationToken();
+            List<SmartFinance.Accounts> accountsList = new List<SmartFinance.Accounts>();
+            ObservableCollection<SmartFinance.Transactions> transactionsList = new ObservableCollection<SmartFinance.Transactions>();
+
+
+#if WINFORMS
+
+            MainProcess.Output_Message(textBoxConsole, "HSBC Open Banking Sandbox", MainProcess.Mally.examine.scrape, MainProcess.Mally.console);
+#endif
+
+            string CustomerId = @"1234567890";
+#if WINFORMS
+            MainProcess.Output_Message(textBoxConsole, "Customer Id: " + CustomerId, MainProcess.Mally.examine.scrape, MainProcess.Mally.console);
+#endif
+            string AuthorizationUsername = @"djefferson@f96e79b7-1a96-4cdc-82d4-d79df7557002.example.org";
+#if WINFORMS
+            MainProcess.Output_Message(textBoxConsole, "Authorization Username: " + AuthorizationUsername, MainProcess.Mally.examine.scrape, MainProcess.Mally.console);
+#endif
+            await Start(
+#if WINFORMS
+                        textBoxConsole,
+#endif
+                        ourviewmodel,
+                         financeviewmodel,
+                         Client_Id,
+                         Client_Secret,
+                         organization_id,
+                         url_base,
+                         AuthorizationUsername,
+                         CustomerId,
+                         cancel_token,
+                         accountsList,
+                         transactionsList,
+                         institution_code,
+                         brand_code);
+            Console.ReadLine();
+        }
+
+        internal static async Task<bool> Start(
+#if WINFORMS
+                                                RichTextBox textBoxConsole,
+#endif
+                                                MainViewModel ourviewmodel,
+                                                FinanceViewModel financeviewmodel,
+                                                string Client_Id,
+                                                string Client_Secret,
+                                                string organization_id,
+                                                string url_base,
+                                                string AuthorizationUsername,
+                                                string CustomerId,
+                                                CancellationToken cancel_token,
+                                                List<SmartFinance.Accounts> accountsList,
+                                                ObservableCollection<SmartFinance.Transactions> transactionsList,
+                                                short institution_code,
+                                                short brand_code)
+        {
+            // Setup Account Access Consent
+            // Retrieve Access Token (POST)
+#if WINFORMS
+            MainProcess.Output_Message(textBoxConsole, "Step 1: Account Access", MainProcess.Mally.examine.scrape, MainProcess.Mally.console);
+#endif
+            financeviewmodel.rbs_access_token = string.Empty;
+
+            short ordinal = 1;
+            string targetUrl = SmartSpikeFinanceV2017.Finance_LookupUrl_Ordinal(ourviewmodel,
+                                                                            financeviewmodel,
+                                                                            ordinal,
+                                                                            institution_code,
+                                                                            brand_code);
+
+            Uri token_uri = SmartNibbyV2016.Return_Uri(ourviewmodel,
+                                                        url_base,
+                                                        targetUrl);
+            if (!string.IsNullOrEmpty(ourviewmodel.errorMessage))
+            {
+                return false;
+            }
+            if (! //await
+                  RBS_ACCOUNT_ACCESS(ourviewmodel,
+                                        financeviewmodel,
+                                        token_uri,
+                                        Client_Id,
+                                        Client_Secret,
+                                        cancel_token))
+            {
+                return false;
+            }
+            if (!string.IsNullOrEmpty(financeviewmodel.rbs_access_token))
+            {
+                // Retrieve Account Access Consent (POST)
+
+                // Increment the ordinal
+                ordinal++;
+
+#if WINFORMS
+                MainProcess.Output_Message(textBoxConsole, "Step 2: Account Access Consent", MainProcess.Mally.examine.scrape, MainProcess.Mally.console);
+#endif
+                targetUrl = SmartSpikeFinanceV2017.Finance_LookupUrl_Ordinal(ourviewmodel,
+                                                                        financeviewmodel,
+                                                                        ordinal,
+                                                                        institution_code,
+                                                                        brand_code);
+
+                Uri account_access_uri = SmartNibbyV2016.Return_Uri(ourviewmodel,
+                                                                    url_base,
+                                                                    targetUrl);
+                if (!string.IsNullOrEmpty(ourviewmodel.errorMessage))
+                {
+                    return false;
+                }
+                if (! //await
+                      RBS_ACCOUNT_ACCESS_CONSENT(ourviewmodel,
+                                    financeviewmodel,
+                                    account_access_uri,
+                                    organization_id,
+                                    cancel_token))
+                {
+                    return false;
+                }
+                string Redirect_Uri = "https://www.keasdon.co.uk/redirect";
+                string Consent_Id = financeviewmodel.rbs_consentid;
+                // Send Account Authorize Consent (GET)
+#if WINFORMS
+                MainProcess.Output_Message(textBoxConsole, "Step 3: Account Authorize Consent", MainProcess.Mally.examine.scrape, MainProcess.Mally.console);
+#endif
+                // Increment the ordinal
+                ordinal++;
+
+                targetUrl = SmartSpikeFinanceV2017.Finance_LookupUrl_Ordinal(ourviewmodel,
+                                                                        financeviewmodel,
+                                                                        ordinal,
+                                                                        institution_code,
+                                                                        brand_code);
+                Uri account_authorize_uri = SmartNibbyV2016.Return_Uri(ourviewmodel,
+                                                                        url_base,
+                                                                        targetUrl);
+                if (!string.IsNullOrEmpty(ourviewmodel.errorMessage))
+                {
+                    return false;
+                }
+
+                if (!await RBS_ACCOUNT_AUTHORIZE_CONSENT(ourviewmodel,
+                                                        financeviewmodel,
+                                                        account_authorize_uri,
+                                                        Client_Id,
+                                                        Redirect_Uri,
+                                                        Consent_Id,
+                                                        AuthorizationUsername,
+                                                        CustomerId,
+                                                        cancel_token))
+                {
+                    return false;
+                }
+                // Exchange Authorization Code for Access Token (POST)
+#if WINFORMS
+                MainProcess.Output_Message(textBoxConsole, "Step 4: Authorization Code Exchange", MainProcess.Mally.examine.scrape, MainProcess.Mally.console);
+#endif
+                // Increment the ordinal
+                ordinal++;
+
+                targetUrl = SmartSpikeFinanceV2017.Finance_LookupUrl_Ordinal(ourviewmodel,
+                                                                        financeviewmodel,
+                                                                        ordinal,
+                                                                        institution_code,
+                                                                        brand_code);
+                Uri authorize_code_exchange_uri = SmartNibbyV2016.Return_Uri(ourviewmodel,
+                                                                            url_base,
+                                                                            targetUrl);
+                if (!string.IsNullOrEmpty(ourviewmodel.errorMessage))
+                {
+                    return false;
+                }
+
+                if (! //await
+                      RBS_AUTHORIZE_CODE_EXCHANGE(ourviewmodel,
+                                                    financeviewmodel,
+                                                    authorize_code_exchange_uri,
+                                                    Client_Id,
+                                                    Client_Secret,
+                                                    Redirect_Uri,
+                                                    financeviewmodel.rbs_authorization_code,
+                                                    cancel_token))
+                {
+                    return false;
+                }
+
+                // Send Account Details To Actually Retirve The Fucking Data (GET)
+#if WINFORMS
+                MainProcess.Output_Message(textBoxConsole, "Step 5: Account Data Request", MainProcess.Mally.examine.scrape, MainProcess.Mally.console);
+#endif
+                // Increment the ordinal
+                ordinal++;
+
+                targetUrl = SmartSpikeFinanceV2017.Finance_LookupUrl_Ordinal(ourviewmodel,
+                                                                        financeviewmodel,
+                                                                        ordinal,
+                                                                        institution_code,
+                                                                        brand_code);
+                Uri request_data_uri = SmartNibbyV2016.Return_Uri(ourviewmodel,
+                                                                    url_base,
+                                                                    targetUrl);
+                if (!string.IsNullOrEmpty(ourviewmodel.errorMessage))
+                {
+                    return false;
+                }
+
+                if (!await RBS_ACCOUNT_REQUEST_DATA(ourviewmodel,
+                                                        financeviewmodel,
+                                                        request_data_uri,
+                                                        financeviewmodel.rbs_access_token,
+                                                        accountsList,
+                                                        cancel_token,
+                                                        institution_code,
+                                                        brand_code))
+                {
+                    return false;
+                }
+#if WINFORMS
+                MainProcess.Output_Message(textBoxConsole, "Step 6: Account Transactions", MainProcess.Mally.examine.scrape, MainProcess.Mally.console);
+#endif
+                // Increment the ordinal
+                ordinal++;
+
+                targetUrl = SmartSpikeFinanceV2017.Finance_LookupUrl_Ordinal(ourviewmodel,
+                                                                        financeviewmodel,
+                                                                        ordinal,
+                                                                        institution_code,
+                                                                        brand_code);
+
+
+                string ACCOUNT_ID = string.Empty;
+                foreach (SmartFinance.Accounts account_row in accountsList)
+                {
+                    Uri request_transactions_uri = SmartNibbyV2016.Return_Uri(ourviewmodel,
+                                                                                url_base,
+                                                                                targetUrl +
+                                                                                ACCOUNT_ID + //account_row.ACCOUNT_ID +
+                                                                                "/transactions");
+                    if (!string.IsNullOrEmpty(ourviewmodel.errorMessage))
+                    {
+                        return false;
+                    }
+
+                    // Account Id Transactions
+                    if (!await RBS_ACCOUNT_REQUEST_TRANSACTIONS(ourviewmodel,
+                                                    financeviewmodel,
+                                                    request_transactions_uri,
+                                                    financeviewmodel.rbs_access_token,
+                                                    transactionsList,
+                                                    cancel_token))
+                                                    //institution_code,
+                                                    //brand_code))
+                    {
+                        return false;
+                    }
+                    else
+                    {
+#if WINFORMS
+                        ACCOUNT_ID = string.Empty;
+                        MainProcess.Output_Message(textBoxConsole, "Processed Account Id: " +
+                            ACCOUNT_ID, //account_row.ACCOUNT_ID, 
+                            MainProcess.Mally.examine.scrape, MainProcess.Mally.console);
+#endif
+                    }
+                }
+#if WINFORMS
+                MainProcess.Output_Message(textBoxConsole, "Step 7: Finished!", MainProcess.Mally.examine.scrape, MainProcess.Mally.console);
+#endif
+            }
+            return true;
+        }
+
+        internal static
+            //async Task<bool>
+            bool RBS_ACCOUNT_ACCESS(MainViewModel ourviewmodel,
+                                                    FinanceViewModel financeviewmodel,
+                                                    Uri account_access_uri,
+                                                    string CLIENT_ID,
+                                                    string CLIENT_SECRET,
+                                                    CancellationToken cancel_token)
+        {
+            financeviewmodel.errorMessage = string.Empty;
+
+            string[] param = new string[4];
+            param[0] = "grant_type" + "|" + "client_credentials";
+            param[1] = "client_assertion_type" + "|" + "urn:ietf:params:oauth:client-assertion-type:jwt-bearer";
+            param[2] = "client_assertion" + "|" + @"eyJhbGciOiJSUzI1NiIsImtpZCI6IjhkZThjYTc3LWQ2ODEtNDc4Mi04MTIyLWUwMzkyNTg5MDIxYiJ9.eyJpc3MiOiIyMTFlMzZkZS02NGIyLTQ3OWUtYWUyOC04YTViNDFhMWE5NDAiLCJhdWQiOiJodHRwczovL3NhbmRib3guaHNiYy5jb20vcHNkMi9vYmllL3YzLjEvYXMvdG9rZW4ub2F1dGgyIiwic3ViIjoiMjExZTM2ZGUtNjRiMi00NzllLWFlMjgtOGE1YjQxYTFhOTQwIiwiaWF0IjoxNDk5MTgzNjAxLCJleHAiOjE3NzkzNDg1MjF9.uu282OmEHUa0t6z6T68MfXzEGGgq8PiWuyJxuNQ1be6iWdD5sVbw3W--_O6TFAH-ae7BYXsE0kncYgA6gF9AmkXuA77w_Wbn2YyjPCB9gDCkrlJUS6rvb3UJYcIBZ7W-WZlRAsRE0l6EV74c5xnyL9c7cpGMfQ-HfPsYOG4JCsrvtpAHdo7jHWTVgKoe67jWGQkNOYt1Ba7rCf4y-fqQ3d6hZoptAAcJd26yigvV4768GHQGrBvgAc7OzutOGzYARAgStpjQMp0kMiOGIzq-TUsDlvtMrx2fH8gfy2uG2HvzsROkbNedL-iO5PmswNrDvCYEWZmVjMcaVg--ZF0sjg";
+            param[3] = "scope" + "|" + "accounts";
+
+            string result = string.Empty;
+            foreach (string vals in param)
+            {
+                string[] fields = vals.Split('|');
+                if (fields.Length == 2)
+                {
+                    if (result.Length > 0)
+                    {
+                        result += "&";
+                    }
+                    string fields1 = WebUtility.UrlEncode(fields[1]);
+                    if (fields1.Contains("("))
+                    {
+                        fields1 = fields1.Replace("(", "%28");
+                    }
+                    if (fields1.Contains(")"))
+                    {
+                        fields1 = fields1.Replace(")", "%29");
+                    }
+                    result = result + fields[0] + "=" + fields1;
+                }
+            }
+            string stringFormParams = result;
+
+            //X509Certificate2 Cert2 = new X509Certificate2();
+            //Cert2.Import(@"C:\Users\Ray\Documents\SmartSwitch\Banking\HSBC\HSBC.pfx", SmartParametersV2016.myPassword, X509KeyStorageFlags.PersistKeySet);
+            //Cert.Import(@"C:\Users\Ray\Documents\SmartSwitch\Banking\HSBC\server.csr", SmartParametersV2016.myPassword, X509KeyStorageFlags.PersistKeySet);
+            //X509Certificate PrivateKey = new X509Certificate();
+            //PrivateKey.Import(@"C:\Users\Ray\Documents\SmartSwitch\Banking\HSBC\server.key", "", X509KeyStorageFlags.PersistKeySet);
+            //X509Certificate Cert = new X509Certificate();
+            //Cert.Import(@"C:\Users\Ray\Documents\SmartSwitch\Banking\HSBC\qwac_PSP_IC,PSP_PI,PSP_AI,PSP_AS_07_03_2021.der", "anni85+DANI82", X509KeyStorageFlags.PersistKeySet);
+
+            bool status = true; // await SmartBobV2017.RBS_POST_ACCESS_WITH_CERTS(ourviewmodel,
+                                //                    financeviewmodel,
+                                //                    //new Uri("https://sandbox.hsbc.com/psd2/obie/v3.1/as/token.oauth2"),
+                                //                    new Uri("https://sandbox.hsbc.com/psd2/obie/v3.1/as/token"),
+                                //                    SmartParametersV2016.timespanTimeout,
+                                //                    string.Empty,
+                                //                    stringFormParams,
+                                //                    Cert2,
+                                //                     cancel_token);
+            if (status)
+            {
+                try
+                {
+                    string token_type = string.Empty;
+                    string scope = string.Empty;
+
+                    dynamic jsonResponse = JObject.Parse(financeviewmodel.obs_post_result);
+                    foreach (dynamic statement in jsonResponse)
+                    {
+                        string column = statement.Name;
+                        switch (column)
+                        {
+                            case "token_type":
+                                token_type = statement.Value;
+#if WINFORMS
+                                //("Token Type: " + token_type);
+#endif
+                                break;
+                            case "access_token":
+                                financeviewmodel.rbs_access_token = statement.Value;
+#if WINFORMS
+                                //("Access Token: " + financeviewmodel.rbs_access_token.Substring(0, 20));
+#endif
+                                break;
+                            case "expires_in":
+#if WINFORMS
+                                //("Expires in: " + statement.Value + "secs");
+#endif
+                                break;
+                            case "scope":
+                                scope = statement.Value;
+#if WINFORMS
+                                //("Scope: " + scope);
+#endif
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    status = true;
+                }
+                catch (Exception ex)
+                {
+                    ourviewmodel.errorMessage = ex.Message;
+                    status = false;
+                }
+            }
+            return status;
+        }
+
+        internal static
+            // async Task<bool>
+            bool RBS_ACCOUNT_ACCESS_CONSENT(MainViewModel ourviewmodel,
+                                                            FinanceViewModel financeviewmodel,
+                                                            Uri account_access_uri,
+                                                            string organization_id,
+                                                            CancellationToken cancel_token)
+        {
+            bool status = false;    // Assume failure first
+
+
+
+
+            try
+            {
+                //Access_Consent access_consent = JsonConvert.DeserializeObject<Access_Consent>(ourviewmodel.jsonString);
+                if (ourviewmodel.trace)
+                {
+#if WINFORMS
+                    //(string.Concat("Access Consent ", access_consent));
+#endif
+                }
+                // Submit Account Access Consent
+                string data = string.Empty;
+                string creationdatetime = string.Empty;
+                string datastatus = string.Empty;
+                string datastatusupdatedatetime = string.Empty;
+                string links = string.Empty;
+                string self = string.Empty;
+                string meta = string.Empty;
+                string risk = string.Empty;
+                string totalpages = string.Empty;
+                try
+                {
+                    status = true; // await SmartBobV2017.RBS_POST_ACCESS_CONSENT(ourviewmodel,
+                                   //                             financeviewmodel,
+                                   //                             account_access_uri,
+                                   //                             SmartParametersV2016.timespanTimeout,
+                                   //                             access_consent,
+                                   //                             financeviewmodel.rbs_access_token,
+                                   //                             organization_id,
+                                   //                             cancel_token);
+                    if (status)
+                    {
+                        try
+                        {
+                            dynamic jsonResponse1 = JObject.Parse(financeviewmodel.obs_post_result);
+                            foreach (dynamic statement in jsonResponse1)
+                            {
+                                string column = statement.Name;
+                                switch (column)
+                                {
+                                    case "Data":
+                                        if (ourviewmodel.trace)
+                                        {
+#if WINFORMS
+                                            //("Data: " + statement.Value);
+#endif
+                                        }
+                                        foreach (dynamic data_view in statement.Value)
+                                        {
+                                            string data_column = data_view.Name;
+                                            switch (data_column)
+                                            {
+                                                case "ConsentId":
+                                                    financeviewmodel.rbs_consentid = data_view.Value;
+#if WINFORMS
+                                                    //("Consent Id: " + financeviewmodel.rbs_consentid);
+#endif
+                                                    break;
+                                                case "CreationDateTime":
+                                                    creationdatetime = data_view.Value;
+                                                    break;
+                                                case "Status":
+                                                    datastatus = data_view.Value;
+                                                    break;
+                                                case "StatusUpdateDateTime":
+                                                    datastatusupdatedatetime = data_view.Value;
+                                                    break;
+                                                case "Permissions":
+                                                    string permissions = string.Empty;
+#if WINFORMS
+                                                    Console.Write("Permissions: ");
+#endif
+                                                    foreach (dynamic permissions_view in data_view.Value)
+                                                    {
+                                                        if (!string.IsNullOrEmpty(permissions))
+                                                        {
+                                                            permissions += ",";
+                                                        }
+                                                        permissions += permissions_view.ToString();
+                                                    }
+#if WINFORMS
+                                                    //(permissions.ToString());
+#endif
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                        break;
+                                    case "Links":
+                                        foreach (dynamic links_view in statement.Value)
+                                        {
+                                            string links_column = links_view.Name;
+                                            switch (links_column)
+                                            {
+                                                case "Self":
+                                                    self = links_view.Value;
+#if WINFORMS
+                                                    //("Self: " + self);
+#endif
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                        break;
+                                    case "Meta":
+                                        foreach (dynamic meta_view in statement.Value)
+                                        {
+                                            string meta_column = meta_view.Name;
+                                            switch (meta_column)
+                                            {
+                                                case "TotalPages":
+                                                    totalpages = meta_view.Value;
+#if WINFORMS
+                                                    //("TotalPages: " + totalpages);
+#endif
+                                                    break;
+                                                default:
+                                                    break;
+                                            }
+                                        }
+                                        break;
+                                    case "Risk":
+                                        break;
+                                    default:
+                                        break;
+                                }
+                            }
+                            status = true;
+                        }
+                        catch (Exception ex)
+                        {
+                            ourviewmodel.errorMessage = ex.Message;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    financeviewmodel.errorMessage = "Bad json: " + ex.Message + " " + financeviewmodel.obs_post_result;
+                }
+            }
+            catch (Exception ex)
+            {
+                financeviewmodel.errorMessage = "Bad json: " + ex.Message + " " + ourviewmodel.jsonString;
+            }
+            return status;
+        }
+
+        internal static async Task<bool> RBS_ACCOUNT_AUTHORIZE_CONSENT(MainViewModel ourviewmodel,
+                                                    FinanceViewModel financeviewmodel,
+                                                    Uri account_authorize_uri,
+                                                    string CLIENT_ID,
+                                                    string REDIRECT_URI,
+                                                    string CONSENT_ID,
+                                                    string AuthorizationUsername,
+                                                    string CustomerId,
+                                                    CancellationToken cancel_token)
+        {
+            financeviewmodel.errorMessage = string.Empty;
+
+            string[] param = new string[9];
+            param[0] = "client_id" + "|" + CLIENT_ID;
+            param[1] = "response_type" + "|" + "code id_token";
+            param[2] = "scope" + "|" + "openid accounts";
+            param[3] = "redirect_uri" + "|" + REDIRECT_URI;
+            param[4] = "request" + "|" + CONSENT_ID;
+            param[5] = "authorization_mode" + "|" + "AUTO_POSTMAN";
+            param[6] = "authorization_result" + "|" + "APPROVED";
+            param[7] = "authorization_username" + "|" + AuthorizationUsername;
+
+            //"123456789012@YOUR_DOMAIN"; // {test-user-username}@{your-team-domain}";
+            param[8] = "authorization_accounts" + "|" + "*";
+
+
+            string result = string.Empty;
+            foreach (string vals in param)
+            {
+                string[] fields = vals.Split('|');
+                if (fields.Length == 2)
+                {
+                    if (result.Length > 0)
+                    {
+                        result += "&";
+                    }
+                    string fields1 = WebUtility.UrlEncode(fields[1]);
+                    if (fields1.Contains("("))
+                    {
+                        fields1 = fields1.Replace("(", "%28");
+                    }
+                    if (fields1.Contains(")"))
+                    {
+                        fields1 = fields1.Replace(")", "%29");
+                    }
+                    result = result + fields[0] + "=" + fields1;
+                }
+            }
+
+            Uri token_uri = new Uri(account_authorize_uri.ToString() + "?" + result);
+            bool status = await RBS_GET_AUTHORIZE(ourviewmodel,
+                                                    financeviewmodel,
+                                                     token_uri,
+                                                    SmartParametersV2016.timespanTimeout,
+                                                    string.Empty,
+                                                    cancel_token);
+            if (status)
+            {
+                try
+                {
+                    dynamic jsonResponse = JObject.Parse(financeviewmodel.obs_post_result);
+                    foreach (dynamic statement in jsonResponse)
+                    {
+                        string column = statement.Name;
+                        switch (column)
+                        {
+                            case "redirectUri":
+                                string redirect = statement.Value.ToString();
+                                redirect = redirect.Replace(REDIRECT_URI, string.Empty);
+                                if (ourviewmodel.trace)
+                                {
+#if WINFORMS
+                                    //("RedirectUri: " + redirect);
+#endif
+                                }
+                                string[] paramsx = redirect.Split('&');
+                                if (paramsx.Length >= 2)
+                                {
+                                    int count = 0;
+                                    foreach (string param_string in paramsx)
+                                    {
+                                        switch (count)
+                                        {
+                                            case 0:
+                                                string[] code = param_string.Split('=');
+                                                if (code.Length >= 2)
+                                                {
+                                                    if (code[0] == "#code")
+                                                    {
+                                                        financeviewmodel.rbs_authorization_code = code[1];
+#if WINFORMS
+                                                        //("Authorization code: " + financeviewmodel.rbs_authorization_code.Substring(0, 20));
+#endif
+                                                    }
+                                                }
+                                                break;
+                                            case 1:
+                                                string[] token = param_string.Split('=');
+                                                if (token.Length >= 2)
+                                                {
+                                                    if (token[0] == "id_token")
+                                                    {
+                                                        financeviewmodel.rbs_id_token = token[1];
+#if WINFORMS
+                                                        //("Id Token: " + financeviewmodel.rbs_id_token.Substring(0, 20));
+#endif
+                                                    }
+                                                }
+                                                break;
+                                            default:
+                                                break;
+
+                                        }
+                                        count += 1;
+                                    }
+                                }
+                                break;
+                            default:
+                                break;
+
+                        }
+                    }
+                    status = true;
+                }
+                catch (Exception ex)
+                {
+                    ourviewmodel.errorMessage = ex.Message;
+                    status = false;
+                }
+            }
+            return status;
+        }
+
+        internal static
+            // async Task<bool>
+            bool RBS_AUTHORIZE_CODE_EXCHANGE(MainViewModel ourviewmodel,
+                                                    FinanceViewModel financeviewmodel,
+                                                    Uri authorize_code_exchange_uri,
+                                                    string CLIENT_ID,
+                                                    string CLIENT_SECRET,
+                                                    string REDIRECT_URI,
+                                                    string AUTHORIZATION_CODE,
+                                                    CancellationToken cancel_token)
+        {
+            financeviewmodel.errorMessage = string.Empty;
+
+            string[] param = new string[5];
+            param[0] = "client_id" + "|" + CLIENT_ID;
+            param[1] = "client_secret" + "|" + CLIENT_SECRET;
+            param[2] = "redirect_uri" + "|" + REDIRECT_URI;
+            param[3] = "grant_type" + "|" + "authorization_code";
+            param[4] = "code" + "|" + AUTHORIZATION_CODE;
+
+            string result = string.Empty;
+            foreach (string vals in param)
+            {
+                string[] fields = vals.Split('|');
+                if (fields.Length == 2)
+                {
+                    if (result.Length > 0)
+                    {
+                        result += "&";
+                    }
+                    string fields1 = WebUtility.UrlEncode(fields[1]);
+                    if (fields1.Contains("("))
+                    {
+                        fields1 = fields1.Replace("(", "%28");
+                    }
+                    if (fields1.Contains(")"))
+                    {
+                        fields1 = fields1.Replace(")", "%29");
+                    }
+                    result = result + fields[0] + "=" + fields1;
+                }
+            }
+            string stringFormParams = result;
+
+            bool status = true; // await SmartBobV2017.RBS_POST_ACCESS(ourviewmodel,
+                                //                   financeviewmodel,
+                                //                    authorize_code_exchange_uri,
+                                //                   SmartParametersV2016.timespanTimeout,
+                                //                   string.Empty,
+                                //                   stringFormParams,
+                                //                   cancel_token);
+            if (status)
+            {
+                try
+                {
+                    string refresh_token = string.Empty;
+                    string token_type = string.Empty;
+                    string id_token = string.Empty;
+                    string scope = string.Empty;
+
+                    dynamic jsonResponse = JObject.Parse(financeviewmodel.obs_post_result);
+                    foreach (dynamic statement in jsonResponse)
+                    {
+                        string column = statement.Name;
+                        switch (column)
+                        {
+                            case "refresh_token":
+                                refresh_token = statement.Value;
+#if WINFORMS
+                                //("Refresh Token: " + refresh_token.Substring(0, 20));
+#endif
+                                break;
+                            case "token_type":
+                                token_type = statement.Value;
+#if WINFORMS
+                                //("Token Type: " + token_type);
+#endif
+                                break;
+                            case "access_token":
+                                financeviewmodel.rbs_access_token = statement.Value;
+#if WINFORMS
+                                //("Access Token: " + financeviewmodel.rbs_access_token.Substring(0, 20));
+#endif
+                                break;
+                            case "id_token":
+                                id_token = statement.Value;
+#if WINFORMS
+                                //("Id Token: " + id_token.Substring(0, 20));
+#endif
+                                break;
+                            case "expires_in":
+#if WINFORMS
+                                //("Expires in: " + statement.Value + "secs");
+#endif
+                                break;
+                            case "scope":
+                                scope = statement.Value;
+#if WINFORMS
+                                //("Scope: " + scope);
+#endif
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    status = true;
+                }
+                catch (Exception ex)
+                {
+                    ourviewmodel.errorMessage = ex.Message;
+                    status = false;
+                }
+            }
+            return status;
+        }
+
+        internal static async Task<bool> RBS_ACCOUNT_REQUEST_DATA(MainViewModel ourviewmodel,
+                                                    FinanceViewModel financeviewmodel,
+                                                    Uri request_data_uri,
+                                                    string ACCESS_TOKEN,
+                                                    List<SmartFinance.Accounts> accountsList,
+                                                    CancellationToken cancel_token,
+                                                    short institution_code,
+                                                            short brand_code)
+        {
+            financeviewmodel.errorMessage = string.Empty;
+
+            bool status = await RBS_GET_AUTHORIZE(ourviewmodel,
+                                                    financeviewmodel,
+                                                    request_data_uri,
+                                                    SmartParametersV2016.timespanTimeout,
+                                                    ACCESS_TOKEN,
+                                                    cancel_token);
+            if (status)
+            {
+                try
+                {
+                    string accountid = string.Empty;
+                    string currency = string.Empty;
+                    string account_type = string.Empty;
+                    string account_subtype = string.Empty;
+                    string description = string.Empty;
+                    string nickname = string.Empty;
+                    string self = string.Empty;
+                    string totalpages = string.Empty;
+
+                    dynamic jsonResponse1 = JObject.Parse(financeviewmodel.obs_post_result);
+                    foreach (dynamic statement in jsonResponse1)
+                    {
+                        string column = statement.Name;
+                        switch (column)
+                        {
+                            case "Data":
+                                if (ourviewmodel.trace)
+                                {
+#if WINFORMS
+                                    //("Data: " + statement.Value);
+#endif
+                                }
+                                foreach (dynamic data_view in statement.Value)
+                                {
+                                    string data_column = data_view.Name;
+                                    switch (data_column)
+                                    {
+                                        case "Account":
+                                            foreach (dynamic main_account_view in data_view.Value)
+                                            {
+                                                DateTime accountCreated = DateTime.UtcNow;
+                                                SmartFinance.Accounts account = SmartFinanceV2025.Account_Template(ourviewmodel,
+                                                                                                                    financeviewmodel,
+                                                                                                                    institution_code,
+                                                                                                                    brand_code,
+                                                                                                                    "",
+                                                                                                                    "",
+                                                                                                                    "",
+                                                                                                                    accountCreated,
+                                                                                                                    '\0',
+                                                                                                                    0,
+                                                                                                                    "",
+                                                                                                                    0,
+                                                                                                                    'O');
+
+                                                string ACCOUNT_ID = string.Empty;
+                                                foreach (dynamic account_view in main_account_view)
+                                                {
+                                                    string account_column = account_view.Name;
+                                                    switch (account_column)
+                                                    {
+                                                        case "AccountId":
+                                                            accountid = account_view.Value;
+#if WINFORMS
+                                                            //("Account Id: " + accountid);
+#endif
+                                                            ACCOUNT_ID = accountid; // account.ACCOUNT_ID = accountid;
+                                                            break;
+                                                        case "Currency":
+                                                            currency = account_view.Value;
+#if WINFORMS
+                                                            //("Currency: " + currency);
+#endif
+                                                            //account.CURRENCY_ORDINAL = Convert.ToInt16(currency);
+                                                            break;
+                                                        case "AccountType":
+                                                            account_type = account_view.Value;
+#if WINFORMS
+                                                            //("Account Type: " + account_type);
+#endif
+                                                            account.CATEGORY_CODE = Convert.ToChar(account_type);
+                                                            break;
+                                                        case "AccountSubType":
+                                                            account_subtype = account_view.Value;
+#if WINFORMS
+                                                            //("Account SubType: " + account_subtype);
+#endif
+                                                            //account.ACCOUNT_SUBTYPE = account_subtype;
+                                                            break;
+                                                        case "Description":
+                                                            description = account_view.Value;
+#if WINFORMS
+                                                            //("Description: " + description);
+#endif
+                                                            //account.DESCRIPTION = description;
+                                                            break;
+                                                        case "Nickname":
+                                                            nickname = account_view.Value;
+#if WINFORMS
+                                                            //("Nickname: " + nickname);
+#endif
+                                                            //account.NICKNAME = nickname;
+                                                            break;
+                                                        case "Account":
+                                                            string account_info = string.Empty;
+#if WINFORMS
+                                                            Console.Write("Account: ");
+#endif
+                                                            foreach (dynamic accounts_view in account_view.Value)
+                                                            {
+                                                                foreach (dynamic accounts_sub_view in accounts_view)
+                                                                {
+                                                                    if (!string.IsNullOrEmpty(account_info))
+                                                                    {
+                                                                        account_info += ",";
+                                                                    }
+                                                                    account_info += accounts_sub_view.ToString();
+                                                                }
+                                                            }
+#if WINFORMS
+                                                            //(account_info.ToString());
+#endif
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+                                                }
+                                                accountsList.Add(account);
+                                            }
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                break;
+                            case "Links":
+                                foreach (dynamic links_view in statement.Value)
+                                {
+                                    string links_column = links_view.Name;
+                                    switch (links_column)
+                                    {
+                                        case "Self":
+                                            self = links_view.Value;
+                                            //("Self: " + self);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                break;
+                            case "Meta":
+                                foreach (dynamic meta_view in statement.Value)
+                                {
+                                    string meta_column = meta_view.Name;
+                                    switch (meta_column)
+                                    {
+                                        case "TotalPages":
+                                            totalpages = meta_view.Value;
+                                            //("TotalPages: " + totalpages);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                break;
+                            //case "Risk": <= Doesn't appear to be in Accounts??
+                            //    break;
+                            default:
+                                break;
+                        }
+                    }
+                    status = true;
+                }
+                catch (Exception ex)
+                {
+                    ourviewmodel.errorMessage = ex.Message;
+                    status = false;
+                }
+            }
+            return status;
+        }
+
+        internal static async Task<bool> RBS_ACCOUNT_REQUEST_TRANSACTIONS(MainViewModel ourviewmodel,
+                                                    FinanceViewModel financeviewmodel,
+                                                    Uri request_transaction_uri,
+                                                    string ACCESS_TOKEN,
+                                                    ObservableCollection<SmartFinance.Transactions> transactionsList,
+                                                    CancellationToken cancel_token)
+                                                    //short institution_code,
+                                                    //short brand_code)
+        {
+            financeviewmodel.errorMessage = string.Empty;
+
+            bool status = await RBS_GET_AUTHORIZE(ourviewmodel,
+                                                    financeviewmodel,
+                                                    request_transaction_uri,
+                                                    SmartParametersV2016.timespanTimeout,
+                                                    ACCESS_TOKEN,
+                                                    cancel_token);
+            if (status)
+            {
+                try
+                {
+                    string account_id = string.Empty;
+                    string transaction_id = string.Empty;
+                    string transaction_status = string.Empty;
+                    string transaction_information = string.Empty;
+                    string transaction_datetime = string.Empty;
+                    string amount = string.Empty;
+                    string currency = string.Empty;
+                    string transaction_code = string.Empty;
+                    string creditdebit_indicator = string.Empty;
+                    //string balance_type = "";
+                    string balance_amount = string.Empty;
+                    string balance_currency = string.Empty;
+                    string balance_creditdebit_indicator = string.Empty;
+
+                    string self = string.Empty;
+                    string first = string.Empty;
+                    string last = string.Empty;
+                    string totalpages = string.Empty;
+
+                    DateTime transaction_created = DateTime.UtcNow;  // Same UTC date for all this batch
+
+                    dynamic jsonResponse1 = JObject.Parse(financeviewmodel.obs_post_result);
+                    foreach (dynamic statement in jsonResponse1)
+                    {
+                        string column = statement.Name;
+                        switch (column)
+                        {
+                            case "Data":
+                                if (ourviewmodel.trace)
+                                {
+                                    //("Data: " + statement.Value);
+                                }
+                                foreach (dynamic data_view in statement.Value)
+                                {
+                                    string data_column = data_view.Name;
+                                    switch (data_column)
+                                    {
+                                        case "Transaction":
+
+                                            SmartFinance.Transactions transaction = new SmartFinance.Transactions();
+
+                                            //SmartFinanceV2025.Transaction_Template(ourviewmodel,
+                                            //                                                                            financeviewmodel,
+                                            //                                                                            institution_code,
+                                            //                                                                            brand_code);
+                                            //
+                                            foreach (dynamic main_account_view in data_view.Value)
+                                            {
+                                                //();
+                                                string ACCOUNT_ID = string.Empty;
+                                                string TRANSACTION_ID = string.Empty;
+                                                foreach (dynamic account_view in main_account_view)
+                                                {
+                                                    string account_column = account_view.Name;
+                                                    switch (account_column)
+                                                    {
+                                                        case "AccountId":
+                                                            account_id = account_view.Value;
+                                                            // We COULD check here that the accountid matches!
+                                                            // But we have to rely on the bank to ensure its data is correct
+                                                            // (it saves us a check!!)
+                                                            ////("Account Id: " + account_id);
+                                                            ACCOUNT_ID = account_id; // transaction.ACCOUNT_ID = account_id;
+                                                            break;
+                                                        case "TransactionId":
+                                                            transaction_id = account_view.Value;
+                                                            ////("Transaction Id: " + transaction_id);
+                                                            TRANSACTION_ID = transaction_id; // transaction.TRANSACTION_ID = transaction_id;
+                                                            break;
+                                                        case "CreditDebitIndicator":
+                                                            creditdebit_indicator = account_view.Value;
+                                                            ////("CreditDebit Indicator: " + creditdebit_indicator);
+                                                            //transaction.CREDITDEBIT_INDICATOR = false; // creditdebit_indicator;
+                                                            break;
+                                                        case "Status":
+                                                            transaction_status = account_view.Value;
+                                                            ////("Status: " + transaction_status);
+                                                            //transaction.TRANSACTION_STATUS = transaction_status;
+                                                            break;
+                                                        case "TransactionInformation":
+                                                            transaction_information = account_view.Value;
+                                                            //("Transaction Information: " + transaction_information);
+                                                            //transaction.TRANSACTION_INFORMATION = transaction_information;
+                                                            break;
+                                                        case "TransactionDateTime":
+                                                            transaction_datetime = account_view.Value;
+                                                            //("Booking DateTime: " + transaction_datetime);
+                                                            //transaction.TRANSACTION_DATE = Convert.ToDateTime(transaction_datetime);
+
+                                                            break;
+                                                        case "Amount":
+                                                            foreach (dynamic amount_view in account_view.Value)
+                                                            {
+                                                                string amount_col = amount_view.Name;
+                                                                switch (amount_col)
+                                                                {
+                                                                    case "Amount":
+                                                                        amount = amount_view.Value;
+                                                                        //("Amount: " + amount);
+                                                                        //transaction.AMOUNT = Convert.ToInt32(amount);
+                                                                        break;
+                                                                    case "Currency":
+                                                                        currency = amount_view.Value;
+                                                                        //("Currency: " + currency);
+                                                                        //transaction.CURRENCY_ORDINAL = 1; // currency;
+                                                                        break;
+                                                                    default:
+                                                                        break;
+                                                                }
+                                                            }
+                                                            break;
+                                                        case "Balance":
+                                                            foreach (dynamic balance_view in account_view.Value)
+                                                            {
+                                                                string balance_col = balance_view.Name;
+                                                                switch (balance_col)
+                                                                {
+                                                                    case "Amount":
+                                                                        foreach (dynamic balance_amount_view in balance_view)
+                                                                        {
+                                                                            string balance_amount_col = balance_amount_view.Name;
+                                                                            switch (balance_amount_col)
+                                                                            {
+                                                                                case "Amount":
+                                                                                    balance_amount = balance_amount_view.Value;
+                                                                                    //("Balance Amount: " + balance_amount);
+                                                                                    //transaction.BALANCE_AMOUNT = Convert.ToInt32(balance_amount);
+                                                                                    break;
+                                                                                case "Currency":
+                                                                                    balance_currency = balance_amount_view.Value;
+                                                                                    //("Currency: " + balance_currency);
+                                                                                    //transaction.BALANCE_CURRENCY_ORDINAL = 1; // balance_currency;
+                                                                                    break;
+                                                                                default:
+                                                                                    break;
+                                                                            }
+                                                                        }
+                                                                        break;
+                                                                    case "CreditDebitIndicator":
+                                                                        balance_creditdebit_indicator = balance_view.Value;
+                                                                        //("Balance CreditDebit Indicator: " + balance_creditdebit_indicator);
+                                                                        //transaction.BALANCE_CREDITDEBIT_INDICATOR = false; // balance_creditdebit_indicator;
+                                                                        break;
+                                                                    case "Type":
+                                                                        //balance_type = Convert.ToString(balance_view.Value);
+                                                                        //("Type: " + balance_type);
+                                                                        //transaction.AMOUNT_TYPE = amount_type;
+                                                                        break;
+                                                                    default:
+                                                                        break;
+                                                                }
+                                                            }
+                                                            break;
+                                                        case "ProprietaryBankTransactionCode":
+                                                            foreach (dynamic transaction_view in account_view.Value)
+                                                            {
+                                                                string transaction_col = transaction_view.Name;
+                                                                switch (transaction_col)
+                                                                {
+                                                                    case "Code":
+                                                                        transaction_code = transaction_view.Value;
+                                                                        //("Code: " + transaction_code);
+                                                                        //transaction.TRANSACTION_CODE = 0; // transaction_code;
+                                                                        break;
+                                                                    default:
+                                                                        break;
+                                                                }
+                                                            }
+                                                            break;
+                                                        default:
+                                                            break;
+                                                    }
+                                                }
+                                            }
+                                            transactionsList.Add(transaction);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                break;
+                            case "Links":
+                                foreach (dynamic links_view in statement.Value)
+                                {
+                                    string links_column = links_view.Name;
+                                    switch (links_column)
+                                    {
+                                        case "First":
+                                            first = links_view.Value;
+                                            //("First: " + first);
+                                            break;
+                                        case "Last":
+                                            last = links_view.Value;
+                                            //("Last: " + last);
+                                            break;
+                                        case "Self":
+                                            self = links_view.Value;
+                                            //("Self: " + self);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                break;
+                            case "Meta":
+                                foreach (dynamic meta_view in statement.Value)
+                                {
+                                    string meta_column = meta_view.Name;
+                                    switch (meta_column)
+                                    {
+                                        case "TotalPages":
+                                            totalpages = meta_view.Value;
+                                            //("TotalPages: " + totalpages);
+                                            break;
+                                        default:
+                                            break;
+                                    }
+                                }
+                                break;
+                            //case "Risk": <= Doesn't appear to be in Accounts??
+                            //    break;
+                            default:
+                                break;
+                        }
+                    }
+                    status = true;
+                }
+                catch (Exception ex)
+                {
+                    ourviewmodel.errorMessage = ex.Message;
+                    status = false;
+                }
+            }
+            return status;
+        }
+
+        internal static async Task<bool> RBS_GET_AUTHORIZE(MainViewModel ourviewmodel,
+                                                    FinanceViewModel financeviewmodel,
+                                                    Uri targetUrl,
+                                                    TimeSpan timespanTimeout,
+                                                    string access_token,
+                                                    CancellationToken cancellation_token)
+        {
+            financeviewmodel.errorMessage = string.Empty;
+
+            bool status = false;    // Assume the worst (initially)
+
+            HttpClient client = SmartBobV2017.BuildClient(ourviewmodel.cookies, ourviewmodel.timespanTimeout);
+            if (!string.IsNullOrEmpty(access_token))
+            {
+                client.DefaultRequestHeaders.Add("Authorization", "Bearer " + access_token);
+            }
+            try
+            {
+                HttpResponseMessage response = await client.GetAsync(targetUrl, cancellation_token);
+                if (response.IsSuccessStatusCode)
+                {
+                    MemoryStream dataStream = new MemoryStream();
+
+                    await response.Content.CopyToAsync(dataStream);// Only V5 Bollocks, cancellation_token);
+                    int length = dataStream.ToArray().Length;
+                    if (length > 0)
+                    {
+                        financeviewmodel.obs_post_result = Encoding.UTF8.GetString(dataStream.ToArray(), 0, length);
+                        status = true;
+                    }
+                    else
+                    {
+                        financeviewmodel.errorMessage = "Document is empty";
+                    }
+                }
+                else
+                {
+                    financeviewmodel.errorMessage = response.StatusCode.ToString();
+                }
+            }
+            catch (AggregateException exception)
+            {
+                financeviewmodel.errorMessage = exception.Message;
+            }
+            catch (TaskCanceledException exception)
+            {
+                financeviewmodel.errorMessage = exception.Message;
+            }
+            catch (HttpRequestException exception)
+            {
+                financeviewmodel.errorMessage = exception.Message;
+            }
+            return status;
+        }
+    }
+}
+

@@ -1,0 +1,135 @@
+﻿<ResourceDictionary>
+	
+	<!-- SignIn strings -->
+	<string Key="UsernameBox">Username</string>
+	<string Key="PasswordBox">Password</string>
+	<string Key="LoginStatusMessage">You need to be logged-in to run SmartSwitch</string>
+	<string Key="Signin">Sign-in</string>
+	<string Key="ResetUTC">Reset UTC</string>
+	<string Key="Fatalerror">Fatal error</string>
+	<string Key="CreateHandlerFailure">Failed to create Uri handler</string>
+	<string Key="EnsureConnectedToInternet">Please ensure your device is connected to the Internet before signing in</string>
+	<string Key="Problem UTC">Problem retrieving UTC ... please press Reset</string>
+	<string Key="PleaseSignin">Please Sign-in to continue</string>
+	<string Key="CannotSignin">Cannot sign in at this time</string> 
+	<string Key="EnterUsernameAndPassword">Please enter your Username and Password before Sign-in</string> 
+	<string Key="InvalidSignin">Sign-in invalid</string>
+	<string Key="CannotLoadFromMothership">Cannot load from Mothership</string>
+	<string Key="UnableToAuthenticate">Unable to authenticate - you are not logged-in</string>
+	<string Key="CancellationTokenNone">Cancellation Token None</string>
+	<string Key="CreateAccount">Create an Account</string>
+	
+	<string Key="AnalyzeBrandMatrix">Failed Brand Matri</string>
+	<string Key="AnalyzeConditionsDates">Failed Conditions Dates:</string>
+	<string Key="AnalyzeConditionsPlans">Failed Conditions_Plans:</string>
+	<string Key="AnalyzeCosts">Problem with: analyze costs</string>
+	<string Key="AnalyzeFieldName">Failed Conditions_Limits: FieldName</string>
+	<string Key="AnalyzeFixedArea">Failed Conditions_Limits: Fixed Area NOT SET</string>
+	<string Key="AnalyzeLimitCode">Failed Conditions_Limits: LimitCode</string>
+	<string Key="AnalyzeLimitType">Failed Conditions_Limits: LimitType</string>
+	<string Key="AnalyzePostFieldName">Failed Post_Limits: Field Name</string>
+	<string Key="AnalyzePreConditions">Failed Pre_Conditions:</string>
+	<string Key="AnalyzePreFieldName">Failed Pre_Conditions: Field Name</string>
+	<string Key="AnalyzeTariffEngine">Failed Tariff Engine:</string>
+	<string Key="AnalyzeTariffMatrix">Failed Tariff Matri</string>
+	<string Key="AnalyzeTier">Failed Conditions_Limits: Tier</string>
+	<string Key="AnalyzeTierCount">Failed Conditions_Limits: Tier Count</string>
+	<string Key="AnalyzeTierThree">Failed Conditions_Limits: TIER3</string>
+	<string Key="AnalyzeVatRates">Failed Vat Rates: not found</string>
+	
+	<string Key="Asterisks">********</string>
+	<string Key="UserId">UserId:</string>
+	<string Key="LogOnAttempted">LogOn attempted ...</string>
+	<string Key="QuoteId">Quote Id:</string>
+	
+	<string Key="SwitchAddressCode">Address Code:</string>
+	<string Key="SwitchBankDetails">Enter your Account Name, Sort Code and Account Number</string>
+	<string Key="SwitchCityTown">City/Town:</string>
+	<string Key="SwitchConfirmation">Confirmation :</string>
+	<string Key="Switchdetailsincomplete">Switch details are incomplete</string>
+	<string Key="SwitchHouseName">House Name:</string>
+	<string Key="SwitchHouseNo">House No:</string>
+	<string Key="SwitchStreet">Street:</string>
+	<string Key="SwitchAddress">Address :</string>
+	<string Key="EdFSwitchStep2">Step 2 Form Build Id:</string>
+	<string Key="EdFSwitchStep3">Step 3 Form Build Id:</string>
+	<string Key="EdFSwitchStep4">Step 4 Form Build Id:</string>
+	<string Key="EdFSwitchStep5">Step 5 Form Build Id:</string>
+	<string Key="EdFSwitchStep5Bank">Step 5: Bank account details incorrect</string>
+	<string Key="HeavyTick">\u2714</string>
+	<string Key="True">true</string>
+	<string Key="False">false</string>
+	<string Key="Confirmation">Confirmation:</string>
+	<string Key="Logindetailsincomplete">Login details are incomplete</string>
+	<string Key="CancelMeter">Problem with: cancel meter</string>
+	<string Key="SwitchingNow">Switching now:</string>
+	<string Key="CannotFindWebServiceKey">Cannot find Web Service Key</string>
+	<string Key="WebServiceKey">Web Service Key:</string>
+	<string Key="CannotDecodeJson">Cannot decode JSON</string>
+	<string Key="SignupLinkEmpty">SignupLink is empty</string>
+	
+	<string Key="LoggingOut">Logging out...</string>
+	<string Key="ConfirmationRequired">Confirmation required</string>
+	<string Key="ReallyLeave">Do you really want to leave SmartSwitch?</string>
+	<string Key="Yes">Yes</string>
+	<string Key="No">No</string>
+
+	<string Key="SubscribersOnly">"Please become a Subscriber to use this feature"</string>
+
+	<string Key="ZoomTooltip">Press to toggle full-screen mode</string>
+	<string Key="AutoSwitchTooltip">Press to initiate connectionSwitching</string>
+	<string Key="OpenCloseTooltip">Press to operate the meter doors</string>
+	<string Key="QuitTooltip">Press to quit SmartSwitch</string>
+
+	<string Key="SaveProfileTooltip">Save information to Local or Remote storage</string>
+	<string Key="AddGroupsTooltip">Add a new Group for Multi-Meter processing</string>
+
+	<string Key="FinanceSubmitTooltip">Press to collect your Provider's account transactions</string>
+	<string Key="FinanceCancelTooltip">Press to clear any Provider processing errors</string>
+	<string Key="FinanceInstitutionsTooltip">Choose your Institution from the dropdown list - then double-click it to set up the connection</string>
+	<string Key="FinanceProvidersTooltip">Choose Providers to refine the display</string>
+	<string Key="FinanceAccountsTooltip">Choose Accounts to refine the display</string>
+	<string Key="FinanceTransactionsTooltip">Choose Transaction types to refine the display</string>
+	<string Key="FinanceBanksTooltip">Click for Banking data</string>
+	<string Key="FinanceSavingsTooltip">Click for Savings data</string>
+	<string Key="FinanceInvestmentsTooltip">Click for Investments data</string>
+	<string Key="FinanceCryptosTooltip">Click for Crypto currency data</string>
+	<string Key="FinanceAddressesTooltip">Choose an Address to refine the data displayed</string>
+	<string Key="FinanceAutoSwitchTooltip">This button is not active at the present time</string>
+	<string Key="FinanceStartDateTooltip">Choose a Start Date to refine the data displayed</string>
+	<string Key="FinanceResetDatesTooltip">Press to reset the Transaction dates</string>
+	<string Key="FinanceEndDateTooltip">Choose an End Date to refine the data displayed</string>	
+	<string Key="FinanceResultsStartDateTooltip">Start date of the data displayed</string>
+	<string Key="FinanceResultsEndDateTooltip">End date of the data displayed</string>
+	<string Key="FinancePostCodeTooltip">The PostCode of the address displayed</string>
+	<string Key="FinanceCultureTooltip">Press to set the Culture for all date/time and monetary formats</string>
+	<string Key="FinanceExchangeRatesTooltip">Rates are APPROXIMATIONS and should *NOT* be used to make financial decisions</string>
+	<string Key="N">No</string>
+	<string Key="Y">Yes</string>
+	
+	<string Key="NoValidConnections">No valid Connections available</string>
+	<string Key="NoProvidersLoginMethods">No Providers have free Login methods</string>
+	<string Key="ProviderNoLoginMethods">Provider has no Login Methods</string>
+	<string Key="NoFreeLoginMethods">No free Login methods available</string>
+	<string Key="Parameter1Empty">Parameter1 cannot be empty</string>
+	<string Key="Parameter1Failed">Parameter1 failed validation</string>
+	<string Key="LoginMethodNotSelected">Login method must be selected</string>
+	<string Key="LoginExists">Login already exists</string>
+	<string Key="ConnectionDeleteFail">Cannot delete Connection</string>
+	<string Key="ConnectionUpdateFail">Cannot update Connection</string>
+	<string Key="ConnectionAddFail">Cannot add Connection</string>
+	<string Key="ConnectionDeleteSuccess">Connection deleted</string>
+	<string Key="ConnectionUpdateSuccess">Connection updated</string>
+	<string Key="ConnectionAddSuccess">Connection added</string>
+	<string Key="LoginDeleteFail">Cannot delete Login</string>
+	<string Key="LoginUpdateFail">Cannot update Login</string>
+	<string Key="LoginAddFail">Cannot add Login</string>
+	<string Key="LoginDeleteSuccess">Login deleted</string>
+	<string Key="LoginUpdateSuccess">Login updated</string>
+	<string Key="LoginAddSuccess">Login added</string>	
+	<string Key="ConfirmDelete">Confirm Delete</string>
+	<string Key="DeleteConnection">Delete connection</string>
+	<string Key="AllAssociatedLogins">All associated Logins will also be deleted</string>
+	<string Key="DeleteLogin">Are you sure you want to delete login Provider</string>
+</ResourceDictionary>
+

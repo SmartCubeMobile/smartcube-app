@@ -1,0 +1,13 @@
+USERNAME nvarchar(18)	PROFILE_CREATED datetime(8)	LASTNAME nvarchar(64)	FIRSTNAME nvarchar(64)	MIDDLENAME nvarchar(64)	DATE_OF_BIRTH nvarchar(8)	TITLE nvarchar(16)	GENDER nvarchar(3)	CONTACT_NO nvarchar(16)	EMAIL_ADDRESS nvarchar(128)	DISPLAYNAME nvarchar(64)
+ANNA	01/06/2021 00:00:00	Marsh	Anna	Teresa	1982-12-29	Mrs	F	07731329706	atmc_21@hotmail.com	AnWans
+BOB	29/04/2021 00:00:00	Chapman	Robert		1947-04-29	Mr	M	07971698944	bobchapmanuk@yahoo.co.uk	Bobbins
+Daniel	10/04/2025 11:39:40	Chapman	Daniel	Anthony	14-Aug-1985	Mr	Male			Dan
+IRENE	03/12/2021 00:00:00	Slater	Irene		1941-06-30	Mrs	F	01614911931	hammondreg@hotmail.com	Irene
+LUCY	12/05/2021 00:00:00	Cox	Lucy	Nora!	1921-08-26	Mrs	F	?	ray_chapman48@hotmail.com	Lucy
+MARIA	16/10/2021 00:00:00	Chapman	Maria	Anne	1953-09-10	Mrs	F	07731377016	maria_chapman53@hotmail.com	Mrs Happy
+MARK	12/05/2021 00:00:00	Waterfall	Mark		1960-01-01	Mr	M	012264623560	abc@def.com	Mark
+MARKUS	12/05/2021 00:00:00	Barg	Markus		1960-01-01	Mr	M	07747811698	markus.barg@gmail.com	Markus
+MARTIN	12/05/2021 00:00:00	Frost	Martin		1960-01-01	Mr	M	?	frosty@o2email.co.uk	Frosty
+MICHELLE	14/08/2021 00:00:00	Slater	Michelle		1960-01-01	Mrs	F	?	abc@def.com	Michelle
+PAT	12/05/2021 00:00:00	O'Donnell	Pat		1960-01-01	Mrs	F	?	mrsdiamondcat@yahoo.co.uk	Mrs Diamond Cat
+RAY	19/09/2021 00:00:00	Chapman	Raymond	Denis	1948-09-19	Mr	M	07845026967	ray_chapman48@hotmail.com	Thicko

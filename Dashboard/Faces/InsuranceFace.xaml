@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.Dashboard.Faces.InsuranceFace"
+             BackgroundColor="{StaticResource PageBg}">
+
+    <Grid ColumnDefinitions="*,*" Padding="16" ColumnSpacing="12">
+
+        <!-- Left Column -->
+        <ScrollView Grid.Column="0">
+        <VerticalStackLayout Spacing="12">
+
+            <!-- Summary Card -->
+            <Border x:Name="SummaryCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <Label Text="Insurance Overview" Style="{StaticResource Heading2}"
+                               ToolTipProperties.Text="How many insurance policies you have and what they cost per month and per year." />
+                        <Button Grid.Column="1" Text="?"
+                                ToolTipProperties.Text="What this section does"
+                                FontSize="12" FontAttributes="Bold"
+                                WidthRequest="26" HeightRequest="26" Padding="0"
+                                CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8"
+                                VerticalOptions="Center"
+                                Clicked="OnHelpClicked" />
+                    </Grid>
+                    <Grid ColumnDefinitions="*,*,*" RowSpacing="8">
+                        <VerticalStackLayout Grid.Column="0" Spacing="2" HorizontalOptions="Center">
+                            <Label x:Name="PolicyCountLabel" Text="0"
+                                   TextColor="{StaticResource Primary}" FontSize="22"
+                                   FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                            <Label Text="policies" TextColor="{StaticResource TextMuted}"
+                                   FontSize="11" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="1" Spacing="2" HorizontalOptions="Center">
+                            <Label x:Name="TotalMonthlyLabel" Text="£0.00"
+                                   TextColor="{StaticResource Warning}" FontSize="22"
+                                   FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                            <Label Text="per month" TextColor="{StaticResource TextMuted}"
+                                   FontSize="11" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                        <VerticalStackLayout Grid.Column="2" Spacing="2" HorizontalOptions="Center">
+                            <Label x:Name="TotalYearlyLabel" Text="£0.00"
+                                   TextColor="{StaticResource Danger}" FontSize="22"
+                                   FontAttributes="Bold" HorizontalTextAlignment="Center" />
+                            <Label Text="per year" TextColor="{StaticResource TextMuted}"
+                                   FontSize="11" HorizontalTextAlignment="Center" />
+                        </VerticalStackLayout>
+                    </Grid>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Car Insurance -->
+            <Border x:Name="CarCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                        <Border WidthRequest="36" HeightRequest="36"
+                                BackgroundColor="#1E3A5F"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                VerticalOptions="Center">
+                            <Label Text="&#x1F697;" FontSize="18"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Grid.Column="1" Text="Car Insurance"
+                               Style="{StaticResource Heading2}" VerticalOptions="Center"
+                               ToolTipProperties.Text="Your car insurance policies, provider, premium and cover details." />
+                        <Button Grid.Column="2" x:Name="AddCarBtn" Text="+ Manual"
+                                BackgroundColor="#1E3A5F" TextColor="#60A5FA"
+                                FontSize="10" FontAttributes="Bold"
+                                CornerRadius="8" Padding="8,2"
+                                HeightRequest="24"
+                                ToolTipProperties.Text="Add a car insurance policy by typing in the details yourself."
+                                Clicked="OnAddCarClicked" />
+                    </Grid>
+                    <VerticalStackLayout x:Name="CarPolicies" Spacing="8" />
+                    <Label x:Name="CarEmptyLabel"
+                           Text="No car insurance policies added"
+                           TextColor="{StaticResource TextMuted}" FontSize="12"
+                           HorizontalTextAlignment="Center" Margin="0,4" />
+                    <!-- Drop Zone -->
+                    <Border x:Name="CarDropZone"
+                            BackgroundColor="#0D1928"
+                            Stroke="#1E3A5F" StrokeThickness="1.5"
+                            StrokeDashArray="6,4"
+                            StrokeShape="RoundRectangle 8"
+                            HeightRequest="80" Margin="0,4,0,0"
+                            ToolTipProperties.Text="Drop a car policy PDF or photo here, or click to choose one — Smart Scan reads the details automatically.">
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="&#x1F4C4;" FontSize="22" HorizontalOptions="Center" />
+                            <Label Text="Drop policy document here"
+                                   TextColor="#475569" FontSize="11"
+                                   HorizontalOptions="Center" />
+                            <Label Text="or click to upload"
+                                   TextColor="#334155" FontSize="10"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- House Insurance -->
+            <Border x:Name="HouseCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                        <Border WidthRequest="36" HeightRequest="36"
+                                BackgroundColor="#0A3D2E"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                VerticalOptions="Center">
+                            <Label Text="&#x1F3E0;" FontSize="18"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Grid.Column="1" Text="House Insurance"
+                               Style="{StaticResource Heading2}" VerticalOptions="Center"
+                               ToolTipProperties.Text="Your house insurance policies, provider, premium and cover details." />
+                        <Button Grid.Column="2" x:Name="AddHouseBtn" Text="+ Manual"
+                                BackgroundColor="#0A3D2E" TextColor="#34D399"
+                                FontSize="10" FontAttributes="Bold"
+                                CornerRadius="8" Padding="8,2"
+                                HeightRequest="24"
+                                ToolTipProperties.Text="Add a house insurance policy by typing in the details yourself."
+                                Clicked="OnAddHouseClicked" />
+                    </Grid>
+                    <VerticalStackLayout x:Name="HousePolicies" Spacing="8" />
+                    <Label x:Name="HouseEmptyLabel"
+                           Text="No house insurance policies added"
+                           TextColor="{StaticResource TextMuted}" FontSize="12"
+                           HorizontalTextAlignment="Center" Margin="0,4" />
+                    <!-- Drop Zone -->
+                    <Border x:Name="HouseDropZone"
+                            BackgroundColor="#0A1A16"
+                            Stroke="#0A3D2E" StrokeThickness="1.5"
+                            StrokeDashArray="6,4"
+                            StrokeShape="RoundRectangle 8"
+                            HeightRequest="80" Margin="0,4,0,0"
+                            ToolTipProperties.Text="Drop a house policy PDF or photo here, or click to choose one — Smart Scan reads the details automatically.">
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="&#x1F4C4;" FontSize="22" HorizontalOptions="Center" />
+                            <Label Text="Drop policy document here"
+                                   TextColor="#475569" FontSize="11"
+                                   HorizontalOptions="Center" />
+                            <Label Text="or click to upload"
+                                   TextColor="#334155" FontSize="10"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+        </ScrollView>
+
+        <!-- Right Column -->
+        <ScrollView Grid.Column="1">
+        <VerticalStackLayout Spacing="12">
+
+            <!-- Life Insurance -->
+            <Border x:Name="LifeCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                        <Border WidthRequest="36" HeightRequest="36"
+                                BackgroundColor="#2E1A5F"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                VerticalOptions="Center">
+                            <Label Text="&#x2764;" FontSize="18"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Grid.Column="1" Text="Life Insurance"
+                               Style="{StaticResource Heading2}" VerticalOptions="Center"
+                               ToolTipProperties.Text="Your life insurance policies, provider, premium and cover details." />
+                        <Button Grid.Column="2" x:Name="AddLifeBtn" Text="+ Manual"
+                                BackgroundColor="#2E1A5F" TextColor="#A78BFA"
+                                FontSize="10" FontAttributes="Bold"
+                                CornerRadius="8" Padding="8,2"
+                                HeightRequest="24"
+                                ToolTipProperties.Text="Add a life insurance policy by typing in the details yourself."
+                                Clicked="OnAddLifeClicked" />
+                    </Grid>
+                    <VerticalStackLayout x:Name="LifePolicies" Spacing="8" />
+                    <Label x:Name="LifeEmptyLabel"
+                           Text="No life insurance policies added"
+                           TextColor="{StaticResource TextMuted}" FontSize="12"
+                           HorizontalTextAlignment="Center" Margin="0,4" />
+                    <!-- Drop Zone -->
+                    <Border x:Name="LifeDropZone"
+                            BackgroundColor="#12102A"
+                            Stroke="#2E1A5F" StrokeThickness="1.5"
+                            StrokeDashArray="6,4"
+                            StrokeShape="RoundRectangle 8"
+                            HeightRequest="80" Margin="0,4,0,0"
+                            ToolTipProperties.Text="Drop a life policy PDF or photo here, or click to choose one — Smart Scan reads the details automatically.">
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="&#x1F4C4;" FontSize="22" HorizontalOptions="Center" />
+                            <Label Text="Drop policy document here"
+                                   TextColor="#475569" FontSize="11"
+                                   HorizontalOptions="Center" />
+                            <Label Text="or click to upload"
+                                   TextColor="#334155" FontSize="10"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Pet Insurance -->
+            <Border x:Name="PetCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Grid ColumnDefinitions="Auto,*,Auto" ColumnSpacing="10">
+                        <Border WidthRequest="36" HeightRequest="36"
+                                BackgroundColor="#5F3A1E"
+                                StrokeShape="RoundRectangle 8"
+                                Stroke="Transparent"
+                                VerticalOptions="Center">
+                            <Label Text="&#x1F43E;" FontSize="18"
+                                   HorizontalOptions="Center" VerticalOptions="Center" />
+                        </Border>
+                        <Label Grid.Column="1" Text="Pet Insurance"
+                               Style="{StaticResource Heading2}" VerticalOptions="Center"
+                               ToolTipProperties.Text="Your pet insurance policies, provider, premium and cover details." />
+                        <Button Grid.Column="2" x:Name="AddPetBtn" Text="+ Manual"
+                                BackgroundColor="#5F3A1E" TextColor="#FBBF24"
+                                FontSize="10" FontAttributes="Bold"
+                                CornerRadius="8" Padding="8,2"
+                                HeightRequest="24"
+                                ToolTipProperties.Text="Add a pet insurance policy by typing in the details yourself."
+                                Clicked="OnAddPetClicked" />
+                    </Grid>
+                    <VerticalStackLayout x:Name="PetPolicies" Spacing="8" />
+                    <Label x:Name="PetEmptyLabel"
+                           Text="No pet insurance policies added"
+                           TextColor="{StaticResource TextMuted}" FontSize="12"
+                           HorizontalTextAlignment="Center" Margin="0,4" />
+                    <!-- Drop Zone -->
+                    <Border x:Name="PetDropZone"
+                            BackgroundColor="#1A1408"
+                            Stroke="#5F3A1E" StrokeThickness="1.5"
+                            StrokeDashArray="6,4"
+                            StrokeShape="RoundRectangle 8"
+                            HeightRequest="80" Margin="0,4,0,0"
+                            ToolTipProperties.Text="Drop a pet policy PDF or photo here, or click to choose one — Smart Scan reads the details automatically.">
+                        <VerticalStackLayout Spacing="4" HorizontalOptions="Center" VerticalOptions="Center">
+                            <Label Text="&#x1F4C4;" FontSize="22" HorizontalOptions="Center" />
+                            <Label Text="Drop policy document here"
+                                   TextColor="#475569" FontSize="11"
+                                   HorizontalOptions="Center" />
+                            <Label Text="or click to upload"
+                                   TextColor="#334155" FontSize="10"
+                                   HorizontalOptions="Center" />
+                        </VerticalStackLayout>
+                    </Border>
+                </VerticalStackLayout>
+            </Border>
+
+            <!-- Renewal Reminders -->
+            <Border x:Name="RemindersCard" Style="{StaticResource CardFrame}" Padding="16">
+                <VerticalStackLayout Spacing="10">
+                    <Label Text="Upcoming Renewals" Style="{StaticResource Heading2}"
+                           ToolTipProperties.Text="Policies due for renewal soon, ordered by how urgent they are." />
+                    <VerticalStackLayout x:Name="RenewalsList" Spacing="8" />
+                    <Label x:Name="RenewalsEmptyLabel"
+                           Text="No upcoming renewals"
+                           TextColor="{StaticResource TextMuted}" FontSize="12"
+                           HorizontalTextAlignment="Center" Margin="0,8" />
+                </VerticalStackLayout>
+            </Border>
+
+        </VerticalStackLayout>
+        </ScrollView>
+
+    </Grid>
+</ContentView>

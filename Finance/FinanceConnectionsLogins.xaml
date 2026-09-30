@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="SmartCubeMobile.FinanceConnectionsLogins"
+             BackgroundColor="{StaticResource PageBg}"
+             Shell.NavBarIsVisible="False">
+
+    <Grid RowDefinitions="Auto,*,Auto" Padding="16">
+
+        <!-- Header -->
+        <Grid ColumnDefinitions="*,Auto" Grid.Row="0" Padding="0,8,0,16">
+            <Label Text="Connections &amp; Logins"
+                   Style="{StaticResource Heading2}"
+                   TextColor="{StaticResource TextPrimary}"
+                   VerticalOptions="Center" />
+            <Button Grid.Column="1"
+                    Text="Close"
+                    Style="{StaticResource SecondaryButton}"
+                    Clicked="OnCloseClicked" />
+        </Grid>
+
+        <!-- Card -->
+        <Border Grid.Row="1"
+                Style="{StaticResource CardFrame}"
+                BackgroundColor="{StaticResource CardBg}"
+                Stroke="{StaticResource BorderColor}"
+                StrokeShape="RoundRectangle 12"
+                Padding="12">
+            <CollectionView x:Name="ConnectionsListView"
+                            ItemsSource="{Binding Connections}">
+                <CollectionView.EmptyView>
+                    <Label Text="No connections or logins found."
+                           TextColor="{StaticResource TextMuted}"
+                           HorizontalOptions="Center"
+                           VerticalOptions="Center"
+                           Margin="0,40" />
+                </CollectionView.EmptyView>
+                <CollectionView.ItemTemplate>
+                    <DataTemplate>
+                        <Border BackgroundColor="{StaticResource CardBgLight}"
+                                Stroke="{StaticResource BorderColor}"
+                                StrokeShape="RoundRectangle 8"
+                                Padding="12"
+                                Margin="0,4">
+                            <Grid ColumnDefinitions="*,Auto">
+                                <VerticalStackLayout Spacing="4">
+                                    <Label Text="{Binding ConnectionName}"
+                                           TextColor="{StaticResource TextPrimary}"
+                                           FontAttributes="Bold" />
+                                    <Label Text="{Binding Type}"
+                                           TextColor="{StaticResource TextSecondary}"
+                                           FontSize="12" />
+                                </VerticalStackLayout>
+                                <Label Grid.Column="1"
+                                       Text="{Binding Status}"
+                                       TextColor="{StaticResource Accent}"
+                                       VerticalOptions="Center"
+                                       FontSize="12" />
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </CollectionView.ItemTemplate>
+            </CollectionView>
+        </Border>
+
+        <!-- Action Buttons -->
+        <HorizontalStackLayout Grid.Row="2"
+                               Spacing="8"
+                               HorizontalOptions="Fill"
+                               Margin="0,12,0,0">
+            <Button x:Name="ConnectionAdd"
+                    Text="Add Connection"
+                    Style="{StaticResource SecondaryButton}"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="{StaticResource TextPrimary}"
+                    HorizontalOptions="FillAndExpand"
+                    Clicked="OnConnectionAddClicked" />
+            <Button x:Name="LoginAdd"
+                    Text="Add Login"
+                    Style="{StaticResource SecondaryButton}"
+                    BackgroundColor="{StaticResource Primary}"
+                    TextColor="{StaticResource TextPrimary}"
+                    HorizontalOptions="FillAndExpand"
+                    Clicked="OnLoginAddClicked" />
+            <Button x:Name="Finish"
+                    Text="Finish"
+                    Style="{StaticResource SecondaryButton}"
+                    HorizontalOptions="FillAndExpand"
+                    Clicked="OnFinishClicked" />
+        </HorizontalStackLayout>
+
+    </Grid>
+</ContentPage>
