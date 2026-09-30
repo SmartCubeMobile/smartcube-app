@@ -1,4 +1,4 @@
-using SmartCubeMobile.MockData;
+﻿using SmartCubeMobile.MockData;
 using SmartCubeMobile.Services;
 using System.Globalization;
 
@@ -21,6 +21,9 @@ namespace SmartCubeMobile.Dashboard
             PopulateData();
         }
 
+        // Legs of transfers between the user's own wallets/exchanges (not counted as buys or sells).
+        private Dictionary<MockCryptoTransaction, CryptoPnlService.TransferLeg> _transfers = new(ReferenceEqualityComparer.Instance);
+
         private void PopulateData()
         {
             var price = _holdings.FirstOrDefault(h => h.PriceGBP > 0)?.PriceGBP ?? 0;
@@ -29,10 +32,10 @@ namespace SmartCubeMobile.Dashboard
             var totalValue = totalQty * price;
             var name = _holdings.FirstOrDefault()?.Name ?? _symbol;
 
-            var allTxs = _holdings
+            // Transactions excluded on a wallet page don't count towards P&L here either.
+            var allTxs = CryptoExclusions.Counted(_holdings
                 .Where(h => h.Transactions != null)
-                .SelectMany(h => h.Transactions)
-                .ToList();
+                .SelectMany(h => h.Transactions));
 
             HeaderTitle.Text = $"{_symbol} — {name}";
             HeaderSubtitle.Text = $"Across {_holdings.Count} source{(_holdings.Count == 1 ? "" : "s")}";
@@ -44,12 +47,13 @@ namespace SmartCubeMobile.Dashboard
             ChangeLabel.Text = $"{(change >= 0 ? "+" : "")}{change:F2}%";
             ChangeLabel.TextColor = change >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
 
-            var costBasis = allTxs.Where(t => (t.Type == "Receive" || t.Type == "Buy") && t.PriceAtTime > 0)
-                .Sum(t => t.Quantity * t.PriceAtTime);
-            var receivedQty = allTxs.Where(t => t.Type == "Receive" || t.Type == "Buy").Sum(t => t.Quantity);
-            var avgCost = receivedQty > 0 ? costBasis / receivedQty : 0;
-            var pnl = costBasis > 0 ? totalValue - costBasis : 0;
-            var pnlPct = costBasis > 0 ? (pnl / costBasis) * 100 : 0;
+            // Portfolio P&L for this coin: transfers between your own wallets/exchanges aren't buys or sells.
+            _transfers = CryptoPnlService.FindTransfers(MockDataService.GetCryptoHoldings().Concat(_holdings).Distinct());
+            var coin = CryptoPnlService.Calculate(_holdings, _transfers);
+            var costBasis = coin.Cost;
+            var avgCost = coin.AvgCost;
+            var pnl = coin.HasCost ? coin.Pnl : 0;
+            var pnlPct = coin.PnlPct;
 
             PnlLabel.Text = costBasis > 0
                 ? $"{CryptoFormatHelper.FormatSignedValue(pnl)} ({pnlPct:+0.0;-0.0}%)"
@@ -61,7 +65,7 @@ namespace SmartCubeMobile.Dashboard
 
             BuildSourcesBreakdown(price);
             BuildTxSummary(allTxs);
-            BuildPnlChart(allTxs);
+            BuildPnlChart(allTxs.Where(t => !_transfers.ContainsKey(t)).ToList());
             BuildFilterButtons(allTxs);
             BuildTransactionRows(allTxs);
         }
@@ -364,7 +368,7 @@ namespace SmartCubeMobile.Dashboard
             AddHeaderCell(header, "Quantity", 6);
             AddHeaderCell(header, "Price", 7);
             AddHeaderCell(header, "Value", 8);
-            AddHeaderCell(header, "P&L", 9);
+            AddHeaderCell(header, "P&L / transfer", 9);
             AddHeaderCell(header, "Hash", 10);
             TransactionsList.Children.Add(header);
 
@@ -394,6 +398,8 @@ namespace SmartCubeMobile.Dashboard
                 var isLinked = linkedGroups.TryGetValue(tx, out var groupIdx);
                 var bgColor = isLinked ? TransactionHelper.GetLinkBgColor(groupIdx) : "#131B2E";
                 var linkColor = isLinked ? TransactionHelper.GetLinkColor(groupIdx) : null;
+                var transfer = _transfers.TryGetValue(tx, out var leg) ? leg : null;
+                if (transfer != null) typeLabel = "Transfer";
 
                 var fromInfo = TransactionHelper.ResolveWithSource(tx.FromAddress, tx.Type, true, source, addressMap, source);
                 var toInfo = TransactionHelper.ResolveWithSource(tx.ToAddress, tx.Type, false, source, addressMap, source);
@@ -443,10 +449,12 @@ namespace SmartCubeMobile.Dashboard
                             Cell($"{qtyPrefix}{tx.Quantity:G}", typeColor, 6, 12, FontAttributes.Bold),
                             Cell(tx.PriceAtTime > 0 ? CryptoFormatHelper.FormatPrice(tx.PriceAtTime) : "—", "#F1F5F9", 7, 11),
                             Cell(valueAtTime > 0 ? CryptoFormatHelper.FormatValue(valueAtTime) : "—", "#F1F5F9", 8, 11),
-                            Cell(tx.PriceAtTime > 0
-                                ? $"{CryptoFormatHelper.FormatSignedValue(gainLoss)}\n({glPct:+0.0;-0.0}%)"
-                                : "—",
-                                tx.PriceAtTime > 0 ? glColor : "#64748B", 9, 10, FontAttributes.Bold),
+                            transfer != null
+                                ? Cell((transfer.Outgoing ? "→ " : "← ") + transfer.OtherSide, "#A78BFA", 9, 10)
+                                : Cell(tx.PriceAtTime > 0
+                                    ? $"{CryptoFormatHelper.FormatSignedValue(gainLoss)}\n({glPct:+0.0;-0.0}%)"
+                                    : "—",
+                                    tx.PriceAtTime > 0 ? glColor : "#64748B", 9, 10, FontAttributes.Bold),
                             Cell(tx.Hash, "#475569", 10, 9),
                         }
                     }

@@ -1,4 +1,4 @@
-using SmartCubeMobile.MockData;
+﻿using SmartCubeMobile.MockData;
 using SmartCubeMobile.Services;
 using System.Globalization;
 
@@ -10,6 +10,7 @@ namespace SmartCubeMobile.Dashboard
         private readonly CultureInfo _culture;
         private readonly HashSet<string> _activeFilters = new();
         private readonly Dictionary<string, Border> _filterButtons = new();
+        private Dictionary<MockCryptoTransaction, CryptoPnlService.TransferLeg> _transfers = new(ReferenceEqualityComparer.Instance);
 
         public WalletDetailPage(MockCryptoHolding holding, CultureInfo culture)
         {
@@ -23,7 +24,9 @@ namespace SmartCubeMobile.Dashboard
         {
             var h = _holding;
             var value = h.Quantity * h.PriceGBP;
-            var txs = h.Transactions ?? new();
+            var allTxs = h.Transactions ?? new();
+            var txs = CryptoExclusions.Counted(allTxs);   // excluded transactions don't count towards P&L
+            var excludedCount = allTxs.Count - txs.Count;
 
             HeaderTitle.Text = h.WalletLabel ?? h.Name;
             HeaderSubtitle.Text = h.WalletAddress ?? h.Symbol;
@@ -35,27 +38,18 @@ namespace SmartCubeMobile.Dashboard
             ChangeLabel.Text = $"{(h.Change24h >= 0 ? "+" : "")}{h.Change24h:F2}%";
             ChangeLabel.TextColor = h.Change24h >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
 
-            var costBasis = txs.Where(t => (t.Type == "Receive" || t.Type == "Buy") && t.PriceAtTime > 0)
-                .Sum(t => t.Quantity * t.PriceAtTime);
-            var receivedQty = txs.Where(t => t.Type == "Receive" || t.Type == "Buy").Sum(t => t.Quantity);
-            var avgCost = receivedQty > 0 ? costBasis / receivedQty : 0;
-            var currentValue = receivedQty > 0 ? receivedQty * h.PriceGBP : value;
-            var pnl = costBasis > 0 ? currentValue - costBasis : 0;
-            var pnlPct = costBasis > 0 ? (pnl / costBasis) * 100 : 0;
-
-            PnlLabel.Text = costBasis > 0
-                ? $"{CryptoFormatHelper.FormatSignedValue(pnl)} ({pnlPct:+0.0;-0.0}%)"
-                : "—";
-            PnlLabel.TextColor = pnl >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
-
-            AvgCostLabel.Text = avgCost > 0 ? CryptoFormatHelper.FormatPrice(avgCost) : "—";
-            CostBasisLabel.Text = costBasis > 0 ? CryptoFormatHelper.FormatValue(costBasis) : "—";
+            // No P&L per wallet: transfers are matched across the whole portfolio.
+            _transfers = CryptoPnlService.FindTransfers(MockDataService.GetCryptoHoldings().Append(h).Distinct());
+            var transferCount = allTxs.Count(t => _transfers.ContainsKey(t));
+            TransfersLabel.Text = transferCount > 0 ? $"🔗 {transferCount}" : "None";
 
             NetworkLabel.Text = h.Network ?? "";
             AddressLabel.Text = h.WalletAddress ?? "—";
             WalletLabelText.Text = h.WalletLabel ?? "—";
 
-            TxCountLabel.Text = $"{txs.Count} transactions";
+            TxCountLabel.Text = excludedCount > 0
+                ? $"{allTxs.Count} transactions ({excludedCount} excluded from P&L)"
+                : $"{allTxs.Count} transactions";
 
             var received = txs.Where(t => t.Type == "Receive" || t.Type == "Buy").Sum(t => t.Quantity);
             var sent = txs.Where(t => t.Type == "Send" || t.Type == "Sell").Sum(t => t.Quantity);
@@ -70,9 +64,8 @@ namespace SmartCubeMobile.Dashboard
             NetFlow.Text = $"{(net >= 0 ? "+" : "")}{net:G} {h.Symbol}";
             NetFlow.TextColor = net >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
 
-            BuildPnlChart(txs);
             BuildFilterButtons();
-            BuildTransactionRows(txs);
+            BuildTransactionRows(FilteredTransactions());
         }
 
         private void BuildFilterButtons()
@@ -89,6 +82,7 @@ namespace SmartCubeMobile.Dashboard
             if (hasSwap) filterList.Add("Swap");
             if (hasWithdraw) filterList.Add("Withdraw");
             if (hasFees) filterList.Add("No Fees");
+            if (txs.Any(CryptoExclusions.IsExcluded)) filterList.Add("Excluded");
             var filters = filterList.ToArray();
             FilterBar.Children.Clear();
             _filterButtons.Clear();
@@ -116,7 +110,9 @@ namespace SmartCubeMobile.Dashboard
                     ? "Show every transaction below, with no type filter applied."
                     : filter == "No Fees"
                         ? "Hide tiny dust or fee transactions from the list below."
-                        : $"Show only {filter} transactions in the list below.");
+                        : filter == "Excluded"
+                            ? "Show only the transactions you've excluded from P&L."
+                            : $"Show only {filter} transactions in the list below.");
 
                 var f = filter;
                 btn.GestureRecognizers.Add(new TapGestureRecognizer
@@ -142,10 +138,7 @@ namespace SmartCubeMobile.Dashboard
 
         private async Task ExportPdf()
         {
-            var allTxs = _holding.Transactions?.ToList() ?? new();
-            var typeFilters = _activeFilters.Where(f => f != "No Fees").ToHashSet();
-            if (typeFilters.Count > 0) allTxs = allTxs.Where(t => typeFilters.Contains(t.Type)).ToList();
-            if (_activeFilters.Contains("No Fees")) allTxs = allTxs.Where(t => t.Quantity >= 0.01m).ToList();
+            var allTxs = FilteredTransactions();
 
             var walletLabel = _holding.WalletLabel ?? $"{_holding.Symbol} Wallet";
             var addressMap = TransactionHelper.BuildAddressMap();
@@ -172,13 +165,13 @@ namespace SmartCubeMobile.Dashboard
                 foreach (var kvp in _filterButtons)
                     SetButtonActive(kvp.Value, kvp.Key == "All");
             }
-            else if (filter == "No Fees")
+            else if (filter == "No Fees" || filter == "Excluded")
             {
-                if (_activeFilters.Contains("No Fees"))
-                    _activeFilters.Remove("No Fees");
+                if (_activeFilters.Contains(filter))
+                    _activeFilters.Remove(filter);
                 else
-                    _activeFilters.Add("No Fees");
-                SetButtonActive(btn, _activeFilters.Contains("No Fees"));
+                    _activeFilters.Add(filter);
+                SetButtonActive(btn, _activeFilters.Contains(filter));
                 if (_filterButtons.TryGetValue("All", out var allBtn))
                     SetButtonActive(allBtn, _activeFilters.Count == 0);
             }
@@ -194,14 +187,41 @@ namespace SmartCubeMobile.Dashboard
                     SetButtonActive(allBtn, _activeFilters.Count == 0);
             }
 
+            BuildTransactionRows(FilteredTransactions());
+        }
+
+        private List<MockCryptoTransaction> FilteredTransactions()
+        {
             var txs = _holding.Transactions ?? new();
-            var typeFilters = _activeFilters.Where(f => f != "No Fees").ToHashSet();
+            var typeFilters = _activeFilters.Where(f => f != "No Fees" && f != "Excluded").ToHashSet();
             if (typeFilters.Count > 0)
                 txs = txs.Where(t => typeFilters.Contains(t.Type)).ToList();
             if (_activeFilters.Contains("No Fees"))
                 txs = txs.Where(t => t.Quantity >= 0.01m).ToList();
+            if (_activeFilters.Contains("Excluded"))
+                txs = txs.Where(CryptoExclusions.IsExcluded).ToList();
+            return txs;
+        }
 
-            BuildTransactionRows(txs);
+        private async Task OnTransactionTapped(MockCryptoTransaction tx)
+        {
+            var excluded = CryptoExclusions.IsExcluded(tx);
+            var desc = $"{tx.Type} {tx.Quantity:G} {tx.Symbol} on {tx.Date:dd MMM yyyy}";
+            if (!excluded)
+            {
+                if (!await DisplayAlert("Exclude from P&L",
+                        $"{desc}\n\nLeave this transaction out of the profit & loss, cost basis, totals and chart? " +
+                        "Use this for spam airdrops or anything priced wrongly (transfers between your own wallets are already left out automatically). " +
+                        "It stays in the list (greyed out) and you can include it again at any time.",
+                        "Exclude", "Cancel")) return;
+                CryptoExclusions.Set(tx, true);
+            }
+            else
+            {
+                if (!await DisplayAlert("Include in P&L", $"{desc}\n\nCount this transaction in the profit & loss again?", "Include", "Cancel")) return;
+                CryptoExclusions.Set(tx, false);
+            }
+            PopulateData();
         }
 
         private static readonly ColumnDefinitionCollection TxColumns = new()
@@ -214,7 +234,7 @@ namespace SmartCubeMobile.Dashboard
             new ColumnDefinition(GridLength.Star),      // 5: quantity
             new ColumnDefinition(new GridLength(70)),   // 6: price
             new ColumnDefinition(new GridLength(75)),   // 7: value
-            new ColumnDefinition(new GridLength(90)),   // 8: P&L
+            new ColumnDefinition(new GridLength(110)),  // 8: transfer / note
             new ColumnDefinition(new GridLength(85)),   // 9: hash
         };
 
@@ -248,7 +268,7 @@ namespace SmartCubeMobile.Dashboard
             AddHeaderCell(header, "Quantity", 5);
             AddHeaderCell(header, "Price", 6);
             AddHeaderCell(header, "Value", 7);
-            AddHeaderCell(header, "P&L", 8);
+            AddHeaderCell(header, "Transfer", 8);
             AddHeaderCell(header, "Hash", 9);
             TransactionsList.Children.Add(header);
 
@@ -267,10 +287,8 @@ namespace SmartCubeMobile.Dashboard
                 var qtyPrefix = (tx.Type == "Receive" || tx.Type == "Buy") ? "+" : (tx.Type == "Send" || tx.Type == "Sell" || tx.Type == "Withdraw") ? "-" : "";
 
                 var valueAtTime = tx.PriceAtTime > 0 ? tx.Quantity * tx.PriceAtTime : 0;
-                var valueNow = tx.Quantity * _holding.PriceGBP;
-                var gainLoss = tx.PriceAtTime > 0 ? valueNow - valueAtTime : 0;
-                var glPct = valueAtTime > 0 ? (gainLoss / valueAtTime) * 100 : 0;
-                var glColor = gainLoss >= 0 ? "#22C55E" : "#EF4444";
+                var transfer = _transfers.TryGetValue(tx, out var leg) ? leg : null;
+                if (transfer != null) typeLabel = "Transfer";
 
                 var isLinked = linkedGroups.TryGetValue(tx, out var groupIdx);
                 var bgColor = isLinked ? TransactionHelper.GetLinkBgColor(groupIdx) : "#131B2E";
@@ -303,8 +321,10 @@ namespace SmartCubeMobile.Dashboard
                     });
                 }
 
+                var isExcluded = CryptoExclusions.IsExcluded(tx);
                 var row = new Border
                 {
+                    Opacity = isExcluded ? 0.4 : 1,
                     BackgroundColor = Color.FromArgb(bgColor),
                     Stroke = isLinked ? Color.FromArgb(TransactionHelper.GetLinkStrokeColor(groupIdx)) : Colors.Transparent,
                     StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 6 },
@@ -321,18 +341,39 @@ namespace SmartCubeMobile.Dashboard
                             fromCell,
                             toCell,
                             Cell($"{qtyPrefix}{tx.Quantity:G}", typeColor, 5, 12, FontAttributes.Bold),
-                            Cell(tx.PriceAtTime > 0 ? CryptoFormatHelper.FormatPrice(tx.PriceAtTime) : "—", "#F1F5F9", 6, 11),
+                            PriceCell(tx),
                             Cell(valueAtTime > 0 ? CryptoFormatHelper.FormatValue(valueAtTime) : "—", "#F1F5F9", 7, 11),
-                            Cell(tx.PriceAtTime > 0
-                                ? $"{CryptoFormatHelper.FormatSignedValue(gainLoss)}\n({glPct:+0.0;-0.0}%)"
+                            Cell(isExcluded ? "Excluded"
+                                : transfer != null ? (transfer.Outgoing ? "→ " : "← ") + transfer.OtherSide
                                 : "—",
-                                tx.PriceAtTime > 0 ? glColor : "#64748B", 8, 10, FontAttributes.Bold),
+                                isExcluded ? "#94A3B8" : transfer != null ? "#A78BFA" : "#475569", 8, 10, FontAttributes.Bold),
                             Cell(tx.Hash, "#475569", 9, 9),
                         }
                     }
                 };
+                var tapped = tx;
+                row.GestureRecognizers.Add(new TapGestureRecognizer { Command = new Command(async () => await OnTransactionTapped(tapped)) });
+                ToolTipProperties.SetText(row, isExcluded
+                    ? "Excluded from P&L. Tap to count it again."
+                    : "Tap to exclude this transaction from the portfolio P&L (e.g. spam tokens or wrongly priced entries). Transfers between your own wallets are recognised automatically.");
                 TransactionsList.Children.Add(row);
             }
+        }
+
+        // Price on the day of the transaction; "≈" marks an estimate (no price history for that coin/day).
+        private static Label PriceCell(MockCryptoTransaction tx)
+        {
+            var estimate = tx.PriceSource == HistoricalPriceService.SourceCurrent || (tx.PriceSource == null && tx.PriceAtTime > 0);
+            var cell = Cell(tx.PriceAtTime > 0 ? (estimate ? "≈" : "") + CryptoFormatHelper.FormatPrice(tx.PriceAtTime) : "—",
+                estimate ? "#F59E0B" : "#F1F5F9", 6, 11);
+            ToolTipProperties.SetText(cell, tx.PriceSource switch
+            {
+                HistoricalPriceService.SourceNetwork => "Price at the time of the transaction, from the network.",
+                HistoricalPriceService.SourceDaily => "Closing price on the day of the transaction.",
+                HistoricalPriceService.SourceExchange => "Price the exchange recorded for this transaction.",
+                _ => "Estimate: no price history was found for this date, so today's price is used. Press refresh to try again.",
+            });
+            return cell;
         }
 
         private static void AddHeaderCell(Grid grid, string text, int col)
@@ -364,38 +405,6 @@ namespace SmartCubeMobile.Dashboard
             return lbl;
         }
 
-        private void BuildPnlChart(List<MockCryptoTransaction> txs)
-        {
-            var receiveTxs = txs
-                .Where(t => (t.Type == "Receive" || t.Type == "Buy") && t.PriceAtTime > 0)
-                .OrderBy(t => t.Date)
-                .ToList();
-
-            if (receiveTxs.Count == 0)
-            {
-                PnlChart.IsVisible = false;
-                return;
-            }
-
-            var dataPoints = new List<(DateTime Date, decimal PnL)>();
-            decimal runningQty = 0;
-            decimal runningCost = 0;
-
-            foreach (var tx in receiveTxs)
-            {
-                runningQty += tx.Quantity;
-                runningCost += tx.Quantity * tx.PriceAtTime;
-                var valueAtTime = runningQty * tx.PriceAtTime;
-                var pnlAtTime = valueAtTime - runningCost;
-                dataPoints.Add((tx.Date, pnlAtTime));
-            }
-
-            var currentPnl = (runningQty * _holding.PriceGBP) - runningCost;
-            dataPoints.Add((DateTime.Now, currentPnl));
-
-            PnlChart.Drawable = new PnlChartDrawable(dataPoints, _culture);
-        }
-
         private async void OnRefreshClicked(object sender, EventArgs e)
         {
             RefreshButton.Text = "⟳";
@@ -408,6 +417,12 @@ namespace SmartCubeMobile.Dashboard
                     _holding.PriceGBP = pp.Price;
                     _holding.PriceUSD = pp.Price * 1.27m;
                     _holding.Change24h = pp.Change24h;
+                }
+                // Re-price any transaction that still has an estimated (today's) price.
+                if (_holding.Transactions?.Any(HistoricalPriceService.NeedsPrice) == true && _holding.Network != "coinbase")
+                {
+                    await HistoricalPriceService.FillPricesAsync(_holding.Transactions, _holding.PriceGBP);
+                    CryptoStorageService.SaveHoldingsCache(MockDataService.GetCryptoHoldings());
                 }
                 PopulateData();
             }
@@ -427,7 +442,7 @@ namespace SmartCubeMobile.Dashboard
         private async void OnHelpClicked(object sender, EventArgs e)
         {
             await DisplayAlert("Wallet Detail",
-                "This page shows one wallet holding in detail: its value, price, profit/loss, network and address, and its full transaction history. The transaction list can be filtered by type and exported to a PDF report. All figures are calculated from data stored locally on this PC.",
+                "This page shows one wallet holding in detail: its value, price, profit/loss, network and address, and its full transaction history. The transaction list can be filtered by type and exported to a PDF report. Profit/loss is not shown per wallet: it is worked out for your whole portfolio on the Crypto page, and coins moved between your own wallets and exchanges are marked as Transfers (with the other wallet shown) and never count as buying or selling. Tap a transaction to exclude it from the portfolio profit/loss (for spam airdrops or wrongly priced entries); it stays greyed out in the list, the Excluded filter shows them, and tapping it again counts it back in. All figures are calculated from data stored locally on this PC.",
                 "OK");
         }
     }

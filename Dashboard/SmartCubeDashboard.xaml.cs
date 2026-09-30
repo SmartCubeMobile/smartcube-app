@@ -130,6 +130,8 @@ namespace SmartCubeMobile
 
             if (index == 0)
                 _ = bankingFace.ReloadAsync();
+            if (index == 6)
+                subscriptionsFace.Refresh();
             if (index == 10)
             {
                 var open = pendingSupportTicket; pendingSupportTicket = null;

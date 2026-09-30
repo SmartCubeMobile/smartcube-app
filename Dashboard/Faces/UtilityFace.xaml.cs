@@ -599,6 +599,7 @@ namespace SmartCubeMobile.Dashboard.Faces
         private void LoadBillHistory(List<MockUtilityBill> bills, CultureInfo culture)
         {
             var ordered = bills.OrderByDescending(b => b.BillDate).ThenBy(b => b.FuelType).ToList();
+            var transactions = SmartDataService.GetCachedTransactions() ?? new List<MockTransaction>();
 
             var items = new List<BillDisplayItem>();
             foreach (var bill in ordered)
@@ -660,6 +661,17 @@ namespace SmartCubeMobile.Dashboard.Faces
                 var allBills = MockDataService.GetUtilityBills();
                 var billIndex = allBills.IndexOf(bill);
 
+                // Bank account: the user's choice, else the matching payment in the bank transactions
+                // (grey when it's only the account that usually pays this supplier).
+                string bankText; string bankColour;
+                if (!string.IsNullOrWhiteSpace(bill.BankAccount)) { bankText = bill.BankAccount; bankColour = "#CBD5E1"; }
+                else
+                {
+                    var (acct, exact) = TransactionAnalyzer.FindPaymentAccount(bill, transactions);
+                    bankText = acct ?? "—";
+                    bankColour = acct == null ? "#475569" : exact ? "#CBD5E1" : "#64748B";
+                }
+
                 items.Add(new BillDisplayItem
                 {
                     Period = FormatPeriod(bill.Period, bill.BillDate),
@@ -675,6 +687,8 @@ namespace SmartCubeMobile.Dashboard.Faces
                     SupplierBrandColor = Color.FromArgb(brandColor),
                     AbbrevFontSize = brandAbbrev.Length > 2 ? 6 : 7,
                     BillIndex = billIndex,
+                    BankAccount = bankText,
+                    BankAccountColour = Color.FromArgb(bankColour),
                 });
             }
 
@@ -687,7 +701,8 @@ namespace SmartCubeMobile.Dashboard.Faces
             BillsList.SelectedItem = null;
 
             var action = await Application.Current.Windows[0].Page.DisplayActionSheet(
-                $"{item.FuelType} — {item.Period}", "Cancel", "Remove Bill");
+                $"{item.FuelType} — {item.Period}", "Cancel", "Remove Bill", "Set Bank Account");
+            if (action == "Set Bank Account") { await PickBankAccount(item); return; }
             if (action != "Remove Bill") return;
 
             var confirm = await Application.Current.Windows[0].Page.DisplayAlert(
@@ -697,6 +712,34 @@ namespace SmartCubeMobile.Dashboard.Faces
             if (!confirm) return;
 
             MockDataService.RemoveBill(item.BillIndex);
+            RefreshData();
+        }
+
+        private async Task PickBankAccount(BillDisplayItem item)
+        {
+            var bills = MockDataService.GetUtilityBills();
+            if (item.BillIndex < 0 || item.BillIndex >= bills.Count) return;
+            var bill = bills[item.BillIndex];
+
+            var accounts = (SmartDataService.GetCachedAccounts() ?? new List<MockAccount>())
+                .Select(a => a.AccountName).Where(n => !string.IsNullOrWhiteSpace(n)).Distinct().ToList();
+            const string auto = "Match automatically";
+            const string other = "Other (type a name)";
+            var options = accounts.Append(auto).Append(other).ToArray();
+
+            var page = Application.Current.Windows[0].Page;
+            var pick = await page.DisplayActionSheet($"Which account paid {item.FuelType} ({item.Period})?", "Cancel", null, options);
+            if (pick == null || pick == "Cancel") return;
+
+            if (pick == other)
+            {
+                var typed = await page.DisplayPromptAsync("Bank account", "Name of the account that paid this bill:", "Save", "Cancel", initialValue: bill.BankAccount ?? "");
+                if (typed == null) return;
+                bill.BankAccount = typed.Trim();
+            }
+            else bill.BankAccount = pick == auto ? null : pick;
+
+            MockDataService.SaveBills();
             RefreshData();
         }
 
@@ -1224,5 +1267,7 @@ namespace SmartCubeMobile.Dashboard.Faces
         public double AbbrevFontSize { get; set; }
         public string MeterReadingFormatted { get; set; }
         public int BillIndex { get; set; }
+        public string BankAccount { get; set; }
+        public Color BankAccountColour { get; set; }
     }
 }

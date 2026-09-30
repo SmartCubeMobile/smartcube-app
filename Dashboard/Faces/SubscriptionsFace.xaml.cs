@@ -29,6 +29,19 @@ namespace SmartCubeMobile.Dashboard.Faces
             catch { }
         }
 
+        // Called each time the section is shown: re-reads the saved bank transactions so category
+        // changes made in Banking show up straight away.
+        public void Refresh()
+        {
+            try
+            {
+                var cached = SmartDataService.GetCachedTransactions();
+                if (cached?.Count > 0) MockDataService.DetectSubscriptionsFromLiveTransactions(cached);
+            }
+            catch { }
+            LoadData();
+        }
+
         private void LoadData()
         {
             var subs = MockDataService.GetSubscriptions();
@@ -169,6 +182,8 @@ namespace SmartCubeMobile.Dashboard.Faces
             });
 
             var subLine = sub.Category;
+            if (sub.IsAutoDetected)
+                subLine += $" · {sub.PaymentMethod}" + (sub.Frequency is { } f && f != "Monthly" ? $" · {f.ToLowerInvariant()}" : "");
             if (sub.NextRenewal.HasValue && isActive)
                 subLine += $" · Renews {sub.NextRenewal.Value:dd MMM}";
             details.Add(new Label
@@ -305,7 +320,7 @@ namespace SmartCubeMobile.Dashboard.Faces
         private async void OnHelpClicked(object sender, EventArgs e)
         {
             var page = Application.Current?.Windows.FirstOrDefault()?.Page;
-            if (page != null) await page.DisplayAlert("Subscriptions", "This section tracks your recurring subscriptions, whether added by hand or detected automatically from your transactions. It totals your spend per month and per year, and groups it by category on the right. Tap + Add to record a subscription, Cancel to mark one as cancelled and see how to cancel it with the provider, or Remove to delete it from the list. All of this data is stored locally on this PC.", "OK");
+            if (page != null) await page.DisplayAlert("Subscriptions", "This section tracks your recurring subscriptions, whether added by hand or detected automatically from your transactions. SmartCube lists a payee here when it's paid the same amount on a regular schedule, or when you put it in the Subscriptions category in Banking (tap a transaction > Change category). Moving a payee to another category there takes it off this list. It totals your spend per month and per year, and groups it by category on the right. Tap + Add to record a subscription, Cancel to mark one as cancelled and see how to cancel it with the provider, or Remove to delete it from the list. All of this data is stored locally on this PC.", "OK");
         }
 
         public async Task PlayEntryAnimation()

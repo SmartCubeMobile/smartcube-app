@@ -1,4 +1,4 @@
-using SmartCubeMobile.Dashboard;
+﻿using SmartCubeMobile.Dashboard;
 using SmartCubeMobile.MockData;
 using SmartCubeMobile.Services;
 using System.Globalization;
@@ -186,6 +186,7 @@ namespace SmartCubeMobile.Dashboard.Faces
             });
             AccountCards.Children.Add(addCard);
 
+            RunAnalysis(accounts);
             ShowTransactions(null);
             _ = PlayEntryAnimation();
         }
@@ -297,6 +298,7 @@ namespace SmartCubeMobile.Dashboard.Faces
             });
             AccountCards.Children.Add(addCard);
 
+            RunAnalysis(accounts);
             ShowTransactions(null);
             _ = PlayEntryAnimation();
         }
@@ -338,27 +340,317 @@ namespace SmartCubeMobile.Dashboard.Faces
 
         private void ShowTransactions(string accountName)
         {
-            var filtered = accountName == null
-                ? allTransactions
-                : allTransactions.Where(t => t.AccountName == accountName).ToList();
+            var source = allTransactions ?? new List<MockTransaction>();
+            IEnumerable<MockTransaction> filtered = accountName == null
+                ? source
+                : source.Where(t => t.AccountName == accountName);
 
-            var label = accountName == null
-                ? $"{filtered.Count} transactions"
-                : $"{filtered.Count} transactions — {accountName}";
+            if (categoryFilter != null)
+                filtered = filtered.Where(t => CategoryOf(t) == categoryFilter);
+            if (merchantFilter != null)
+                filtered = filtered.Where(t => analysis?.For(t)?.MerchantKey == merchantFilter);
+            var list = filtered.ToList();
 
+            var label = $"{list.Count} transactions";
+            if (accountName != null) label += $" — {accountName}";
             TransactionCount.Text = label;
-            TransactionsList.ItemsSource = filtered.OrderByDescending(t => t.Date)
-                .Select(t => new TransactionDisplayItem
+
+            FilterBar.IsVisible = merchantFilter != null;
+            if (merchantFilter != null)
+            {
+                var spent = list.Where(t => t.Amount < 0).Sum(t => -t.Amount);
+                var received = list.Where(t => t.Amount > 0).Sum(t => t.Amount);
+                FilterLabel.Text = $"Payments for {TransactionAnalyzer.DisplayName(merchantFilter)}: "
+                    + (spent > 0 ? $"{spent.ToString("C", culture)} out" : "")
+                    + (spent > 0 && received > 0 ? ", " : "")
+                    + (received > 0 ? $"{received.ToString("C", culture)} in" : "");
+            }
+
+            TransactionsList.ItemsSource = list.OrderByDescending(t => t.Date)
+                .Select(t =>
                 {
-                    Description = t.Description,
-                    Date = t.Date,
-                    Category = t.Category,
-                    AccountName = t.AccountName,
-                    Type = t.Type,
-                    AmountFormatted = t.Amount.ToString("C", culture),
-                    AmountColour = t.Amount >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444"),
+                    var a = analysis?.For(t);
+                    var r = a?.Recurring;
+                    return new TransactionDisplayItem
+                    {
+                        Source = t,
+                        Description = t.Description,
+                        Date = t.Date,
+                        Category = a?.Category ?? t.Category,
+                        AccountName = t.AccountName,
+                        Type = t.Type,
+                        AmountFormatted = t.Amount.ToString("C", culture),
+                        AmountColour = t.Amount >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444"),
+                        HasRecurring = r != null && r.Kind != "Transfer",
+                        RecurringText = r == null ? "" : $"↻ {r.Frequency} {r.Kind.ToLowerInvariant()}",
+                        RecurringColour = Color.FromArgb(KindColour(r?.Kind)),
+                    };
                 }).ToList();
+
+            if (AnalysisPanel.IsVisible) BuildAnalysisPanel();
         }
+
+        #region Analysis
+
+        private TransactionAnalysis analysis;
+        private List<MockAccount> knownAccounts = new();
+        private string categoryFilter;
+        private string merchantFilter;
+        private bool updatingPicker;
+
+        private string CategoryOf(MockTransaction t) => analysis?.For(t)?.Category ?? t.Category ?? "General";
+
+        private void RunAnalysis(List<MockAccount> accounts)
+        {
+            if (accounts != null) knownAccounts = accounts;
+            analysis = TransactionAnalyzer.Analyse(allTransactions, knownAccounts);
+            RefreshCategoryPicker();
+        }
+
+        private void RefreshCategoryPicker()
+        {
+            updatingPicker = true;
+            try
+            {
+                var cats = (allTransactions ?? new List<MockTransaction>())
+                    .GroupBy(CategoryOf)
+                    .OrderByDescending(g => g.Sum(t => Math.Abs(t.Amount)))
+                    .Select(g => g.Key).ToList();
+                if (categoryFilter != null && !cats.Contains(categoryFilter)) categoryFilter = null;
+
+                CategoryPicker.Items.Clear();
+                CategoryPicker.Items.Add("All categories");
+                foreach (var c in cats) CategoryPicker.Items.Add(c);
+                CategoryPicker.SelectedIndex = categoryFilter == null ? 0 : CategoryPicker.Items.IndexOf(categoryFilter);
+            }
+            finally { updatingPicker = false; }
+        }
+
+        private void OnCategoryFilterChanged(object sender, EventArgs e)
+        {
+            if (updatingPicker) return;
+            var picked = CategoryPicker.SelectedItem as string;
+            categoryFilter = picked == null || picked == "All categories" ? null : picked;
+            ShowTransactions(selectedAccountName);
+        }
+
+        private void OnClearFilterClicked(object sender, EventArgs e)
+        {
+            merchantFilter = null;
+            categoryFilter = null;
+            RefreshCategoryPicker();
+            ShowTransactions(selectedAccountName);
+        }
+
+        private void OnAnalyseClicked(object sender, EventArgs e)
+        {
+            AnalysisPanel.IsVisible = !AnalysisPanel.IsVisible;
+            AnalyseBtn.Text = AnalysisPanel.IsVisible ? "Hide analysis" : "Analyse";
+            if (AnalysisPanel.IsVisible) BuildAnalysisPanel();
+        }
+
+        private void ShowMerchant(string key)
+        {
+            merchantFilter = key;
+            categoryFilter = null;
+            RefreshCategoryPicker();
+            ShowTransactions(selectedAccountName);
+        }
+
+        private void ShowCategory(string category)
+        {
+            merchantFilter = null;
+            categoryFilter = category;
+            RefreshCategoryPicker();
+            ShowTransactions(selectedAccountName);
+        }
+
+        private static string KindColour(string kind) => kind switch
+        {
+            TransactionAnalyzer.KindIncome => "#22C55E",
+            TransactionAnalyzer.KindBill => "#F59E0B",
+            TransactionAnalyzer.KindVariableBill => "#06B6D4",
+            TransactionAnalyzer.KindSubscription => "#A78BFA",
+            TransactionAnalyzer.KindStandingOrder => "#60A5FA",
+            _ => "#94A3B8",
+        };
+
+        private static Label Text(string text, double size, string colour, bool bold = false) => new Label
+        {
+            Text = text, FontSize = size, TextColor = Color.FromArgb(colour),
+            FontAttributes = bold ? FontAttributes.Bold : FontAttributes.None,
+        };
+
+        private void BuildAnalysisPanel()
+        {
+            AnalysisContent.Children.Clear();
+            if (analysis == null || allTransactions == null || allTransactions.Count == 0)
+            {
+                AnalysisContent.Add(Text("No transactions to analyse yet. Connect a bank account or press ⟳.", 13, "#94A3B8"));
+                return;
+            }
+
+            var scope = selectedAccountName == null ? allTransactions : allTransactions.Where(t => t.AccountName == selectedAccountName).ToList();
+            var recurring = analysis.Recurring
+                .Where(r => r.Kind != "Transfer" && (selectedAccountName == null || r.AccountName == selectedAccountName))
+                .ToList();
+
+            var from = scope.Count > 0 ? scope.Min(t => t.Date) : DateTime.Today;
+            var to = scope.Count > 0 ? scope.Max(t => t.Date) : DateTime.Today;
+            var months = Math.Max(1.0, (to - from).TotalDays / 30.44);
+
+            AnalysisContent.Add(Text(
+                $"Based on {scope.Count} transactions from {from:dd MMM yyyy} to {to:dd MMM yyyy}"
+                + (selectedAccountName != null ? $" in {selectedAccountName}" : " across all accounts")
+                + ". Same amount on a schedule = subscription; regular but changing amount = utility bill. Tap a transaction below to correct its category.",
+                12, "#94A3B8"));
+
+            // Summary tiles: monthly totals per kind of regular payment.
+            var tiles = new FlexLayout { Wrap = Microsoft.Maui.Layouts.FlexWrap.Wrap, JustifyContent = Microsoft.Maui.Layouts.FlexJustify.Start };
+            void Tile(string title, string kind, IEnumerable<RecurringPayment> items)
+            {
+                var list = items.ToList();
+                if (list.Count == 0) return;
+                var tile = new Border
+                {
+                    BackgroundColor = Color.FromArgb("#131B2E"), Stroke = Color.FromArgb(KindColour(kind)), StrokeThickness = 1,
+                    StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 10 },
+                    Padding = new Thickness(14, 10), Margin = new Thickness(0, 0, 10, 10), MinimumWidthRequest = 170,
+                    Content = new VerticalStackLayout
+                    {
+                        Spacing = 2,
+                        Children =
+                        {
+                            Text(title, 11, KindColour(kind), true),
+                            Text($"{list.Sum(r => r.MonthlyCost).ToString("C", culture)} / month", 18, "#F1F5F9", true),
+                            Text($"{list.Count} regular payment{(list.Count == 1 ? "" : "s")}", 11, "#64748B"),
+                        }
+                    }
+                };
+                tiles.Add(tile);
+            }
+            Tile("Income", TransactionAnalyzer.KindIncome, recurring.Where(r => r.Kind == TransactionAnalyzer.KindIncome));
+            Tile("Bills", TransactionAnalyzer.KindBill, recurring.Where(r => r.Kind is TransactionAnalyzer.KindBill or TransactionAnalyzer.KindVariableBill));
+            Tile("Subscriptions", TransactionAnalyzer.KindSubscription, recurring.Where(r => r.Kind == TransactionAnalyzer.KindSubscription));
+            Tile("Standing orders", TransactionAnalyzer.KindStandingOrder, recurring.Where(r => r.Kind == TransactionAnalyzer.KindStandingOrder));
+            Tile("Other regular spending", TransactionAnalyzer.KindRegularSpend, recurring.Where(r => r.Kind == TransactionAnalyzer.KindRegularSpend));
+            if (tiles.Children.Count > 0) AnalysisContent.Add(tiles);
+
+            // Regular payments list.
+            AnalysisContent.Add(Text(recurring.Count == 0 ? "No regular payments found yet (needs at least two or three payments to the same payee)." : "Regular payments", 14, "#F1F5F9", true));
+            foreach (var r in recurring)
+            {
+                var amount = r.FixedAmount || r.MaxAmount - r.MinAmount < 0.01m
+                    ? r.TypicalAmount.ToString("C", culture)
+                    : $"{r.MinAmount.ToString("C", culture)} – {r.MaxAmount.ToString("C", culture)}";
+
+                var chip = new Border
+                {
+                    BackgroundColor = Color.FromArgb("#0B1120"), Stroke = Color.FromArgb(KindColour(r.Kind)), StrokeThickness = 1,
+                    StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 6 },
+                    Padding = new Thickness(8, 2), VerticalOptions = LayoutOptions.Center, WidthRequest = 110,
+                    Content = new Label { Text = r.Kind, FontSize = 11, TextColor = Color.FromArgb(KindColour(r.Kind)), HorizontalTextAlignment = TextAlignment.Center },
+                };
+                var info = new VerticalStackLayout { Spacing = 2 };
+                info.Add(Text($"{r.Name}  ·  {r.Category}", 13, "#F1F5F9", true));
+                info.Add(Text($"{r.Reason}  ·  {r.Count} payments  ·  {r.AccountName}", 11, "#64748B"));
+
+                var right = new VerticalStackLayout { Spacing = 2, HorizontalOptions = LayoutOptions.End };
+                right.Add(new Label { Text = $"{amount} {r.Frequency.ToLowerInvariant()}", FontSize = 13, FontAttributes = FontAttributes.Bold, TextColor = Color.FromArgb(r.IsIncome ? "#22C55E" : "#F1F5F9"), HorizontalTextAlignment = TextAlignment.End });
+                right.Add(new Label
+                {
+                    Text = $"last {r.LastDate:dd MMM}" + (r.NextDue >= DateTime.Today.AddDays(-3) ? $"  ·  next ~{r.NextDue:dd MMM}" : "  ·  overdue / stopped?"),
+                    FontSize = 11, TextColor = Color.FromArgb(r.NextDue >= DateTime.Today.AddDays(-3) ? "#64748B" : "#F87171"), HorizontalTextAlignment = TextAlignment.End,
+                });
+
+                var grid = new Grid
+                {
+                    ColumnDefinitions = { new ColumnDefinition(GridLength.Auto), new ColumnDefinition(GridLength.Star), new ColumnDefinition(GridLength.Auto) },
+                    ColumnSpacing = 12,
+                };
+                grid.Add(chip, 0); grid.Add(info, 1); grid.Add(right, 2);
+
+                var row = new Border
+                {
+                    BackgroundColor = Color.FromArgb("#131B2E"), Stroke = Colors.Transparent,
+                    StrokeShape = new Microsoft.Maui.Controls.Shapes.RoundRectangle { CornerRadius = 8 },
+                    Padding = new Thickness(12, 8), Content = grid,
+                };
+                var key = r.Key;
+                row.GestureRecognizers.Add(new TapGestureRecognizer { Command = new Command(() => ShowMerchant(key)) });
+                ToolTipProperties.SetText(row, "Show every payment for this payee.");
+                AnalysisContent.Add(row);
+            }
+
+            // Spending by category (monthly average, money out only, transfers excluded).
+            var spend = scope.Where(t => t.Amount < 0)
+                .GroupBy(CategoryOf)
+                .Where(g => g.Key != "Transfer")
+                .Select(g => new { Category = g.Key, Monthly = g.Sum(t => -t.Amount) / (decimal)months })
+                .OrderByDescending(x => x.Monthly).ToList();
+            if (spend.Count > 0)
+            {
+                AnalysisContent.Add(Text("Where your money goes (average per month)", 14, "#F1F5F9", true));
+                var top = spend[0].Monthly;
+                foreach (var s in spend)
+                {
+                    var bar = new Grid { ColumnDefinitions = { new ColumnDefinition(new GridLength(150)), new ColumnDefinition(GridLength.Star), new ColumnDefinition(new GridLength(90)) }, ColumnSpacing = 10 };
+                    bar.Add(Text(s.Category, 12, "#CBD5E1"), 0);
+                    var track = new Grid { HeightRequest = 8, VerticalOptions = LayoutOptions.Center };
+                    track.Add(new BoxView { Color = Color.FromArgb("#1E2D4A"), CornerRadius = 4 });
+                    track.Add(new BoxView
+                    {
+                        Color = Color.FromArgb("#7C3AED"), CornerRadius = 4, HorizontalOptions = LayoutOptions.Start,
+                        WidthRequest = top > 0 ? Math.Max(4, (double)(s.Monthly / top) * 320) : 4,
+                    });
+                    bar.Add(track, 1);
+                    bar.Add(new Label { Text = s.Monthly.ToString("C", culture), FontSize = 12, TextColor = Color.FromArgb("#F1F5F9"), HorizontalTextAlignment = TextAlignment.End }, 2);
+                    var cat = s.Category;
+                    bar.GestureRecognizers.Add(new TapGestureRecognizer { Command = new Command(() => ShowCategory(cat)) });
+                    ToolTipProperties.SetText(bar, $"Show only {cat} transactions.");
+                    AnalysisContent.Add(bar);
+                }
+            }
+        }
+
+        private async void OnTransactionSelected(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.CurrentSelection.FirstOrDefault() is not TransactionDisplayItem item) return;
+            TransactionsList.SelectedItem = null;
+            var a = analysis?.For(item.Source);
+            if (a == null) return;
+            var page = Application.Current?.Windows.FirstOrDefault()?.Page;
+            if (page == null) return;
+
+            const string change = "Change category";
+            var showAll = $"Show all payments for {a.MerchantName}";
+            const string why = "Why this category?";
+            var pick = await page.DisplayActionSheet($"{a.MerchantName} · {a.Category}", "Cancel", null, change, showAll, why);
+
+            if (pick == showAll) { ShowMerchant(a.MerchantKey); return; }
+            if (pick == why)
+            {
+                var r = a.Recurring;
+                await page.DisplayAlert(a.Category,
+                    $"{a.Reason}." + (r != null ? $"\n\n{r.Count} payments to {r.Name}, {r.Frequency.ToLowerInvariant()}, "
+                        + (r.FixedAmount ? $"always {r.TypicalAmount.ToString("C", culture)}." : $"between {r.MinAmount.ToString("C", culture)} and {r.MaxAmount.ToString("C", culture)}.") : "")
+                    + (TransactionAnalyzer.GetRule(a.MerchantKey) != null ? "\n\nYou set this category yourself." : "\n\nIf it's wrong, choose Change category and SmartCube will remember it for this payee."),
+                    "OK");
+                return;
+            }
+            if (pick != change) return;
+
+            const string auto = "Automatic (let SmartCube decide)";
+            var options = TransactionAnalyzer.Categories.Append(auto).ToArray();
+            var chosen = await page.DisplayActionSheet($"Category for all payments to {a.MerchantName}", "Cancel", null, options);
+            if (chosen == null || chosen == "Cancel") return;
+
+            TransactionAnalyzer.SetRule(a.MerchantKey, chosen == auto ? null : chosen);
+            RunAnalysis(null);
+            ShowTransactions(selectedAccountName);
+        }
+
+        #endregion
 
         private async void OnAddAccount()
         {
@@ -384,7 +676,8 @@ namespace SmartCubeMobile.Dashboard.Faces
         {
             var page = Application.Current?.Windows.FirstOrDefault()?.Page;
             if (page != null)
-                await page.DisplayAlert("Banking", "This section shows your connected bank accounts and recent transactions. Tap an account card to filter the list below to just that account. Use Add Account to connect a new bank through TrueLayer — SmartCube never sees your bank password. All your account and transaction data is stored locally on this PC.", "OK");
+                await page.DisplayAlert("Banking", "This section shows your connected bank accounts and recent transactions. Tap an account card to filter the list below to just that account. Use Add Account to connect a new bank through TrueLayer — SmartCube never sees your bank password. All your account and transaction data is stored locally on this PC.\n\n" +
+                    "SmartCube sorts every transaction into a category from who you paid and how often. A payment that repeats on a schedule for the same amount is treated as a subscription; one that repeats but changes a little each time is treated as a utility bill; known payees (energy suppliers, councils, supermarkets and so on) get their own category. Press Analyse to see your regular payments and monthly spending by category, use the category box to filter, and tap a transaction to correct its category — SmartCube remembers your choice for that payee.", "OK");
         }
 
         private void RefreshData()
@@ -436,6 +729,10 @@ namespace SmartCubeMobile.Dashboard.Faces
 
     public class TransactionDisplayItem
     {
+        public MockTransaction Source { get; set; }
+        public bool HasRecurring { get; set; }
+        public string RecurringText { get; set; }
+        public Color RecurringColour { get; set; }
         public string Description { get; set; }
         public DateTime Date { get; set; }
         public string Category { get; set; }

@@ -146,7 +146,9 @@ namespace SmartCubeMobile.Dashboard.Faces
             var profile = MockDataService.GetUserProfile();
 
             ProfileName.Text = profile.DisplayName;
-            ProfileEmail.Text = profile.Email;
+            ShowAccountEmail(profile.Email);
+            if (string.IsNullOrEmpty(profile.Email) && SessionService.Current != null)
+                _ = LoadAccountEmailAsync();
             AvatarInitials.Text = SessionService.InitialsFor(profile.DisplayName);
             ProfileUsername.Text = profile.Username;
             ProfileCulture.Text = profile.CultureCode;
@@ -166,6 +168,29 @@ namespace SmartCubeMobile.Dashboard.Faces
             LoadDocuments();
             LoadCreditScore();
             LoadSmartScan();
+        }
+
+        // The email address the user registered their SmartCube account with.
+        private void ShowAccountEmail(string email)
+        {
+            var text = string.IsNullOrWhiteSpace(email) ? "—" : email.Trim();
+            ProfileEmail.Text = text == "—" ? "" : text;
+            ProfileEmailRow.Text = text;
+            PersonalEmailLabel.Text = text;
+        }
+
+        // Older saved sessions may not carry the email: ask the server for the account details once.
+        private async Task LoadAccountEmailAsync()
+        {
+            try
+            {
+                var (ok, _, json) = await SessionService.ApiGet("/api/account/me");
+                var email = ok ? json?["email"]?.ToString() : null;
+                if (string.IsNullOrWhiteSpace(email)) return;
+                if (SessionService.Current != null) SessionService.Current.Email = email;
+                MainThread.BeginInvokeOnMainThread(() => ShowAccountEmail(email));
+            }
+            catch { }
         }
 
         private void LoadPersonalData()

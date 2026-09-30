@@ -1,4 +1,4 @@
-using SmartCubeMobile.MockData;
+﻿using SmartCubeMobile.MockData;
 using SmartCubeMobile.Services;
 using System.Globalization;
 
@@ -29,6 +29,7 @@ namespace SmartCubeMobile.Dashboard
 
         private readonly HashSet<string> _activeFilters = new();
         private readonly Dictionary<string, Border> _filterButtons = new();
+        private Dictionary<MockCryptoTransaction, CryptoPnlService.TransferLeg> _transfers = new(ReferenceEqualityComparer.Instance);
 
         private void BuildSummary()
         {
@@ -36,20 +37,12 @@ namespace SmartCubeMobile.Dashboard
             TotalValue.Text = CryptoFormatHelper.FormatValue(totalValue);
             AssetCount.Text = _holdings.Count.ToString();
 
-            var totalCost = _holdings.Sum(h =>
-            {
-                if (h.Transactions != null && h.Transactions.Count > 0)
-                {
-                    var receives = h.Transactions.Where(t => (t.Type == "Receive" || t.Type == "Buy") && t.PriceAtTime > 0);
-                    return receives.Sum(t => t.Quantity * t.PriceAtTime);
-                }
-                return h.Quantity * h.AvgCostBasis;
-            });
-
-            var pnl = totalValue - totalCost;
-            var pnlPct = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
-            TotalPnl.Text = $"{CryptoFormatHelper.FormatSignedValue(pnl)} ({pnlPct:+0.0;-0.0}%)";
-            TotalPnl.TextColor = pnl >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
+            // P&L is only worked out for the whole portfolio (transfers between your own wallets and this
+            // exchange aren't buys or sells), so this page shows the transfers instead.
+            _transfers = CryptoPnlService.FindTransfers(MockDataService.GetCryptoHoldings().Concat(_holdings).Distinct());
+            var transferCount = _holdings.Sum(h => (h.Transactions ?? new()).Count(t => _transfers.ContainsKey(t)));
+            TotalPnl.Text = transferCount > 0 ? $"🔗 {transferCount}" : "None";
+            TotalPnl.TextColor = Color.FromArgb("#A78BFA");
         }
 
         private void BuildAssetCards()
@@ -63,19 +56,6 @@ namespace SmartCubeMobile.Dashboard
                 var value = h.Quantity * h.PriceGBP;
                 var accentColor = Color.FromArgb(colors[i % colors.Length]);
 
-                var cost = 0m;
-                if (h.Transactions != null && h.Transactions.Count > 0)
-                {
-                    var receives = h.Transactions.Where(t => (t.Type == "Receive" || t.Type == "Buy") && t.PriceAtTime > 0);
-                    cost = receives.Sum(t => t.Quantity * t.PriceAtTime);
-                }
-                else
-                {
-                    cost = h.Quantity * h.AvgCostBasis;
-                }
-                var pnl = value - cost;
-                var pnlPct = cost > 0 ? (pnl / cost) * 100 : 0;
-                var pnlColor = pnl >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
 
                 var txCount = h.Transactions?.Count ?? 0;
 
@@ -121,7 +101,7 @@ namespace SmartCubeMobile.Dashboard
                     Children = { refreshBtn, removeBtn },
                 };
 
-                var valueCol = BuildAssetValue(value, pnl, pnlPct, pnlColor, 2);
+                var valueCol = BuildAssetValue(value, 2);
 
                 var rightStack = new VerticalStackLayout
                 {
@@ -203,7 +183,7 @@ namespace SmartCubeMobile.Dashboard
             return stack;
         }
 
-        private VerticalStackLayout BuildAssetValue(decimal value, decimal pnl, decimal pnlPct, Color pnlColor, int col)
+        private VerticalStackLayout BuildAssetValue(decimal value, int col)
         {
             var stack = new VerticalStackLayout
             {
@@ -216,18 +196,6 @@ namespace SmartCubeMobile.Dashboard
                     {
                         Text = CryptoFormatHelper.FormatValue(value),
                         TextColor = Color.FromArgb("#F1F5F9"), FontSize = 16, FontAttributes = FontAttributes.Bold,
-                        HorizontalOptions = LayoutOptions.End,
-                    },
-                    new Label
-                    {
-                        Text = CryptoFormatHelper.FormatSignedValue(pnl),
-                        TextColor = pnlColor, FontSize = 12,
-                        HorizontalOptions = LayoutOptions.End,
-                    },
-                    new Label
-                    {
-                        Text = $"{pnlPct:+0.0;-0.0}%",
-                        TextColor = pnlColor, FontSize = 11,
                         HorizontalOptions = LayoutOptions.End,
                     },
                 }

@@ -46,24 +46,15 @@
                             <Label Grid.Row="1" Grid.Column="1" x:Name="PriceLabel" TextColor="{StaticResource TextPrimary}" FontSize="14" FontAttributes="Bold" />
                         </Grid>
                         <BoxView HeightRequest="1" Color="{StaticResource CardBgLight}" Margin="0,4" />
-                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="6">
+                        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto" ColumnSpacing="16" RowSpacing="6">
                             <Label Grid.Row="0" Grid.Column="0" Text="24h Change" TextColor="{StaticResource TextMuted}" FontSize="11" />
                             <Label Grid.Row="1" Grid.Column="0" x:Name="ChangeLabel" FontSize="14" FontAttributes="Bold" />
-                            <Label Grid.Row="0" Grid.Column="1" Text="P&amp;L (from tx history)" TextColor="{StaticResource TextMuted}" FontSize="11" />
-                            <Label Grid.Row="1" Grid.Column="1" x:Name="PnlLabel" FontSize="14" FontAttributes="Bold" />
-                            <Label Grid.Row="2" Grid.Column="0" Text="Avg Cost Basis" TextColor="{StaticResource TextMuted}" FontSize="11" />
-                            <Label Grid.Row="3" Grid.Column="0" x:Name="AvgCostLabel" TextColor="{StaticResource TextPrimary}" FontSize="14" FontAttributes="Bold" />
-                            <Label Grid.Row="2" Grid.Column="1" Text="Total Cost" TextColor="{StaticResource TextMuted}" FontSize="11" />
-                            <Label Grid.Row="3" Grid.Column="1" x:Name="CostBasisLabel" TextColor="{StaticResource TextPrimary}" FontSize="14" FontAttributes="Bold" />
+                            <Label Grid.Row="0" Grid.Column="1" Text="Transfers with your other wallets" TextColor="{StaticResource TextMuted}" FontSize="11"
+                                   ToolTipProperties.Text="Coins moved between this wallet and your other wallets or exchanges. They aren't buys or sells, so they don't affect profit or loss." />
+                            <Label Grid.Row="1" Grid.Column="1" x:Name="TransfersLabel" TextColor="#A78BFA" FontSize="14" FontAttributes="Bold" />
                         </Grid>
-                    </VerticalStackLayout>
-                </Border>
-
-                <!-- P&L Chart -->
-                <Border Style="{StaticResource CardFrame}" Padding="16">
-                    <VerticalStackLayout Spacing="8">
-                        <Label Text="P&amp;L Over Time" Style="{StaticResource Heading2}" ToolTipProperties.Text="How the profit or loss on this wallet has changed over time." />
-                        <GraphicsView x:Name="PnlChart" HeightRequest="180" />
+                        <Label Text="Profit &amp; loss is worked out for your whole portfolio on the Crypto page (per coin and in total), not per wallet, so moving coins between your own wallets never counts as buying or selling."
+                               TextColor="{StaticResource TextMuted}" FontSize="11" />
                     </VerticalStackLayout>
                 </Border>
 

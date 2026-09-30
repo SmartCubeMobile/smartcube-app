@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 using SmartCubeMobile.MockData;
 using System.Security.Cryptography;
 using System.Text;
@@ -62,11 +62,8 @@ namespace SmartCubeMobile.Services
                 var price = pricePair.Price;
                 var change = pricePair.Change24h;
 
-                if (price > 0)
-                {
-                    foreach (var tx in transactions.Where(t => t.PriceAtTime == 0))
-                        tx.PriceAtTime = price;
-                }
+                // Coinbase gives the GBP value of most transactions; the rest are priced by date.
+                await HistoricalPriceService.FillPricesAsync(transactions, price);
 
                 holdings.Add(new MockCryptoHolding
                 {
@@ -158,6 +155,7 @@ namespace SmartCubeMobile.Services
                         Hash = tx["network"]?["hash"]?.ToString() ?? tx["id"]?.ToString() ?? "",
                         PriceAtTime = nativeAmount != 0 && amount != 0
                             ? Math.Abs(nativeAmount / amount) : 0,
+                        PriceSource = nativeAmount != 0 && amount != 0 ? HistoricalPriceService.SourceExchange : null,
                         FromAddress = string.IsNullOrEmpty(fromAddr) ? null : fromAddr,
                         ToAddress = string.IsNullOrEmpty(toAddr) ? null : toAddr,
                         SwapFor = swapFor,

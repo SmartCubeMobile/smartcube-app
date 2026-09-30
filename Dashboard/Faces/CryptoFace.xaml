@@ -9,7 +9,7 @@
 
         <!-- Portfolio Summary -->
         <Border x:Name="PortfolioCard" Style="{StaticResource CardFrame}" Padding="20">
-            <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="24">
+            <Grid ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="24">
                 <VerticalStackLayout Grid.Column="0" Spacing="4">
                     <Label Text="Portfolio Value" Style="{StaticResource SubHeading}"
                            ToolTipProperties.Text="The current total value of all your connected crypto wallets and exchanges." />
@@ -27,6 +27,24 @@
                            HorizontalOptions="End" />
                 </VerticalStackLayout>
                 <VerticalStackLayout Grid.Column="2" Spacing="4" VerticalOptions="Center">
+                    <Label Text="Total Bought" Style="{StaticResource SubHeading}"
+                           HorizontalOptions="End"
+                           ToolTipProperties.Text="What everything you bought, or received from outside your portfolio, was worth at the time. Transfers between your own wallets and exchanges aren't counted." />
+                    <Label x:Name="TotalBought" Text=""
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="18" FontAttributes="Bold"
+                           HorizontalOptions="End" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="3" Spacing="4" VerticalOptions="Center">
+                    <Label Text="Total Sold" Style="{StaticResource SubHeading}"
+                           HorizontalOptions="End"
+                           ToolTipProperties.Text="What everything you sold, or sent to someone outside your portfolio, was worth at the time. Transfers between your own wallets and exchanges aren't counted." />
+                    <Label x:Name="TotalSold" Text=""
+                           TextColor="{StaticResource TextPrimary}"
+                           FontSize="18" FontAttributes="Bold"
+                           HorizontalOptions="End" />
+                </VerticalStackLayout>
+                <VerticalStackLayout Grid.Column="4" Spacing="4" VerticalOptions="Center">
                     <Label Text="Total P&amp;L" Style="{StaticResource SubHeading}"
                            HorizontalOptions="End"
                            ToolTipProperties.Text="Your total profit or loss compared with what you originally paid for your holdings." />
@@ -34,7 +52,7 @@
                            FontSize="18" FontAttributes="Bold"
                            HorizontalOptions="End" />
                 </VerticalStackLayout>
-                <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
+                <Button Grid.Column="5" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
             </Grid>
         </Border>
 

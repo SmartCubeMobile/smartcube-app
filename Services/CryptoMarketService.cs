@@ -50,16 +50,95 @@ namespace SmartCubeMobile.Services
 
     public static class CryptoMarketService
     {
-        private static readonly HttpClient _http = new();
+        private static readonly HttpClient _http = new() { Timeout = TimeSpan.FromSeconds(15) };
+        private static readonly HttpClient _fallbackHttp = new() { Timeout = TimeSpan.FromSeconds(8) };
 
         static CryptoMarketService()
         {
             _http.DefaultRequestHeaders.UserAgent.ParseAdd("SmartCubeMobile/1.0");
+            _fallbackHttp.DefaultRequestHeaders.UserAgent.ParseAdd("SmartCubeMobile/1.0");
         }
         private static List<MarketCoin> _cache;
         private static DateTime _cacheTime = DateTime.MinValue;
 
         public static void ClearCache() => _cacheTime = DateTime.MinValue;
+
+        #region CoinGecko throttle
+
+        // CoinGecko's free API allows only a handful of calls a minute per IP. Every call goes through here:
+        // calls are spaced out, and after a "429 Too Many Requests" we stop asking until the cool-down ends
+        // instead of waiting and retrying (which made wallet refreshes look like they'd hung).
+        private static readonly SemaphoreSlim _gate = new(1, 1);
+        private static DateTime _lastCall = DateTime.MinValue;
+        private static DateTime _coolDownUntil = DateTime.MinValue;
+        private static readonly TimeSpan MinSpacing = TimeSpan.FromSeconds(2.5);
+
+        public static bool IsRateLimited => DateTime.UtcNow < _coolDownUntil;
+
+        private static async Task<string> CoinGeckoGetAsync(string url)
+        {
+            if (IsRateLimited) throw new HttpRequestException("CoinGecko rate limit - cooling down");
+            await _gate.WaitAsync();
+            try
+            {
+                if (IsRateLimited) throw new HttpRequestException("CoinGecko rate limit - cooling down");
+                var wait = _lastCall + MinSpacing - DateTime.UtcNow;
+                if (wait > TimeSpan.Zero) await Task.Delay(wait);
+                _lastCall = DateTime.UtcNow;
+
+                using var resp = await _http.GetAsync(url);
+                if ((int)resp.StatusCode == 429)
+                {
+                    var retry = resp.Headers.RetryAfter?.Delta ?? TimeSpan.FromSeconds(60);
+                    _coolDownUntil = DateTime.UtcNow + (retry < TimeSpan.FromSeconds(20) ? TimeSpan.FromSeconds(20) : retry);
+                    throw new HttpRequestException("CoinGecko rate limit (429)");
+                }
+                resp.EnsureSuccessStatusCode();
+                return await resp.Content.ReadAsStringAsync();
+            }
+            finally { _gate.Release(); }
+        }
+
+        #endregion
+
+        #region Price cache
+
+        private static readonly Dictionary<string, (decimal Price, decimal Change, DateTime At)> _prices = new(StringComparer.OrdinalIgnoreCase);
+        private static readonly TimeSpan PriceFresh = TimeSpan.FromMinutes(3);
+
+        private static void Remember(string symbol, decimal price, decimal change)
+        {
+            if (price > 0) lock (_prices) _prices[symbol] = (price, change, DateTime.UtcNow);
+        }
+
+        // Coinbase's public spot price (no key, generous limits) for when CoinGecko is rate limited.
+        private static async Task<decimal> CoinbaseSpotAsync(string symbol)
+        {
+            try
+            {
+                var json = await _fallbackHttp.GetStringAsync($"https://api.coinbase.com/v2/prices/{Uri.EscapeDataString(symbol)}-GBP/spot");
+                var amount = Newtonsoft.Json.Linq.JObject.Parse(json)?["data"]?["amount"]?.ToString();
+                return decimal.TryParse(amount, NumberStyles.Any, CultureInfo.InvariantCulture, out var p) ? p : 0;
+            }
+            catch { return 0; }
+        }
+
+        // Last price SmartCube saw for a coin (this session, or the saved holdings from last time).
+        private static (decimal Price, decimal Change) LastKnown(string symbol)
+        {
+            lock (_prices)
+                if (_prices.TryGetValue(symbol, out var c)) return (c.Price, c.Change);
+            try
+            {
+                var h = MockData.MockDataService.GetCryptoHoldings()
+                    .FirstOrDefault(x => string.Equals(x.Symbol, symbol, StringComparison.OrdinalIgnoreCase) && x.PriceGBP > 0);
+                if (h != null) return (h.PriceGBP, h.Change24h);
+            }
+            catch { }
+            return (0, 0);
+        }
+
+        #endregion
 
         public static async Task<List<MarketCoin>> GetTop50Async()
         {
@@ -68,7 +147,9 @@ namespace SmartCubeMobile.Services
 
             var url = "https://api.coingecko.com/api/v3/coins/markets"
                     + "?vs_currency=gbp&order=market_cap_desc&per_page=50&page=1&sparkline=false";
-            var json = await _http.GetStringAsync(url);
+            string json;
+            try { json = await CoinGeckoGetAsync(url); }
+            catch when (_cache != null) { return _cache; }   // rate limited: keep showing the last list
             var coins = JsonConvert.DeserializeObject<List<CoinGeckoMarket>>(json);
 
             _cache = (coins ?? new List<CoinGeckoMarket>()).Select(c => new MarketCoin
@@ -84,6 +165,7 @@ namespace SmartCubeMobile.Services
             }).ToList();
 
             _cacheTime = DateTime.UtcNow;
+            foreach (var c in _cache) Remember(c.Symbol, c.PriceGBP, Math.Round(c.ChangePercent24h, 2));
             return _cache;
         }
 
@@ -154,6 +236,9 @@ namespace SmartCubeMobile.Services
         public static string GetCoinId(string symbol) =>
             _coinIds.TryGetValue(symbol, out var id) ? id : null;
 
+        // Prices in GBP for known coins. Uses prices fetched in the last few minutes, asks CoinGecko once
+        // for the rest, and if CoinGecko is rate limited falls back to Coinbase's spot price and then to
+        // the last known price, so it always returns promptly. Unknown (spam) tokens get no price.
         public static async Task<Dictionary<string, (decimal Price, decimal Change24h)>> GetBatchPricesAsync(IEnumerable<string> symbols)
         {
             var result = new Dictionary<string, (decimal, decimal)>();
@@ -165,47 +250,55 @@ namespace SmartCubeMobile.Services
             }
             if (symbolToId.Count == 0) return result;
 
-            var chunks = symbolToId.Chunk(50);
-            foreach (var chunk in chunks)
+            var stale = new List<KeyValuePair<string, string>>();
+            foreach (var kv in symbolToId)
+            {
+                bool fresh;
+                (decimal Price, decimal Change, DateTime At) c;
+                lock (_prices) fresh = _prices.TryGetValue(kv.Key, out c) && DateTime.UtcNow - c.At < PriceFresh;
+                if (fresh) result[kv.Key] = (c.Price, c.Change);
+                else stale.Add(kv);
+            }
+
+            foreach (var chunk in stale.Chunk(50))
             {
                 var ids = string.Join(",", chunk.Select(kv => kv.Value));
                 var url = $"https://api.coingecko.com/api/v3/simple/price?ids={ids}&vs_currencies=gbp&include_24hr_change=true";
-                for (int attempt = 0; attempt < 4; attempt++)
+                try
                 {
-                    try
+                    var obj = Newtonsoft.Json.Linq.JObject.Parse(await CoinGeckoGetAsync(url));
+                    foreach (var kv in chunk)
                     {
-                        if (attempt > 0) await Task.Delay((attempt + 1) * 5000);
-                        var resp = await _http.GetAsync(url);
-                        if ((int)resp.StatusCode == 429) continue;
-                        resp.EnsureSuccessStatusCode();
-                        var json = await resp.Content.ReadAsStringAsync();
-                        var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
-                        foreach (var kv in chunk)
-                        {
-                            var price = (decimal?)obj?[kv.Value]?["gbp"] ?? 0;
-                            var change = (decimal?)obj?[kv.Value]?["gbp_24h_change"] ?? 0;
-                            result[kv.Key] = (price, Math.Round(change, 2));
-                        }
-                        break;
+                        var price = (decimal?)obj?[kv.Value]?["gbp"] ?? 0;
+                        var change = Math.Round((decimal?)obj?[kv.Value]?["gbp_24h_change"] ?? 0, 2);
+                        if (price <= 0) continue;
+                        result[kv.Key] = (price, change);
+                        Remember(kv.Key, price, change);
                     }
-                    catch { }
                 }
-                await Task.Delay(3000);
+                catch { break; }   // rate limited or offline: use the fallbacks below
+            }
+
+            var missing = symbolToId.Keys.Where(s => !result.ContainsKey(s)).ToList();
+            if (missing.Count > 0)
+            {
+                var spot = await Task.WhenAll(missing.Select(async s => (Symbol: s, Price: await CoinbaseSpotAsync(s))));
+                foreach (var (sym, price) in spot)
+                {
+                    var last = LastKnown(sym);
+                    if (price > 0) { result[sym] = (price, last.Change); Remember(sym, price, last.Change); }
+                    else if (last.Price > 0) result[sym] = (last.Price, last.Change);
+                }
             }
             return result;
         }
 
         public static async Task<(decimal Price, decimal Change24h)> GetSinglePriceAsync(string symbol)
         {
-            if (!_coinIds.TryGetValue(symbol, out var coinId))
+            if (!_coinIds.ContainsKey(symbol ?? ""))
                 return (0, 0);
-
-            var url = $"https://api.coingecko.com/api/v3/simple/price?ids={coinId}&vs_currencies=gbp&include_24hr_change=true";
-            var json = await _http.GetStringAsync(url);
-            var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
-            var price = (decimal?)obj?[coinId]?["gbp"] ?? 0;
-            var change = (decimal?)obj?[coinId]?["gbp_24h_change"] ?? 0;
-            return (price, Math.Round(change, 2));
+            var prices = await GetBatchPricesAsync(new[] { symbol });
+            return prices.TryGetValue(symbol, out var p) ? p : (0, 0);
         }
 
         public static async Task<List<(long Timestamp, decimal Price)>> GetHistoricalPricesAsync(string symbol)
@@ -214,7 +307,7 @@ namespace SmartCubeMobile.Services
                 return new();
 
             var url = $"https://api.coingecko.com/api/v3/coins/{coinId}/market_chart?vs_currency=gbp&days=365";
-            var json = await _http.GetStringAsync(url);
+            var json = await CoinGeckoGetAsync(url);
             var obj = Newtonsoft.Json.Linq.JObject.Parse(json);
             var prices = obj?["prices"] as Newtonsoft.Json.Linq.JArray;
             if (prices == null) return new();

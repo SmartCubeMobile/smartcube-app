@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -56,6 +56,8 @@ namespace SmartCubeMobile.MockData
         public bool IsDeemedExport { get; set; }
         public decimal MeterReadingStart { get; set; }
         public decimal MeterReadingEnd { get; set; }
+        // Bank account the bill was paid from when the user picked it; empty = matched from transactions.
+        public string BankAccount { get; set; }
     }
 
     public class MockMeterReading
@@ -100,6 +102,11 @@ namespace SmartCubeMobile.MockData
         public string FromAddress { get; set; }
         public string ToAddress { get; set; }
         public string SwapFor { get; set; }
+        // Where PriceAtTime came from: "network" (price at the time from the chain API), "daily" (that
+        // day's close), "exchange" (the exchange's own figure), "current" (estimate), null = legacy.
+        public string PriceSource { get; set; }
+        // USD price at the time when the network reports it (Ethplorer does for ETH).
+        public decimal UsdPriceAtTime { get; set; }
     }
 
     public class CryptoPriceAlert
@@ -253,7 +260,7 @@ namespace SmartCubeMobile.MockData
         private static MortgageDetails _mortgage;
         private static PropertyAddress _property;
 
-        private static string DataDir
+        internal static string DataDir
         {
             get
             {
@@ -656,8 +663,8 @@ namespace SmartCubeMobile.MockData
 
         private static void DetectSubscriptionsFromTransactions()
         {
-            var transactions = GetTransactions();
-            DetectFromTransactionList(transactions);
+            var cached = Services.SmartDataService.GetCachedTransactions();
+            DetectFromTransactionList(cached?.Count > 0 ? cached : GetTransactions());
         }
 
         public static void DetectSubscriptionsFromLiveTransactions(List<MockTransaction> transactions)
@@ -666,58 +673,87 @@ namespace SmartCubeMobile.MockData
             DetectFromTransactionList(transactions);
         }
 
+        // Automatic subscriptions come from the transaction analysis (Banking > Analyse): payees paid the
+        // same amount on a schedule, plus any payee the user has put in the Subscriptions category.
+        // Hand-added entries are never touched; automatic ones are updated, and dropped once the analysis
+        // no longer sees them as a subscription (e.g. the user re-categorised the payee as a bill).
         private static void DetectFromTransactionList(List<MockTransaction> transactions)
         {
-            var excludeCategories = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "Energy", "Water" };
-            var excludeNames = new HashSet<string>(StringComparer.OrdinalIgnoreCase) { "British Gas", "Water Bill", "Water Bill - Severn Trent" };
+            if (transactions == null || transactions.Count == 0) return;
+            var analysis = Services.TransactionAnalyzer.Analyse(transactions, Services.SmartDataService.GetCachedAccounts());
+            var seen = new HashSet<string>();
 
-            var candidates = transactions.Where(t =>
-                t.Amount < 0
-                && !excludeCategories.Contains(t.Category ?? "")
-                && !excludeNames.Contains(t.Description?.Trim() ?? "")
-                && (t.Type == "DD" || t.Type == "SO" || t.Category == "Subscription"
-                    || MatchesKnownSubscription(t.Description?.Trim()))).ToList();
-
-            foreach (var t in candidates)
+            foreach (var r in analysis.Recurring.Where(r => r.Category == "Subscriptions" && !r.IsIncome))
             {
-                var name = CleanDescription(t.Description.Trim());
-                if (_subscriptions.Any(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase))) continue;
-
-                KnownSubscriptions.TryGetValue(name, out var info);
-
-                var sub = new Subscription
-                {
-                    Id = Guid.NewGuid().ToString("N")[..8],
-                    Name = name,
-                    MonthlyCost = Math.Abs(t.Amount),
-                    Category = info.Category ?? t.Category ?? "Other",
-                    NextRenewal = t.Date.AddMonths(1),
-                    PaymentMethod = t.Type == "DD" ? "Direct Debit" : t.Type == "SO" ? "Standing Order" : "Card",
-                    CancelUrl = info.CancelUrl,
-                    CancelPhone = info.CancelPhone,
-                    CancelNotes = info.CancelNotes,
-                    IsAutoDetected = true,
-                };
-                _subscriptions.Add(sub);
+                var desc = analysis.Items.First(a => ReferenceEquals(a.Recurring, r)).Transaction.Description;
+                UpsertDetected(r.Key, desc, r.MonthlyCost, r.Frequency, r.NextDue, r.PaymentType, seen);
             }
+
+            // One-off payments the user has marked as a subscription.
+            foreach (var a in analysis.Items
+                .Where(a => a.Recurring == null && a.Category == "Subscriptions" && a.Transaction.Amount < 0)
+                .GroupBy(a => a.MerchantKey)
+                .Select(g => g.OrderByDescending(a => a.Transaction.Date).First()))
+            {
+                UpsertDetected(a.MerchantKey, a.Transaction.Description, Math.Abs(a.Transaction.Amount), "Monthly",
+                    a.Transaction.Date.AddMonths(1), a.Transaction.Type, seen);
+            }
+
+            _subscriptions.RemoveAll(s => s.IsAutoDetected && s.Status == "Active" && !seen.Contains(s.Id));
             SaveSubscriptions();
         }
 
-        private static bool MatchesKnownSubscription(string desc)
+        private static void UpsertDetected(string key, string description, decimal monthlyCost, string frequency,
+            DateTime nextDue, string paymentType, HashSet<string> seen)
         {
-            if (string.IsNullOrEmpty(desc)) return false;
-            var upper = desc.ToUpperInvariant();
-            return KnownSubscriptions.Keys.Any(k => upper.Contains(k.ToUpperInvariant()));
+            var known = KnownSubscriptions.Keys.FirstOrDefault(k => (description ?? "").Contains(k, StringComparison.OrdinalIgnoreCase));
+            var name = known ?? Services.TransactionAnalyzer.DisplayName(key);
+            var method = paymentType == "DD" ? "Direct Debit" : paymentType == "SO" ? "Standing Order" : "Card";
+
+            var existing = _subscriptions.FirstOrDefault(s => string.Equals(s.MerchantKey, key, StringComparison.OrdinalIgnoreCase))
+                ?? _subscriptions.FirstOrDefault(s => s.Name.Equals(name, StringComparison.OrdinalIgnoreCase));
+            if (existing != null)
+            {
+                seen.Add(existing.Id);
+                if (!existing.IsAutoDetected || existing.Status != "Active") return;
+                existing.MerchantKey = key;
+                existing.MonthlyCost = monthlyCost;
+                existing.Frequency = frequency;
+                existing.NextRenewal = nextDue;
+                existing.PaymentMethod = method;
+                return;
+            }
+
+            KnownSubscriptions.TryGetValue(name, out var info);
+            var sub = new Subscription
+            {
+                Id = Guid.NewGuid().ToString("N")[..8],
+                Name = name,
+                MerchantKey = key,
+                MonthlyCost = monthlyCost,
+                Frequency = frequency,
+                Category = info.Category ?? SubscriptionCategory(description),
+                NextRenewal = nextDue,
+                PaymentMethod = method,
+                CancelUrl = info.CancelUrl,
+                CancelPhone = info.CancelPhone,
+                CancelNotes = info.CancelNotes,
+                IsAutoDetected = true,
+            };
+            _subscriptions.Add(sub);
+            seen.Add(sub.Id);
         }
 
-        private static string CleanDescription(string desc)
+        private static string SubscriptionCategory(string description)
         {
-            foreach (var known in KnownSubscriptions.Keys)
-            {
-                if (desc.Contains(known, StringComparison.OrdinalIgnoreCase))
-                    return known;
-            }
-            return desc;
+            var d = (description ?? "").ToUpperInvariant();
+            bool Any(params string[] words) => words.Any(w => d.Contains(w));
+            if (Any("NETFLIX", "DISNEY", "PRIME", "NOW TV", "NOWTV", "YOUTUBE", "PARAMOUNT", "BRITBOX", "DAZN", "APPLE TV")) return "Streaming";
+            if (Any("SPOTIFY", "AUDIBLE", "APPLE MUSIC", "DEEZER", "TIDAL")) return "Music";
+            if (Any("XBOX", "PLAYSTATION", "NINTENDO", "STEAM", "EA PLAY")) return "Gaming";
+            if (Any("GYM", "FITNESS", "DAVID LLOYD", "LEISURE")) return "Health & Fitness";
+            if (Any("MICROSOFT", "ADOBE", "DROPBOX", "ICLOUD", "APPLE.COM", "GOOGLE", "OPENAI", "CHATGPT", "ANTHROPIC", "CLAUDE", "CANVA", "NORTON", "MCAFEE", "LINKEDIN")) return "Software";
+            return "Other";
         }
 
         public static void SaveSubscriptions()
@@ -738,7 +774,9 @@ namespace SmartCubeMobile.MockData
         public static void RemoveSubscription(string id)
         {
             GetSubscriptions();
-            _subscriptions.RemoveAll(s => s.Id == id);
+            // Automatic entries are hidden rather than deleted so the next scan doesn't add them back.
+            foreach (var s in _subscriptions.Where(s => s.Id == id && s.IsAutoDetected)) s.Status = "Removed";
+            _subscriptions.RemoveAll(s => s.Id == id && !s.IsAutoDetected);
             SaveSubscriptions();
         }
 
@@ -964,5 +1002,7 @@ namespace SmartCubeMobile.MockData
         public string CancelPhone { get; set; }
         public string CancelNotes { get; set; }
         public bool IsAutoDetected { get; set; }
+        // Payee key from TransactionAnalyzer, so automatic entries can be matched on later scans.
+        public string MerchantKey { get; set; }
     }
 }

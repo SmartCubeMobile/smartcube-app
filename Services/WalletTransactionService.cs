@@ -155,6 +155,8 @@ namespace SmartCubeMobile.Services
                     var value = tx["value"]?.Value<decimal>() ?? 0;
                     var from = tx["from"]?.ToString() ?? "";
                     var to = tx["to"]?.ToString() ?? "";
+                    // Ethplorer reports the ETH price in USD at the time of the transaction.
+                    var usdPrice = tx["usdPrice"]?.Type is JTokenType.Float or JTokenType.Integer ? tx["usdPrice"]!.Value<decimal>() : 0;
 
                     results.Add(new MockCryptoTransaction
                     {
@@ -165,6 +167,7 @@ namespace SmartCubeMobile.Services
                         Hash = TruncateHash(hash),
                         FromAddress = from,
                         ToAddress = to,
+                        UsdPriceAtTime = usdPrice,
                     });
                 }
 

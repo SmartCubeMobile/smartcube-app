@@ -1,4 +1,4 @@
-using SmartCubeMobile.Dashboard;
+﻿using SmartCubeMobile.Dashboard;
 using SmartCubeMobile.MockData;
 using SmartCubeMobile.Services;
 using System.Globalization;
@@ -148,9 +148,8 @@ namespace SmartCubeMobile.Dashboard.Faces
                             h.PriceGBP = pp.Price;
                             h.PriceUSD = pp.Price * 1.27m;
                             h.Change24h = pp.Change24h;
-                            if (pp.Price > 0 && h.Transactions != null)
-                                foreach (var tx in h.Transactions.Where(t => t.PriceAtTime == 0))
-                                    tx.PriceAtTime = pp.Price;
+                            if (h.Transactions != null)
+                                await HistoricalPriceService.FillPricesAsync(h.Transactions, pp.Price);
                         }
                     }
                     await Task.Delay(3000);
@@ -193,6 +192,8 @@ namespace SmartCubeMobile.Dashboard.Faces
         }
 
         private static readonly List<MockCryptoHolding> _extraHoldings = new();
+        // Legs of transfers between the user's own wallets/exchanges (rebuilt on every display).
+        private Dictionary<MockCryptoTransaction, CryptoPnlService.TransferLeg> _transfers = new(ReferenceEqualityComparer.Instance);
 
         private void DisplayHoldings(List<MockCryptoHolding> holdings)
         {
@@ -206,9 +207,13 @@ namespace SmartCubeMobile.Dashboard.Faces
                 TotalChange.TextColor = weightedChange >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
             }
 
-            var totalCost = holdings.Sum(h => h.Quantity * h.AvgCostBasis);
-            var totalPnl = totalValue - totalCost;
-            var totalPnlPct = totalCost > 0 ? (totalPnl / totalCost) * 100 : 0;
+            // Portfolio P&L: transfers between your own wallets/exchanges are not buys or sells.
+            _transfers = CryptoPnlService.FindTransfers(holdings);
+            var portfolio = CryptoPnlService.Calculate(holdings, _transfers);
+            var totalPnl = portfolio.Pnl;
+            var totalPnlPct = portfolio.PnlPct;
+            TotalBought.Text = CryptoFormatHelper.FormatValue(portfolio.Cost);
+            TotalSold.Text = CryptoFormatHelper.FormatValue(portfolio.Proceeds);
             TotalPnL.Text = $"{CryptoFormatHelper.FormatSignedValue(totalPnl)} ({totalPnlPct:+0.0;-0.0}%)";
             TotalPnL.TextColor = totalPnl >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
 
@@ -295,9 +300,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                         continue;
                     }
 
-                    if (pp.Price > 0)
-                        foreach (var tx in transactions.Where(t => t.PriceAtTime == 0))
-                            tx.PriceAtTime = pp.Price;
+                    await HistoricalPriceService.FillPricesAsync(transactions, pp.Price);
 
                     EthLog($"Adding holding: {sym} balance={balance} price={pp.Price}");
                     results.Add(new MockCryptoHolding
@@ -338,9 +341,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                 var balance = await WalletBalanceService.GetBalanceAsync("ETH", address) ?? 0;
                 var transactions = new List<MockCryptoTransaction>();
                 try { transactions = await WalletTransactionService.GetTransactionsAsync("ETH", address); } catch { }
-                if (price > 0)
-                    foreach (var tx in transactions.Where(t => t.PriceAtTime == 0))
-                        tx.PriceAtTime = price;
+                await HistoricalPriceService.FillPricesAsync(transactions, price);
                 results.Add(new MockCryptoHolding
                 {
                     Symbol = "ETH", Name = "Ethereum", Quantity = balance,
@@ -512,34 +513,21 @@ namespace SmartCubeMobile.Dashboard.Faces
                 var weightedChange = totalValue > 0
                     ? assets.Sum(a => a.Change24h * (a.Quantity * a.PriceGBP)) / totalValue : 0;
 
-                var totalCost = assets.Sum(a =>
-                {
-                    var txs = a.Transactions ?? new();
-                    var receives = txs.Where(t => (t.Type == "Receive" || t.Type == "Buy") && t.PriceAtTime > 0);
-                    var cost = receives.Sum(t => t.Quantity * t.PriceAtTime);
-                    return cost > 0 ? cost : a.Quantity * a.AvgCostBasis;
-                });
-                var pnl = totalValue - totalCost;
-                var pnlPct = totalCost > 0 ? (pnl / totalCost) * 100 : 0;
-                var pnlColor = pnl >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
+                // No P&L per wallet (coins moved in from your other wallets have no cost of their own);
+                // show how many transfers link this source to the rest of the portfolio instead.
+                var transferCount = assets.Sum(a => (a.Transactions ?? new()).Count(t => _transfers.ContainsKey(t)));
 
                 var assetSymbols = string.Join(", ", assets.Select(a => a.Symbol));
                 if (assetSymbols.Length > 25) assetSymbols = assetSymbols[..22] + "...";
 
                 var pnlStack = new VerticalStackLayout { Spacing = 2 };
-                pnlStack.Children.Add(new Label { Text = "P&L", TextColor = Color.FromArgb("#64748B"), FontSize = 10 });
-                if (totalCost > 0)
+                pnlStack.Children.Add(new Label { Text = "Transfers", TextColor = Color.FromArgb("#64748B"), FontSize = 10 });
+                pnlStack.Children.Add(new Label
                 {
-                    pnlStack.Children.Add(new Label
-                    {
-                        Text = $"{CryptoFormatHelper.FormatSignedValue(pnl)} ({pnlPct:+0.0;-0.0}%)",
-                        TextColor = pnlColor, FontSize = 12, FontAttributes = FontAttributes.Bold,
-                    });
-                }
-                else
-                {
-                    pnlStack.Children.Add(new Label { Text = "—", TextColor = Color.FromArgb("#64748B"), FontSize = 12 });
-                }
+                    Text = transferCount > 0 ? $"🔗 {transferCount} with your other wallets" : "None",
+                    TextColor = Color.FromArgb(transferCount > 0 ? "#A78BFA" : "#64748B"), FontSize = 12,
+                });
+                ToolTipProperties.SetText(pnlStack, "P&L is worked out for your whole portfolio, not per wallet: moving coins between your own wallets and exchanges isn't buying or selling.");
 
                 var refreshBtnLocal = new Button
                 {
@@ -800,13 +788,10 @@ namespace SmartCubeMobile.Dashboard.Faces
 
             foreach (var asset in grouped)
             {
-                var allTxs = asset.Holdings
-                    .Where(h => h.Transactions != null)
-                    .SelectMany(h => h.Transactions).ToList();
-                var costBasis = allTxs.Where(t => (t.Type == "Receive" || t.Type == "Buy") && t.PriceAtTime > 0)
-                    .Sum(t => t.Quantity * t.PriceAtTime);
-                var pnl = costBasis > 0 ? asset.TotalValue - costBasis : 0;
-                var pnlPct = costBasis > 0 ? (pnl / costBasis) * 100 : 0;
+                var coinPnl = CryptoPnlService.Calculate(asset.Holdings, _transfers);
+                var costBasis = coinPnl.Cost;
+                var pnl = coinPnl.HasCost ? coinPnl.Pnl : 0;
+                var pnlPct = coinPnl.PnlPct;
                 var pnlColor = pnl >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444");
                 var sourceCount = asset.Holdings.Count;
 
@@ -1078,6 +1063,8 @@ namespace SmartCubeMobile.Dashboard.Faces
                 var isLinked = linkedGroups.TryGetValue(tx, out var groupIdx);
                 var bgColor = isLinked ? TransactionHelper.GetLinkBgColor(groupIdx) : "#131B2E";
                 var linkColor = isLinked ? TransactionHelper.GetLinkColor(groupIdx) : null;
+                var transfer = _transfers.TryGetValue(tx, out var leg) ? leg : null;
+                if (transfer != null) typeLabel = "Transfer";
 
                 var fromInfo = TransactionHelper.ResolveWithSource(tx.FromAddress, tx.Type, true, source, addressMap, source);
                 var toInfo = TransactionHelper.ResolveWithSource(tx.ToAddress, tx.Type, false, source, addressMap, source);
@@ -1128,10 +1115,12 @@ namespace SmartCubeMobile.Dashboard.Faces
                             TxCell($"{qtyPrefix}{tx.Quantity:G}", typeColor, 7, 12, FontAttributes.Bold),
                             TxCell(tx.PriceAtTime > 0 ? CryptoFormatHelper.FormatPrice(tx.PriceAtTime) : "—", "#F1F5F9", 8, 11),
                             TxCell(valueAtTime > 0 ? CryptoFormatHelper.FormatValue(valueAtTime) : "—", "#F1F5F9", 9, 11),
-                            TxCell(tx.PriceAtTime > 0
-                                ? $"{CryptoFormatHelper.FormatSignedValue(gainLoss)}\n({glPct:+0.0;-0.0}%)"
-                                : "—",
-                                tx.PriceAtTime > 0 ? glColor : "#64748B", 10, 10, FontAttributes.Bold),
+                            transfer != null
+                                ? TxCell((transfer.Outgoing ? "→ " : "← ") + transfer.OtherSide, "#A78BFA", 10, 10)
+                                : TxCell(tx.PriceAtTime > 0
+                                    ? $"{CryptoFormatHelper.FormatSignedValue(gainLoss)}\n({glPct:+0.0;-0.0}%)"
+                                    : "—",
+                                    tx.PriceAtTime > 0 ? glColor : "#64748B", 10, 10, FontAttributes.Bold),
                             TxCell(tx.Hash, "#475569", 11, 9),
                         }
                     }
@@ -1400,9 +1389,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                                 var balance = await WalletBalanceService.GetBalanceAsync(conn.Symbol, conn.Address) ?? 0;
                                 var transactions = new List<MockCryptoTransaction>();
                                 try { transactions = await WalletTransactionService.GetTransactionsAsync(conn.Symbol, conn.Address); } catch { }
-                                if (price > 0)
-                                    foreach (var tx in transactions.Where(t => t.PriceAtTime == 0))
-                                        tx.PriceAtTime = price;
+                                await HistoricalPriceService.FillPricesAsync(transactions, price);
                                 newHoldings.Add(new MockCryptoHolding
                                 {
                                     Symbol = conn.Symbol, Name = conn.Symbol, Quantity = balance,
@@ -1569,7 +1556,7 @@ namespace SmartCubeMobile.Dashboard.Faces
         {
             var page = Application.Current?.Windows.FirstOrDefault()?.Page;
             if (page != null)
-                await page.DisplayAlert("Crypto", "This section tracks your crypto wallets and exchange accounts. Tap Add Wallet to connect a new wallet or exchange, and tap a card to see its full details. Top Assets and Transaction History summarise your holdings and activity across every connected source, and Price Alerts lets you know when a coin crosses a target price. All balances and transactions are fetched live and stored locally on this PC.", "OK");
+                await page.DisplayAlert("Crypto", "This section tracks your crypto wallets and exchange accounts. Tap Add Wallet to connect a new wallet or exchange, and tap a card to see its full details. Top Assets and Transaction History summarise your holdings and activity across every connected source, and Price Alerts lets you know when a coin crosses a target price.\n\nProfit & loss is worked out for your whole portfolio (in total and per coin in Top Assets), not per wallet. When you move coins between your own wallets and exchanges, for example buying on Coinbase and sending to your own wallet, SmartCube matches the send with the receive and marks both as a Transfer: it isn't a sale or a purchase, so it doesn't change your P&L. The original purchase price stays as your cost. All balances and transactions are fetched live and stored locally on this PC.", "OK");
         }
 
         private void RefreshData()

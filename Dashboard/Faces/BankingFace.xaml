@@ -13,27 +13,63 @@
 
         <!-- Transactions List -->
         <Border x:Name="TransactionsCard" Grid.Row="1" Style="{StaticResource CardFrame}" Padding="16">
-            <Grid RowDefinitions="Auto,*">
-                <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,0,0,12">
+            <Grid RowDefinitions="Auto,Auto,Auto,*">
+                <Grid Grid.Row="0" ColumnDefinitions="*,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="8" Margin="0,0,0,12">
                     <Label Text="Recent Transactions"
                            Style="{StaticResource Heading2}"
+                           VerticalOptions="Center"
                            ToolTipProperties.Text="Shows your most recent bank transactions across all connected accounts." />
-                    <Button Grid.Column="1" x:Name="RefreshBtn" Text="⟳"
+                    <Picker Grid.Column="1" x:Name="CategoryPicker"
+                            Title="All categories"
+                            WidthRequest="180"
+                            FontSize="13"
+                            TextColor="{StaticResource TextPrimary}"
+                            BackgroundColor="#1E2D4A"
+                            VerticalOptions="Center"
+                            SelectedIndexChanged="OnCategoryFilterChanged"
+                            ToolTipProperties.Text="Show only transactions in one category. Categories come from SmartCube's analysis of who you paid and how often." />
+                    <Button Grid.Column="2" x:Name="AnalyseBtn" Text="Analyse"
+                            BackgroundColor="#2E1065" TextColor="#C4B5FD"
+                            FontSize="13" FontAttributes="Bold" CornerRadius="8"
+                            HeightRequest="36" Padding="14,0" VerticalOptions="Center"
+                            Clicked="OnAnalyseClicked"
+                            ToolTipProperties.Text="Show your regular payments (subscriptions, bills, income) and where your money goes each month." />
+                    <Button Grid.Column="3" x:Name="RefreshBtn" Text="⟳"
                             BackgroundColor="#1E3A5F" TextColor="#60A5FA"
                             FontSize="16" CornerRadius="8"
                             WidthRequest="36" HeightRequest="36"
                             Padding="0" VerticalOptions="Center"
                             Clicked="OnRefreshClicked"
                             ToolTipProperties.Text="Refresh your account balances and transactions from your bank." />
-                    <Label Grid.Column="2" x:Name="TransactionCount"
+                    <Label Grid.Column="4" x:Name="TransactionCount"
                            Text="19 transactions"
                            Style="{StaticResource SubHeading}"
                            VerticalOptions="Center" />
-                    <Button Grid.Column="3" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
+                    <Button Grid.Column="5" Text="?" ToolTipProperties.Text="What this section does" FontSize="12" FontAttributes="Bold" WidthRequest="26" HeightRequest="26" Padding="0" CornerRadius="13" BackgroundColor="#1E2D4A" TextColor="#94A3B8" VerticalOptions="Center" Clicked="OnHelpClicked" />
                 </Grid>
 
-                <CollectionView Grid.Row="1" x:Name="TransactionsList"
-                                SelectionMode="None">
+                <!-- Active payee filter (set from the analysis panel or a transaction) -->
+                <Border Grid.Row="1" x:Name="FilterBar" IsVisible="False"
+                        BackgroundColor="#1E1B4B" Stroke="#4C1D95" StrokeThickness="1"
+                        StrokeShape="RoundRectangle 8" Padding="12,6" Margin="0,0,0,10">
+                    <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
+                        <Label x:Name="FilterLabel" TextColor="#C4B5FD" FontSize="12" VerticalOptions="Center" />
+                        <Button Grid.Column="1" Text="Clear" FontSize="12" Padding="10,0" HeightRequest="28"
+                                BackgroundColor="#2E1065" TextColor="#E9D5FF" CornerRadius="6"
+                                Clicked="OnClearFilterClicked"
+                                ToolTipProperties.Text="Show all transactions again." />
+                    </Grid>
+                </Border>
+
+                <!-- Analysis panel -->
+                <ScrollView Grid.Row="2" x:Name="AnalysisPanel" IsVisible="False"
+                            MaximumHeightRequest="420" Margin="0,0,0,12">
+                    <VerticalStackLayout x:Name="AnalysisContent" Spacing="10" />
+                </ScrollView>
+
+                <CollectionView Grid.Row="3" x:Name="TransactionsList"
+                                SelectionMode="Single"
+                                SelectionChanged="OnTransactionSelected">
                     <CollectionView.ItemTemplate>
                         <DataTemplate>
                             <Border BackgroundColor="{StaticResource CardBgLight}"
@@ -56,6 +92,10 @@
                                             <Label Text="{Binding AccountName}"
                                                    TextColor="{StaticResource TextMuted}"
                                                    FontSize="11" />
+                                            <Label Text="{Binding RecurringText}"
+                                                   TextColor="{Binding RecurringColour}"
+                                                   FontSize="11"
+                                                   IsVisible="{Binding HasRecurring}" />
                                         </HorizontalStackLayout>
                                     </VerticalStackLayout>
                                     <Label Grid.Column="1"

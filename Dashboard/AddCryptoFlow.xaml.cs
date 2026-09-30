@@ -1,4 +1,4 @@
-using SmartCubeMobile.MockData;
+﻿using SmartCubeMobile.MockData;
 using SmartCubeMobile.Services;
 using System.Globalization;
 
@@ -391,27 +391,12 @@ namespace SmartCubeMobile.Dashboard
                     if (txList.Count > 0)
                     {
                         ConnectingDetail.Text = "Fetching historical prices...";
-                        await Task.Delay(1500);
-                        var history = await CryptoMarketService.GetHistoricalPricesAsync(selectedNetwork);
-                        if (history.Count > 0)
-                        {
-                            foreach (var tx in txList)
-                            {
-                                var cgPrice = CryptoMarketService.FindPriceAtTime(history, tx.Date);
-                                if (cgPrice > 0)
-                                    tx.PriceAtTime = cgPrice;
-                            }
-                        }
-                        if (livePrice > 0)
-                            foreach (var tx in txList.Where(t => t.PriceAtTime == 0))
-                                tx.PriceAtTime = livePrice;
+                        await HistoricalPriceService.FillPricesAsync(txList, livePrice);
                     }
                 }
                 catch
                 {
-                    if (livePrice > 0)
-                        foreach (var tx in txList.Where(t => t.PriceAtTime == 0))
-                            tx.PriceAtTime = livePrice;
+                    await HistoricalPriceService.FillPricesAsync(txList, livePrice);
                 }
 
                 ConnectingDetail.Text = "Calculating values...";

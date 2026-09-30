@@ -16,7 +16,7 @@ namespace SmartCubeMobile.Services
             if (_running) return;
             _running = true;
             _timer = new Timer(_ => _ = CheckAlertsAsync(), null,
-                TimeSpan.FromSeconds(15), TimeSpan.FromSeconds(60));
+                TimeSpan.FromSeconds(15), TimeSpan.FromMinutes(3));   // CoinGecko's free limit is tight
         }
 
         public static void Stop()

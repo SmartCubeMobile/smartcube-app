@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SmartCubeMobile.Dashboard.Faces.UtilityFace"
@@ -264,7 +264,7 @@
                     <Border Grid.Row="1" BackgroundColor="{StaticResource CardBgLight}"
                             StrokeShape="RoundRectangle 6" Stroke="Transparent"
                             Padding="12,8" Margin="0,0,0,6">
-                        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="16">
+                        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="16">
                             <Label Grid.Column="0" Text="Period"
                                    TextColor="{StaticResource TextMuted}" FontSize="11"
                                    FontAttributes="Bold" WidthRequest="80" />
@@ -273,23 +273,27 @@
                             <Label Grid.Column="2" Text="Supplier — Type"
                                    TextColor="{StaticResource TextMuted}" FontSize="11"
                                    FontAttributes="Bold" />
-                            <Label Grid.Column="3" Text="Property"
+                            <Label Grid.Column="3" Text="Bank Account"
+                                   TextColor="{StaticResource TextMuted}" FontSize="11"
+                                   FontAttributes="Bold" WidthRequest="150"
+                                   ToolTipProperties.Text="The bank account the bill was paid from. SmartCube matches it to your bank transactions; select a bill to set it yourself." />
+                            <Label Grid.Column="4" Text="Property"
                                    TextColor="{StaticResource TextMuted}" FontSize="11"
                                    FontAttributes="Bold" WidthRequest="80"
                                    HorizontalTextAlignment="End" />
-                            <Label Grid.Column="4" Text="Meter"
+                            <Label Grid.Column="5" Text="Meter"
                                    TextColor="{StaticResource TextMuted}" FontSize="11"
                                    FontAttributes="Bold" WidthRequest="100"
                                    HorizontalTextAlignment="End" />
-                            <Label Grid.Column="5" Text="Usage"
+                            <Label Grid.Column="6" Text="Usage"
                                    TextColor="{StaticResource TextMuted}" FontSize="11"
                                    FontAttributes="Bold" WidthRequest="110"
                                    HorizontalTextAlignment="End" />
-                            <Label Grid.Column="6" Text="Amount"
+                            <Label Grid.Column="7" Text="Amount"
                                    TextColor="{StaticResource TextMuted}" FontSize="11"
                                    FontAttributes="Bold" WidthRequest="75"
                                    HorizontalTextAlignment="End" />
-                            <Label Grid.Column="7" Text="Change"
+                            <Label Grid.Column="8" Text="Change"
                                    TextColor="{StaticResource TextMuted}" FontSize="11"
                                    FontAttributes="Bold" WidthRequest="70"
                                    HorizontalTextAlignment="End" />
@@ -304,7 +308,7 @@
                                         Stroke="Transparent"
                                         Padding="12,10"
                                         Margin="0,0,0,6">
-                                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="16">
+                                    <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto,Auto,Auto,Auto,Auto" ColumnSpacing="16">
                                         <Label Grid.Column="0"
                                                Text="{Binding Period}"
                                                TextColor="{StaticResource TextSecondary}"
@@ -332,27 +336,34 @@
                                                FontSize="13"
                                                VerticalOptions="Center" />
                                         <Label Grid.Column="3"
+                                               Text="{Binding BankAccount}"
+                                               TextColor="{Binding BankAccountColour}"
+                                               FontSize="12"
+                                               WidthRequest="150"
+                                               LineBreakMode="TailTruncation"
+                                               VerticalOptions="Center" />
+                                        <Label Grid.Column="4"
                                                Text="{Binding Postcode}"
                                                TextColor="{StaticResource TextMuted}"
                                                FontSize="11"
                                                WidthRequest="80"
                                                HorizontalTextAlignment="End"
                                                VerticalOptions="Center" />
-                                        <Label Grid.Column="4"
+                                        <Label Grid.Column="5"
                                                Text="{Binding MeterReadingFormatted}"
                                                TextColor="{StaticResource TextMuted}"
                                                FontSize="11"
                                                WidthRequest="100"
                                                HorizontalTextAlignment="End"
                                                VerticalOptions="Center" />
-                                        <Label Grid.Column="5"
+                                        <Label Grid.Column="6"
                                                Text="{Binding UnitsFormatted}"
                                                TextColor="{StaticResource TextMuted}"
                                                FontSize="12"
                                                WidthRequest="110"
                                                HorizontalTextAlignment="End"
                                                VerticalOptions="Center" />
-                                        <Label Grid.Column="6"
+                                        <Label Grid.Column="7"
                                                Text="{Binding AmountFormatted}"
                                                TextColor="{StaticResource Warning}"
                                                FontSize="14"
@@ -360,7 +371,7 @@
                                                VerticalOptions="Center"
                                                WidthRequest="75"
                                                HorizontalTextAlignment="End" />
-                                        <Label Grid.Column="7"
+                                        <Label Grid.Column="8"
                                                Text="{Binding ChangeFormatted}"
                                                TextColor="{Binding ChangeColour}"
                                                FontSize="11"
