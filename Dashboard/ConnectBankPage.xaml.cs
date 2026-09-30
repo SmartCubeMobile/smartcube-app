@@ -1,4 +1,4 @@
-using SmartCubeMobile.Services;
+﻿using SmartCubeMobile.Services;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -8,8 +8,9 @@ namespace SmartCubeMobile.Dashboard
 {
     public partial class ConnectBankPage : ContentPage
     {
+        // The client id is public (it's in the bank-consent URL). The client secret lives on the
+        // SmartCube server, which does the token exchange for us.
         private const string TL_CLIENT_ID = "smartcube-3d8e01";
-        private const string TL_CLIENT_SECRET = "tlcs_live_5srsqgsjtjwz_QQrUQWQpo4AROiR3nKDxNO6usmKQHsVWOur2Eb7i5SNA";
         private const string TL_REDIRECT_URI = "http://localhost:3000/callback";
 
         public event Action BankConnected;
@@ -176,7 +177,7 @@ namespace SmartCubeMobile.Dashboard
             TLConnectBtn.IsEnabled = false;
             TLConnectBtn.Text = "Connecting...";
 
-            var success = await SmartDataService.ConnectTrueLayerWithCode(authCode, TL_CLIENT_ID, TL_CLIENT_SECRET, TL_REDIRECT_URI);
+            var success = await SmartDataService.ConnectTrueLayerWithCode(authCode, TL_REDIRECT_URI);
 
             TLConnectBtn.IsEnabled = true;
             TLConnectBtn.Text = "Connect";
@@ -276,7 +277,7 @@ namespace SmartCubeMobile.Dashboard
             TLConnectBtn.IsEnabled = false;
             TLConnectBtn.Text = "Connecting...";
 
-            var success = await SmartDataService.ConnectTrueLayerWithCode(authCode, TL_CLIENT_ID, TL_CLIENT_SECRET, TL_REDIRECT_URI);
+            var success = await SmartDataService.ConnectTrueLayerWithCode(authCode, TL_REDIRECT_URI);
 
             TLConnectBtn.IsEnabled = true;
             TLConnectBtn.Text = "Connect";

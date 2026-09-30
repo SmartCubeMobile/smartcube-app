@@ -9,13 +9,9 @@ namespace SmartCubeMobile.Services
     public class TrueLayerService
     {
         private const string DataApiBase = "https://api.truelayer.com/data/v1";
-        private const string AuthBase = "https://auth.truelayer.com";
-
         private readonly HttpClient _http;
         private string _accessToken;
         private string _refreshToken;
-        private string _clientId;
-        private string _clientSecret;
 
         public bool IsConnected => !string.IsNullOrEmpty(_accessToken);
         public string LastError { get; private set; }
@@ -26,12 +22,6 @@ namespace SmartCubeMobile.Services
             _http.DefaultRequestHeaders.Accept.Add(new MediaTypeWithQualityHeaderValue("application/json"));
         }
 
-        public void SetCredentials(string clientId, string clientSecret)
-        {
-            _clientId = clientId;
-            _clientSecret = clientSecret;
-        }
-
         public void SetAccessToken(string accessToken, string refreshToken = null)
         {
             _accessToken = accessToken;
@@ -39,45 +29,15 @@ namespace SmartCubeMobile.Services
             _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
         }
 
+        // Token exchange and refresh go through the SmartCube server, which holds the TrueLayer client
+        // secret. The bank tokens come back to this PC only; the server doesn't keep them.
         public async Task<bool> ExchangeAuthCode(string authCode, string redirectUri = "http://localhost:3000/callback")
         {
-            if (string.IsNullOrEmpty(_clientId) || string.IsNullOrEmpty(_clientSecret))
-            {
-                LastError = "Client ID and Client Secret are required to exchange an auth code.";
-                return false;
-            }
-
-            try
-            {
-                var content = new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("grant_type", "authorization_code"),
-                    new KeyValuePair<string, string>("client_id", _clientId),
-                    new KeyValuePair<string, string>("client_secret", _clientSecret),
-                    new KeyValuePair<string, string>("redirect_uri", redirectUri),
-                    new KeyValuePair<string, string>("code", authCode),
-                });
-
-                var response = await _http.PostAsync($"{AuthBase}/connect/token", content);
-                var body = await response.Content.ReadAsStringAsync();
-
-                if (!response.IsSuccessStatusCode)
-                {
-                    LastError = $"Auth code exchange failed ({response.StatusCode}): {body}";
-                    return false;
-                }
-
-                var json = JObject.Parse(body);
-                _accessToken = json["access_token"]?.ToString();
-                _refreshToken = json["refresh_token"]?.ToString();
-                _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                LastError = $"Auth code exchange error: {ex.Message}";
-                return false;
-            }
+            var (ok, error, json) = await SessionService.ApiPost("/api/account/truelayer/token",
+                new { grantType = "authorization_code", code = authCode, redirectUri });
+            if (!ok) { LastError = "Auth code exchange failed: " + error; return false; }
+            ApplyTokens(json);
+            return true;
         }
 
         public string GetAccessToken() => _accessToken;
@@ -85,37 +45,19 @@ namespace SmartCubeMobile.Services
 
         public async Task<bool> RefreshAccessToken()
         {
-            if (string.IsNullOrEmpty(_refreshToken) || string.IsNullOrEmpty(_clientId))
-                return false;
+            if (string.IsNullOrEmpty(_refreshToken)) return false;
+            var (ok, error, json) = await SessionService.ApiPost("/api/account/truelayer/token",
+                new { grantType = "refresh_token", refreshToken = _refreshToken });
+            if (!ok) { LastError = "Token refresh failed: " + error; return false; }
+            ApplyTokens(json);
+            return true;
+        }
 
-            try
-            {
-                var content = new FormUrlEncodedContent(new[]
-                {
-                    new KeyValuePair<string, string>("grant_type", "refresh_token"),
-                    new KeyValuePair<string, string>("client_id", _clientId),
-                    new KeyValuePair<string, string>("client_secret", _clientSecret),
-                    new KeyValuePair<string, string>("refresh_token", _refreshToken),
-                });
-
-                var response = await _http.PostAsync($"{AuthBase}/connect/token", content);
-                if (!response.IsSuccessStatusCode)
-                {
-                    LastError = $"Token refresh failed: {response.StatusCode}";
-                    return false;
-                }
-
-                var json = JObject.Parse(await response.Content.ReadAsStringAsync());
-                _accessToken = json["access_token"]?.ToString();
-                _refreshToken = json["refresh_token"]?.ToString() ?? _refreshToken;
-                _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                LastError = $"Token refresh error: {ex.Message}";
-                return false;
-            }
+        private void ApplyTokens(JObject json)
+        {
+            _accessToken = json["accessToken"]?.ToString();
+            _refreshToken = json["refreshToken"]?.ToString() ?? _refreshToken;
+            _http.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", _accessToken);
         }
 
         public async Task<List<MockAccount>> GetAccounts()

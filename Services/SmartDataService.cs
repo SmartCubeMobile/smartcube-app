@@ -222,11 +222,10 @@ namespace SmartCubeMobile.Services
             return true;
         }
 
-        public static async Task<bool> ConnectTrueLayerWithCode(string authCode, string clientId, string clientSecret, string redirectUri = "http://localhost:3000/callback")
+        public static async Task<bool> ConnectTrueLayerWithCode(string authCode, string redirectUri = "http://localhost:3000/callback")
         {
             _lastError = null;
             var tl = new TrueLayerService();
-            tl.SetCredentials(clientId, clientSecret);
 
             var exchanged = await tl.ExchangeAuthCode(authCode, redirectUri);
             if (!exchanged)
@@ -261,8 +260,6 @@ namespace SmartCubeMobile.Services
                 Provider = providerKey,
                 AccessToken = tl.GetAccessToken(),
                 RefreshToken = tl.GetRefreshToken(),
-                ClientId = clientId,
-                ClientSecret = clientSecret,
                 ConnectedAt = DateTime.Now,
                 Status = "Connected",
             });
@@ -277,8 +274,6 @@ namespace SmartCubeMobile.Services
             _lastError = null;
             var tl = new TrueLayerService();
             tl.SetAccessToken(accessToken, refreshToken);
-            if (clientId != null)
-                tl.SetCredentials(clientId, clientSecret);
 
             var ok = await tl.TestConnection();
             if (!ok)
@@ -314,7 +309,6 @@ namespace SmartCubeMobile.Services
                 AccessToken = accessToken,
                 RefreshToken = refreshToken,
                 ClientId = clientId,
-                ClientSecret = clientSecret,
                 ConnectedAt = DateTime.Now,
                 Status = "Connected",
             });
@@ -537,8 +531,7 @@ namespace SmartCubeMobile.Services
                 foreach (var conn in connections.Where(c => c.Provider != "Monzo"))
                 {
                     var tl = new TrueLayerService();
-                    if (conn.ClientId != null)
-                        tl.SetCredentials(conn.ClientId, conn.ClientSecret);
+                    conn.ClientSecret = null;   // older versions saved the TrueLayer secret here; the server holds it now
                     tl.SetAccessToken(conn.AccessToken, conn.RefreshToken);
                     var key = conn.Provider;
                     tl.TokensRefreshed += () => UpdateSavedTokens(key, tl.GetAccessToken(), tl.GetRefreshToken());
