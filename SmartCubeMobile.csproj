@@ -14,8 +14,8 @@
     <ApplicationTitle>SmartCube Mobile</ApplicationTitle>
     <ApplicationIcon>Images\SmartCube.ico</ApplicationIcon>
     <ApplicationId>com.smartcube.mobile</ApplicationId>
-    <ApplicationDisplayVersion>1.0.8</ApplicationDisplayVersion>
-    <ApplicationVersion>9</ApplicationVersion>
+    <ApplicationDisplayVersion>1.0.9</ApplicationDisplayVersion>
+    <ApplicationVersion>10</ApplicationVersion>
     <WindowsPackageType>None</WindowsPackageType>
     <WindowsAppSDKSelfContained>true</WindowsAppSDKSelfContained>
     <SupportedOSPlatformVersion Condition="$([MSBuild]::GetTargetPlatformIdentifier('$(TargetFramework)')) == 'windows'">10.0.17763.0</SupportedOSPlatformVersion>
