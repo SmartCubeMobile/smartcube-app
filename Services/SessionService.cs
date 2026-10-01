@@ -1,4 +1,4 @@
-using System.Net;
+﻿using System.Net;
 using System.Text;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
@@ -22,7 +22,7 @@ namespace SmartCubeMobile.Services
     public static class SessionService
     {
         private static readonly string _deviceFile = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            SmartCubeMobile.Services.AppPaths.Local,
             "SmartCube", "device.json");
 
         private static readonly HttpClient _http = CreateClient();
@@ -42,6 +42,17 @@ namespace SmartCubeMobile.Services
 
         public static SessionUser Current { get; private set; }
         public static bool IsSignedIn => Current != null;
+
+        // Demo mode: a made-up signed-in user, no server involved.
+        public static void StartDemoSession()
+        {
+            if (!AppPaths.IsDemo) return;
+            Current = new SessionUser
+            {
+                Username = DemoData.Username, Email = DemoData.Email, FullName = DemoData.FullName,
+                Plan = "Premium", Subscriber = true, LastLogin = DateTime.UtcNow, TwoFactorEnabled = true,
+            };
+        }
 
         public static string DisplayName =>
             Current?.FullName ?? Current?.Username ?? "";

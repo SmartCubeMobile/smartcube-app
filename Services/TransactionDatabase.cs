@@ -1,4 +1,4 @@
-using SQLite;
+﻿using SQLite;
 using SmartCubeMobile.MockData;
 
 namespace SmartCubeMobile.Services
@@ -22,7 +22,7 @@ namespace SmartCubeMobile.Services
     {
         private static SQLiteConnection _db;
         private static readonly string _dbPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            SmartCubeMobile.Services.AppPaths.Local,
             "SmartCube", "transactions.db");
 
         static TransactionDatabase()

@@ -14,7 +14,7 @@
                 <Border x:Name="SupplierCard" Style="{StaticResource CardFrame}" Padding="16">
                     <VerticalStackLayout Spacing="10">
                         <Grid ColumnDefinitions="*,Auto,Auto,Auto" ColumnSpacing="8">
-                            <Label Text="Suppliers &amp; Tariffs" Style="{StaticResource Heading2}"
+                            <Label Text="Suppliers" Style="{StaticResource Heading2}" VerticalOptions="Center" LineBreakMode="NoWrap"
                                    ToolTipProperties.Text="Your energy, water and broadband suppliers, tariffs and monthly cost." />
                             <Button Grid.Column="1" Text="Compare"
                                     BackgroundColor="#164E3A" TextColor="#22C55E"

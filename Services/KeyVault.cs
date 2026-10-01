@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using Newtonsoft.Json;
 
@@ -17,7 +17,7 @@ namespace SmartCubeMobile.Services
     public static class KeyVault
     {
         private static readonly string DataDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SmartCube");
+            SmartCubeMobile.Services.AppPaths.Local, "SmartCube");
         public static readonly string KeysPath = Path.Combine(DataDir, "keys.json");
 
         private const int PasswordIterations = 600_000;

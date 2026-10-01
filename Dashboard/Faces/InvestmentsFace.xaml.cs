@@ -1,4 +1,4 @@
-using SmartCubeMobile.Dashboard;
+﻿using SmartCubeMobile.Dashboard;
 using SmartCubeMobile.MockData;
 using System.Globalization;
 
@@ -45,7 +45,7 @@ namespace SmartCubeMobile.Dashboard.Faces
                         _ => Color.FromArgb("#06B6D4"),
                     },
                     ValueFormatted = value.ToString("C", culture),
-                    SharesFormatted = $"{i.Shares} shares @ {(i.PricePence / 100m):F2}p",
+                    SharesFormatted = $"{i.Shares} shares @ £{(i.PricePence / 100m):F2}",
                     GainFormatted = $"{(gain >= 0 ? "+" : "")}{gain.ToString("C", culture)} ({gainPct:F1}%)",
                     GainColour = gain >= 0 ? Color.FromArgb("#22C55E") : Color.FromArgb("#EF4444"),
                     ChangeFormatted = $"{(i.Change1D >= 0 ? "+" : "")}{i.Change1D:F2}%",

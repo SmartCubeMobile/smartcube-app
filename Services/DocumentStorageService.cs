@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace SmartCubeMobile.Services
 {
@@ -16,11 +16,11 @@ namespace SmartCubeMobile.Services
     public static class DocumentStorageService
     {
         private static readonly string _docsDir = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            SmartCubeMobile.Services.AppPaths.Local,
             "SmartCube", "Documents");
 
         private static readonly string _indexPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            SmartCubeMobile.Services.AppPaths.Local,
             "SmartCube", "documents.json");
 
         private static readonly string _reportsDir = Path.Combine(

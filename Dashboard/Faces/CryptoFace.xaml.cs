@@ -227,7 +227,7 @@ namespace SmartCubeMobile.Dashboard.Faces
             BuildPriceAlerts();
         }
 
-        private static readonly string _logFile = Path.Combine(FileSystem.AppDataDirectory, "eth_debug.log");
+        private static readonly string _logFile = Path.Combine(SmartCubeMobile.Services.AppPaths.AppData, "eth_debug.log");
 
         private static void EthLog(string msg)
         {

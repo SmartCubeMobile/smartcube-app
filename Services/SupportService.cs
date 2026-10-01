@@ -1,4 +1,4 @@
-using Newtonsoft.Json.Linq;
+﻿using Newtonsoft.Json.Linq;
 
 namespace SmartCubeMobile.Services
 {
@@ -63,6 +63,7 @@ namespace SmartCubeMobile.Services
 
         public static async Task<(bool Ok, string Error, List<SupportTicket> Tickets, string[] Areas)> GetMyTickets()
         {
+            if (AppPaths.IsDemo) return (true, null, DemoData.SupportTickets(), DefaultAreas);
             var (ok, error, json) = await SessionService.ApiGet("/api/support/my-tickets");
             if (!ok) return (false, error, new(), DefaultAreas);
             var tickets = (json["tickets"] as JArray)?.Select(ParseTicket).ToList() ?? new();
@@ -72,6 +73,7 @@ namespace SmartCubeMobile.Services
 
         public static async Task<(bool Ok, string Error, SupportTicket Ticket, List<SupportMessage> Messages)> GetTicket(int id)
         {
+            if (AppPaths.IsDemo) return DemoData.SupportThread(id);
             var (ok, error, json) = await SessionService.ApiGet($"/api/support/my-tickets/{id}");
             if (!ok) return (false, error, null, new());
             var t = ParseTicket(json["ticket"]);

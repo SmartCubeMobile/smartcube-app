@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace SmartCubeMobile.Services
 {
@@ -13,7 +13,7 @@ namespace SmartCubeMobile.Services
         }
 
         private static readonly string FilePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SmartCube", "supplier_logins.json");
+            SmartCubeMobile.Services.AppPaths.Local, "SmartCube", "supplier_logins.json");
         private static Dictionary<string, SavedLogin> _cache;
 
         private static Dictionary<string, SavedLogin> Load()

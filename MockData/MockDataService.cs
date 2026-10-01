@@ -264,7 +264,7 @@ namespace SmartCubeMobile.MockData
         {
             get
             {
-                var dir = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SmartCube");
+                var dir = Path.Combine(SmartCubeMobile.Services.AppPaths.Local, "SmartCube");
                 Directory.CreateDirectory(dir);
                 return dir;
             }
@@ -507,6 +507,7 @@ namespace SmartCubeMobile.MockData
 
         public static List<MockChartPoint> GetNetWorthHistory()
         {
+            if (Services.AppPaths.IsDemo) return Services.DemoData.NetWorthHistory();
             return new List<MockChartPoint>();
         }
 

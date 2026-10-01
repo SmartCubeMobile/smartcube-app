@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using SmartCubeMobile.Dashboard;
 using SmartCubeMobile.MockData;
 using SmartCubeMobile.Services;
@@ -92,7 +92,9 @@ namespace SmartCubeMobile.Dashboard.Faces
                 TwoFactorBtn.IsEnabled = false;
                 return;
             }
-            var (ok, error, enabled, codesLeft) = await SessionService.GetTwoFactorStatus();
+            var (ok, error, enabled, codesLeft) = AppPaths.IsDemo
+                ? (true, (string)null, true, 8)   // demo mode has no server account
+                : await SessionService.GetTwoFactorStatus();
             if (!ok)
             {
                 TwoFactorLabel.Text = error;
@@ -874,6 +876,14 @@ namespace SmartCubeMobile.Dashboard.Faces
             LoadVehicles();
         }
 
+
+        // Demo tour: open / close the maintenance (MOT) view for the first vehicle.
+        public void OpenFirstVehicleMaintenance()
+        {
+            var v = UserProfileDataService.GetProfile().Vehicles.FirstOrDefault();
+            if (v != null) OnMaintenanceClicked(v);
+        }
+        public void CloseMaintenance() => OnCloseMaintenanceClicked(this, EventArgs.Empty);
 
         private void OnMaintenanceClicked(VehicleInfo vehicle)
         {

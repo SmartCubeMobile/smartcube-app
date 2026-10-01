@@ -1,4 +1,4 @@
-namespace SmartCubeMobile.Services
+﻿namespace SmartCubeMobile.Services
 {
     // Plain-text activity/error log for the Connect Supplier browser flow.
     // %LocalAppData%\SmartCube\logs\supplier.log
@@ -11,7 +11,7 @@ namespace SmartCubeMobile.Services
             get
             {
                 var dir = System.IO.Path.Combine(
-                    Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SmartCube", "logs");
+                    SmartCubeMobile.Services.AppPaths.Local, "SmartCube", "logs");
                 System.IO.Directory.CreateDirectory(dir);
                 return System.IO.Path.Combine(dir, "supplier.log");
             }

@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8" ?>
+﻿<?xml version="1.0" encoding="utf-8" ?>
 <ContentView xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="SmartCubeMobile.Dashboard.Faces.BankingFace"
@@ -20,7 +20,6 @@
                            VerticalOptions="Center"
                            ToolTipProperties.Text="Shows your most recent bank transactions across all connected accounts." />
                     <Picker Grid.Column="1" x:Name="CategoryPicker"
-                            Title="All categories"
                             WidthRequest="180"
                             FontSize="13"
                             TextColor="{StaticResource TextPrimary}"

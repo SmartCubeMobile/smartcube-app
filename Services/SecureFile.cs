@@ -1,4 +1,4 @@
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 using SmartCubeMobile.Services;
 
@@ -191,8 +191,8 @@ namespace SmartCubeMobile
         {
             int json = 0, bin = 0;
             var vault = KeyVault.IsUnlocked;
-            var local = Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData);
-            var jsonDirs = new[] { Path.Combine(local, "SmartCube"), FileSystem.AppDataDirectory };
+            var local = SmartCubeMobile.Services.AppPaths.Local;
+            var jsonDirs = new[] { Path.Combine(local, "SmartCube"), SmartCubeMobile.Services.AppPaths.AppData };
             foreach (var dir in jsonDirs.Where(Directory.Exists))
             {
                 foreach (var f in Directory.GetFiles(dir, "*.json"))
@@ -216,7 +216,7 @@ namespace SmartCubeMobile
                 }
             }
 
-            var binDirs = new[] { Path.Combine(local, "SmartCube", "Documents"), Path.Combine(FileSystem.AppDataDirectory, "SupplierDownloads") };
+            var binDirs = new[] { Path.Combine(local, "SmartCube", "Documents"), Path.Combine(SmartCubeMobile.Services.AppPaths.AppData, "SupplierDownloads") };
             foreach (var dir in binDirs.Where(Directory.Exists))
             {
                 foreach (var f in Directory.GetFiles(dir))

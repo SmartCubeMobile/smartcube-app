@@ -19,6 +19,12 @@ public partial class App : Application
             throw;
         }
 
+        // Demo mode (--demo): fill the separate demo folder with made-up data before anything reads it.
+        if (Services.AppPaths.IsDemo)
+        {
+            try { Services.DemoData.Seed(); } catch { }
+        }
+
         // Encrypt any local data still stored in plain form (older files, documents), and tidy up
         // decrypted copies left from viewing documents. Runs before any page reads the data.
         try
@@ -52,6 +58,17 @@ public partial class App : Application
         try
         {
 #if MOCK_DATA
+            if (Services.AppPaths.IsDemo)
+            {
+                // No sign-in: a made-up user and made-up data. "--tour" also saves a screenshot of each section.
+                Services.SessionService.StartDemoSession();
+                var dashboard = new SmartCubeDashboard();
+                var demoWindow = new Window(new NavigationPage(dashboard)) { Title = "SmartCube", X = 40, Y = 0, Width = 1440, Height = 810 };
+                if (Environment.GetCommandLineArgs().Any(a => a.Equals("--tour", StringComparison.OrdinalIgnoreCase)))
+                    _ = dashboard.RunDemoTour(@"D:\SmartCubeMobile\Website-Screenshots");
+                return demoWindow;
+            }
+
             var login = new LoginPage();
             var (width, height) = FitToScreen(SignInWidth, SignInHeight);
             return new Window(new NavigationPage(login))

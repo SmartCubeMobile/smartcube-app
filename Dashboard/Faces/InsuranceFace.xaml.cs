@@ -1,4 +1,4 @@
-using System.Globalization;
+﻿using System.Globalization;
 using SmartCubeMobile.MockData;
 using SmartCubeMobile.Services;
 
@@ -461,9 +461,9 @@ namespace SmartCubeMobile.Dashboard.Faces
 
             var infoLine = "";
             if (policy.CoverAmount > 0)
-                infoLine += $"Cover: {policy.CoverAmount:C0}";
+                infoLine += $"Cover: £{policy.CoverAmount:N0}";
             if (policy.Excess > 0)
-                infoLine += (infoLine.Length > 0 ? "  ·  " : "") + $"Excess: {policy.Excess:C0}";
+                infoLine += (infoLine.Length > 0 ? "  ·  " : "") + $"Excess: £{policy.Excess:N0}";
             if (!string.IsNullOrEmpty(infoLine))
             {
                 details.Add(new Label

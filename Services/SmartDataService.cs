@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SmartCubeMobile.MockData;
 
 namespace SmartCubeMobile.Services
@@ -21,15 +21,15 @@ namespace SmartCubeMobile.Services
         private static readonly List<BankConnection> _connections = new();
         private static string _lastError;
         private static readonly string _configPath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            SmartCubeMobile.Services.AppPaths.Local,
             "SmartCube", "connections.json");
 
         private static readonly string _transactionFilePath = @"D:\TransactionsCategories.txt";
         private static readonly string _accountsCachePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            SmartCubeMobile.Services.AppPaths.Local,
             "SmartCube", "accounts_cache.json");
         private static readonly string _transactionsCachePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            SmartCubeMobile.Services.AppPaths.Local,
             "SmartCube", "transactions_cache.json");
 
         public static bool HasLiveConnection => _trueLayerInstances.Values.Any(t => t.IsConnected) || _monzo.IsConnected;
@@ -43,7 +43,8 @@ namespace SmartCubeMobile.Services
         {
             _monzo.TokensRefreshed += () => UpdateSavedTokens("Monzo", _monzo.GetAccessToken(), _monzo.GetRefreshToken());
             LoadConnections();
-            try { TransactionDataLoader.LoadFromFile(_transactionFilePath); } catch { }
+            if (!AppPaths.IsDemo)
+                try { TransactionDataLoader.LoadFromFile(_transactionFilePath); } catch { }
         }
 
         public static void ResetInitialized() => _initialized = false;

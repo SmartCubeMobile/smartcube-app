@@ -1,4 +1,4 @@
-using MailKit;
+﻿using MailKit;
 using MailKit.Net.Imap;
 using MailKit.Search;
 using MimeKit;
@@ -51,7 +51,7 @@ namespace SmartCubeMobile.Services
         };
 
         private static string SettingsPath =>
-            Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "SmartCube", "email_settings.json");
+            Path.Combine(SmartCubeMobile.Services.AppPaths.Local, "SmartCube", "email_settings.json");
 
         public static EmailSettings LoadSettings()
         {

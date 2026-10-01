@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using SmartCubeMobile.MockData;
 
 namespace SmartCubeMobile.Services
@@ -16,9 +16,9 @@ namespace SmartCubeMobile.Services
 
     public static class CryptoStorageService
     {
-        private static readonly string _dataDir = FileSystem.AppDataDirectory;
-        private static readonly string _connectionsFile = Path.Combine(FileSystem.AppDataDirectory, "crypto_connections.json");
-        private static readonly string _cacheFile = Path.Combine(FileSystem.AppDataDirectory, "crypto_cache.json");
+        private static readonly string _dataDir = SmartCubeMobile.Services.AppPaths.AppData;
+        private static readonly string _connectionsFile = Path.Combine(SmartCubeMobile.Services.AppPaths.AppData, "crypto_connections.json");
+        private static readonly string _cacheFile = Path.Combine(SmartCubeMobile.Services.AppPaths.AppData, "crypto_cache.json");
 
         public static void SaveConnection(SavedConnection conn)
         {

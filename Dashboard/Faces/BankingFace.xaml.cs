@@ -442,6 +442,9 @@ namespace SmartCubeMobile.Dashboard.Faces
             ShowTransactions(selectedAccountName);
         }
 
+        public void OpenAnalysis() { if (!AnalysisPanel.IsVisible) OnAnalyseClicked(this, EventArgs.Empty); }
+        public void CloseAnalysis() { if (AnalysisPanel.IsVisible) OnAnalyseClicked(this, EventArgs.Empty); }
+
         private void OnAnalyseClicked(object sender, EventArgs e)
         {
             AnalysisPanel.IsVisible = !AnalysisPanel.IsVisible;

@@ -1,4 +1,4 @@
-using SmartCubeMobile.Dashboard.Faces;
+﻿using SmartCubeMobile.Dashboard.Faces;
 using SmartCubeMobile.Services;
 
 namespace SmartCubeMobile
@@ -75,8 +75,80 @@ namespace SmartCubeMobile
 
             SwitchFace(9);
             StartClock();
-            StartSupportWatch();
+            if (!AppPaths.IsDemo) StartSupportWatch();
             _ = SmartDataService.EnsureTokensFresh();
+        }
+
+        // Demo mode with --tour: shows each section in turn and saves a screenshot of it (made-up data only).
+        public async Task RunDemoTour(string outDir)
+        {
+            if (!AppPaths.IsDemo) return;
+            try
+            {
+                Directory.CreateDirectory(outDir);
+                await Task.Delay(7000);
+
+                async Task Shot(string name)
+                {
+                    var shot = await Screenshot.Default.CaptureAsync();
+                    if (shot == null) return;
+                    using var source = await shot.OpenReadAsync(ScreenshotFormat.Png);
+                    using var file = File.Create(Path.Combine(outDir, name + ".png"));
+                    await source.CopyToAsync(file);
+                }
+                async Task Go(int face, string name, int waitMs = 5000)
+                {
+                    while (isTransitioning) await Task.Delay(200);
+                    SwitchFace(face);
+                    await Task.Delay(waitMs);
+                    await Shot(name);
+                }
+
+                var chatOnly = Environment.GetCommandLineArgs().Any(a => a.Equals("--chatonly", StringComparison.OrdinalIgnoreCase));
+                if (chatOnly) goto Chat;
+
+                await Shot("10-profile");
+                await Go(0, "02-banking");
+                bankingFace.OpenAnalysis();
+                await Task.Delay(2500);
+                await Shot("03-banking-analysis");
+                bankingFace.CloseAnalysis();
+                await Go(1, "04-utility-bills");
+                await Go(2, "05-crypto-portfolio", 8000);
+                await Go(4, "06-investments");
+                await Go(5, "07-charts", 7000);
+                await Go(6, "08-subscriptions");
+                await Go(7, "09-insurance");
+
+                while (isTransitioning) await Task.Delay(200);
+                SwitchFace(9);
+                await Task.Delay(3000);
+                profileFace.OpenFirstVehicleMaintenance();
+                await Task.Delay(3000);
+                await Shot("11-mot-vehicle");
+                profileFace.CloseMaintenance();
+
+                await Go(8, "12-money-news", 9000);
+
+                pendingSupportTicket = DemoData.ChatTicketId;
+                await Go(10, "13-support");
+
+            Chat:
+                // Live chat is a web page inside the app; it is captured from outside (see chat-ready.txt).
+                if (!string.IsNullOrEmpty(DemoData.ChatUrl))
+                {
+                    await Navigation.PushAsync(new Dashboard.SupportChatPage(DemoData.ChatUrl, DemoData.ChatReference, DemoData.ChatSubject));
+                    await Task.Delay(4000);
+                    File.WriteAllText(Path.Combine(outDir, "chat-ready.txt"), "ready");
+                    await Task.Delay(25000);
+                    await Navigation.PopAsync();
+                }
+                File.WriteAllText(Path.Combine(outDir, "tour-done.txt"), DateTime.Now.ToString("s"));
+            }
+            catch (Exception ex)
+            {
+                try { File.WriteAllText(Path.Combine(outDir, "tour-done.txt"), "FAILED: " + ex); } catch { }
+            }
         }
 
         private async void SwitchFace(int index)

@@ -1,4 +1,4 @@
-using SmartCubeMobile.MockData;
+﻿using SmartCubeMobile.MockData;
 using SmartCubeMobile.Services;
 using System.Globalization;
 using System.Text.RegularExpressions;
@@ -500,7 +500,7 @@ namespace SmartCubeMobile.Dashboard
 
         private static string NewDownloadPath(string name)
         {
-            var dir = System.IO.Path.Combine(FileSystem.AppDataDirectory, "SupplierDownloads");
+            var dir = System.IO.Path.Combine(SmartCubeMobile.Services.AppPaths.AppData, "SupplierDownloads");
             System.IO.Directory.CreateDirectory(dir);
             foreach (var c in System.IO.Path.GetInvalidFileNameChars()) name = name.Replace(c, '_');
             if (!name.EndsWith(".pdf", StringComparison.OrdinalIgnoreCase)) name += ".pdf";

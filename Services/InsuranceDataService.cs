@@ -1,4 +1,4 @@
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 
 namespace SmartCubeMobile.Services
 {
@@ -28,7 +28,7 @@ namespace SmartCubeMobile.Services
     {
         private static readonly List<InsurancePolicy> _policies = new();
         private static readonly string _filePath = Path.Combine(
-            Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData),
+            SmartCubeMobile.Services.AppPaths.Local,
             "SmartCube", "insurance.json");
 
         static InsuranceDataService()
