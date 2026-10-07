@@ -1,4 +1,4 @@
-# SmartCube Mobile app: shared development
+﻿# SmartCube Mobile app: shared development
 
 Development of the app lives here (Dad). Production (Dan) pulls from this repo when he decides,
 tests, then releases an installer with `release.ps1`. Nothing is pushed back from production.
@@ -16,7 +16,7 @@ The full arrangement and the server setup are in the server repo's `README-DEVEL
 ## Pointing it at your dev server
 
 The app talks to the live server by default. On the sign-in screen click the **Server:** line at
-the bottom and enter your dev server's address (e.g. `https://localhost:5001`). Blank resets it to
+the bottom and enter your dev server's address (e.g. `http://localhost:5000`). Blank resets it to
 the live server. Your data stays in `%LocalAppData%\SmartCube` on your own PC.
 
 ## Keep out of git
