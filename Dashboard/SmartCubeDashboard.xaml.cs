@@ -47,6 +47,10 @@ namespace SmartCubeMobile
             UserLabel.Text = SessionService.DisplayName;
             UserInitials.Text = SessionService.InitialsFor(SessionService.DisplayName);
 
+            // Test accounts show a banner while their activity is being shared.
+            TestBanner.IsVisible = TestActivity.Active;
+            TestActivity.ActiveChanged += () => MainThread.BeginInvokeOnMainThread(() => TestBanner.IsVisible = TestActivity.Active);
+
             navButtons = new[] { NavBanking, NavUtility, NavCrypto, NavExchange, NavInvestments, NavCharts, NavSubscriptions, NavInsurance, NavNews, NavProfile, NavSupport };
             NavSupport.Clicked += (s, e) => SwitchFace(10);
 

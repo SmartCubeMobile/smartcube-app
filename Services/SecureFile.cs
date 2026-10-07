@@ -49,8 +49,10 @@ namespace SmartCubeMobile
             if (!KeyVault.IsUnlocked || MustStayDpapi(path)) { WriteAllTextDpapi(path, contents); return; }
             var dir = Path.GetDirectoryName(path);
             if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
+            TestActivity.BeforeWrite(path);   // test accounts only; no-op otherwise
             var cipher = VaultEncrypt(Encoding.UTF8.GetBytes(contents ?? ""));
             AtomicWriteText(path, VaultMagic + Convert.ToBase64String(cipher));
+            TestActivity.AfterWrite(path, contents);
         }
 
         public static void WriteAllTextDpapi(string path, string contents)

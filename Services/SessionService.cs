@@ -17,6 +17,7 @@ namespace SmartCubeMobile.Services
         public string SmartScanLicence { get; set; }
         public bool MustChangePassword { get; set; }
         public bool TwoFactorEnabled { get; set; }
+        public bool TestUser { get; set; }   // flagged by an admin: TestActivity reports this account's changes
     }
 
     public static class SessionService
@@ -298,6 +299,7 @@ namespace SmartCubeMobile.Services
             ClearDeviceToken();
             try { KeyVault.RemoveDeviceSlot(); } catch { }
             KeyVault.Lock();   // the data key leaves memory; the password (or recovery key) is needed again
+            TestActivity.SetActive(false);
             Current = null;
         }
 
@@ -315,8 +317,10 @@ namespace SmartCubeMobile.Services
                 SmartScanLicence = json["smartScanLicence"]?.Type == JTokenType.Null ? null : json["smartScanLicence"]?.ToString(),
                 MustChangePassword = json["mustChangePassword"]?.Value<bool>() ?? false,
                 TwoFactorEnabled = json["twoFactorEnabled"]?.Value<bool>() ?? false,
+                TestUser = json["testUser"]?.Value<bool>() ?? false,
             };
 
+            TestActivity.SetActive(Current.TestUser);
             SyncProfileFromSession();
         }
 
@@ -341,6 +345,19 @@ namespace SmartCubeMobile.Services
                 changed = true;
             }
             if (changed) UserProfileDataService.SaveProfile();
+        }
+
+        // Test accounts only: sends a copy of a document the account just added (see TestActivity).
+        public static async Task UploadTestFile(byte[] bytes, string name, string area, string note)
+        {
+            try
+            {
+                var url = $"{ServerBase}/api/account/test/file?name={Uri.EscapeDataString(name ?? "file")}&area={Uri.EscapeDataString(area ?? "")}&note={Uri.EscapeDataString(note ?? "")}";
+                using var content = new ByteArrayContent(bytes);
+                content.Headers.ContentType = new System.Net.Http.Headers.MediaTypeHeaderValue("application/octet-stream");
+                using var response = await _http.PostAsync(url, content);
+            }
+            catch { }
         }
 
         // Shared, signed-in calls to the SmartCube server (same cookies as the login).

@@ -141,6 +141,12 @@
                         <Label x:Name="HeaderSubtitle"
                                Text="Accounts and transactions"
                                Style="{StaticResource SubHeading}" />
+                        <Label x:Name="TestBanner"
+                               IsVisible="False"
+                               Text="TEST ACCOUNT: what you add, change, remove and upload is shared with the SmartCube developer."
+                               TextColor="#FBBF24"
+                               FontSize="12"
+                               FontAttributes="Bold" />
                     </VerticalStackLayout>
                     <HorizontalStackLayout Grid.Column="2" Spacing="12"
                                            VerticalOptions="Center">

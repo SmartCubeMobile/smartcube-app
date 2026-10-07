@@ -64,6 +64,7 @@ namespace SmartCubeMobile.Services
 
             _documents.Add(doc);
             Save();
+            TestActivity.DocumentAdded(sourceFilePath, doc);   // test accounts only; no-op otherwise
             return doc;
         }
 
