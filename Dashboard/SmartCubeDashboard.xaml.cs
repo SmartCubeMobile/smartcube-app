@@ -110,6 +110,19 @@ namespace SmartCubeMobile
 
                 var chatOnly = Environment.GetCommandLineArgs().Any(a => a.Equals("--chatonly", StringComparison.OrdinalIgnoreCase));
                 if (chatOnly) goto Chat;
+                if (Environment.GetCommandLineArgs().Any(a => a.Equals("--qronly", StringComparison.OrdinalIgnoreCase)))
+                {
+                    foreach (var (source, name) in new[] { ("Ledger", "15-wallet-qr"), ("Coinbase", "16-exchange-qr") })
+                    {
+                        await Navigation.PushAsync(new Dashboard.QrCodePage(source));
+                        await Task.Delay(3000);
+                        await Shot(name);
+                        await Navigation.PopAsync();
+                        await Task.Delay(1000);
+                    }
+                    File.WriteAllText(Path.Combine(outDir, "tour-done.txt"), DateTime.Now.ToString("s"));
+                    return;
+                }
 
                 await Shot("10-profile");
                 await Go(0, "02-banking");

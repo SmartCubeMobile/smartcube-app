@@ -57,6 +57,15 @@ namespace SmartCubeMobile.Services
             WriteNewtonsoft("insurance.json", BuildInsurance());
             WriteNewtonsoft("userprofile.json", BuildProfile());
 
+            // Made-up addresses and key, so the QR pages have something to show (demo mode never fetches them).
+            File.WriteAllText(Path.Combine(AppPaths.AppData, "crypto_connections.json"),
+                Newtonsoft.Json.JsonConvert.SerializeObject(new List<SavedConnection>
+                {
+                    new() { Type = "exchange", ExchangeName = "Coinbase", ApiKey = "organizations/demo-0000/apiKeys/demo-1111", Secret = "DEMO-SECRET-NOT-A-REAL-KEY-0000000000000000000000000000000000000000" },
+                    new() { Type = "wallet", Symbol = "BTC", Label = "Ledger", Address = "bc1q7k2f9xw0a4s8n3mve5tz6yq2hr4cdu8lpgj3wd" },
+                    new() { Type = "wallet", Symbol = "ETH", Label = "Ledger", Address = "0x4F2a81D6b3E09c1e5A7d2F8b6C4e0A9d3B7f9C1e" },
+                }, Newtonsoft.Json.Formatting.Indented));
+
             File.WriteAllText(Path.Combine(AppPaths.AppData, "crypto_cache.json"),
                 Newtonsoft.Json.JsonConvert.SerializeObject(BuildCrypto(), Newtonsoft.Json.Formatting.Indented));
         }

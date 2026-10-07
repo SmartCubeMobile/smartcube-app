@@ -60,7 +60,13 @@
 
                 <!-- Wallet Info -->
                 <Border Style="{StaticResource CardFrame}" Padding="16">
-                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="8">
+                    <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="8">
+                        <Button Grid.Row="3" Grid.Column="1" Text="Show QR code"
+                                BackgroundColor="#2E1065" TextColor="#C4B5FD"
+                                FontSize="12" FontAttributes="Bold" CornerRadius="8"
+                                HeightRequest="30" Padding="14,0" HorizontalOptions="Start"
+                                Clicked="OnShowQrClicked"
+                                ToolTipProperties.Text="Show a QR code of this wallet's address (or the exchange account's API key) to scan with a phone." />
                         <Label Grid.Row="0" Grid.Column="0" Text="Network" TextColor="{StaticResource TextMuted}" FontSize="11" />
                         <Label Grid.Row="0" Grid.Column="1" x:Name="NetworkLabel" TextColor="{StaticResource TextPrimary}" FontSize="12" />
                         <Label Grid.Row="1" Grid.Column="0" Text="Address" TextColor="{StaticResource TextMuted}" FontSize="11" />

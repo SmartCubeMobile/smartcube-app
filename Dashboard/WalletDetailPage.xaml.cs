@@ -434,6 +434,9 @@ namespace SmartCubeMobile.Dashboard
             }
         }
 
+        private async void OnShowQrClicked(object sender, EventArgs e) =>
+            await Navigation.PushAsync(new QrCodePage(_holding.WalletLabel ?? $"{_holding.Symbol} Wallet"));
+
         private async void OnBackClicked(object sender, EventArgs e)
         {
             await Navigation.PopAsync();

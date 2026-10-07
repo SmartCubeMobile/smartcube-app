@@ -50,7 +50,7 @@ namespace SmartCubeMobile.Dashboard.Faces
         private async Task RefreshFromSavedConnectionsAsync()
         {
             var connections = CryptoStorageService.LoadConnections();
-            if (connections.Count == 0)
+            if (connections.Count == 0 || AppPaths.IsDemo)   // demo addresses are made up: nothing to fetch
             {
                 _ = UpdateLivePricesAsync();
                 return;
@@ -380,7 +380,7 @@ namespace SmartCubeMobile.Dashboard.Faces
             catch { }
         }
 
-        private static string GetConnectionDisplayName(SavedConnection conn)
+        internal static string GetConnectionDisplayName(SavedConnection conn)
         {
             if (conn.Type == "exchange") return conn.Label ?? conn.ExchangeName;
             if (!string.IsNullOrEmpty(conn.Label)) return conn.Label;
@@ -565,11 +565,29 @@ namespace SmartCubeMobile.Dashboard.Faces
                 var capturedRemoveName = sourceName;
                 removeBtnLocal.Clicked += async (s, e) => await RemoveSourceAsync(capturedRemoveName);
 
+                var qrBtnLocal = new Button
+                {
+                    Text = "QR",
+                    TextColor = Color.FromArgb("#C4B5FD"),
+                    BackgroundColor = Color.FromArgb("#2E1065"),
+                    FontSize = 10,
+                    FontAttributes = FontAttributes.Bold,
+                    CornerRadius = 6,
+                    Padding = new Thickness(4, 0),
+                    HeightRequest = 26,
+                    WidthRequest = 32,
+                    VerticalOptions = LayoutOptions.Center,
+                };
+                ToolTipProperties.SetText(qrBtnLocal, "Show a QR code of this wallet's address (or this exchange account's API key) to scan with a phone.");
+                var capturedQrName = sourceName;
+                qrBtnLocal.Clicked += async (s, e) => await Navigation.PushAsync(new QrCodePage(capturedQrName));
+
                 var headerRow = new Grid
                 {
                     ColumnDefinitions = new ColumnDefinitionCollection
                     {
                         new ColumnDefinition(GridLength.Star),
+                        new ColumnDefinition(GridLength.Auto),
                         new ColumnDefinition(GridLength.Auto),
                         new ColumnDefinition(GridLength.Auto),
                     },
@@ -584,9 +602,11 @@ namespace SmartCubeMobile.Dashboard.Faces
                         new Label { Text = sourceName, TextColor = Color.FromArgb("#F1F5F9"), FontSize = 16, FontAttributes = FontAttributes.Bold, VerticalOptions = LayoutOptions.Center },
                     }
                 });
-                Grid.SetColumn(refreshBtnLocal, 1);
+                Grid.SetColumn(qrBtnLocal, 1);
+                headerRow.Children.Add(qrBtnLocal);
+                Grid.SetColumn(refreshBtnLocal, 2);
                 headerRow.Children.Add(refreshBtnLocal);
-                Grid.SetColumn(removeBtnLocal, 2);
+                Grid.SetColumn(removeBtnLocal, 3);
                 headerRow.Children.Add(removeBtnLocal);
 
                 var content = new VerticalStackLayout
@@ -1339,6 +1359,8 @@ namespace SmartCubeMobile.Dashboard.Faces
 
         private async Task RefreshSingleSourceAsync(string sourceName, Button refreshBtn)
         {
+            if (AppPaths.IsDemo) { await UpdateLivePricesAsync(); return; }   // demo addresses are made up
+
             refreshBtn.Text = "⟳";
             refreshBtn.IsEnabled = false;
             SetSourceLoading(sourceName, true);
